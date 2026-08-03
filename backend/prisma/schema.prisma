@@ -6,3 +6,139 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
+model User {
+  id        Int      @id @default(autoincrement())
+  firstName String
+  lastName  String
+  password  String
+  role      Role     @default(STUDENT)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  student   Student?
+  admin     Admin?
+}
+
+enum Role {
+  STUDENT
+  ADMIN
+}
+
+model Student {
+  id            Int            @id @default(autoincrement())
+  matricule     String         @unique
+  userId        Int            @unique
+  user          User           @relation(fields: [userId], references: [id])
+  subscriptions Subscription[]
+  qrToken       QRToken?
+  mealClaims    MealClaim[]
+}
+
+model Admin {
+  id     Int    @id @default(autoincrement())
+  email  String @unique
+  userId Int    @unique
+  user   User   @relation(fields: [userId], references: [id])
+}
+model Semester {
+  id            Int            @id @default(autoincrement())
+  name          String
+  startDate     DateTime
+  endDate       DateTime
+  isActive      Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+
+  subscriptions Subscription[]
+  menuSchedules MenuSchedule[]
+  mealClaims    MealClaim[]
+}
+model MealPlan {
+  id            Int            @id @default(autoincrement())
+  name          String
+  description   String?
+  credits       Int
+  pricePerCredit Decimal       @db.Decimal(10, 2) @default(100)
+  isActive      Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+
+  subscriptions Subscription[]
+}
+
+model MenuSchedule {
+  id          Int       @id @default(autoincrement())
+  semesterId  Int
+  dayOfWeek   DayOfWeek
+  mealName    String
+  description String?
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+
+  semester    Semester  @relation(fields: [semesterId], references: [id])
+}
+
+enum DayOfWeek {
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+}
+model Subscription {
+  id         Int      @id @default(autoincrement())
+  studentId  Int
+  mealPlanId Int
+  semesterId Int
+  credits    Int
+  createdAt  DateTime @default(now())
+
+  student    Student    @relation(fields: [studentId], references: [id])
+  mealPlan   MealPlan   @relation(fields: [mealPlanId], references: [id])
+  semester   Semester   @relation(fields: [semesterId], references: [id])
+  payments   Payment[]
+  qrTokens   QRToken[]
+}
+model Payment {
+  id             Int           @id @default(autoincrement())
+  subscriptionId Int
+  amount         Decimal       @db.Decimal(10, 2)
+  method         PayMethod
+  status         PayStatus     @default(PENDING)
+  reference      String?
+  createdAt      DateTime      @default(now())
+
+  subscription   Subscription  @relation(fields: [subscriptionId], references: [id])
+}
+
+enum PayMethod {
+  MTN_MOMO
+  ORANGE_MONEY
+}
+
+enum PayStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+model QRToken {
+  id             Int         @id @default(autoincrement())
+  studentId      Int         @unique
+  subscriptionId Int
+  token          String      @unique @default(uuid())
+  createdAt      DateTime    @default(now())
+
+  student        Student     @relation(fields: [studentId], references: [id])
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id])
+  mealClaims     MealClaim[]
+}
+model MealClaim {
+  id          Int       @id @default(autoincrement())
+  studentId   Int
+  qrTokenId   Int
+  semesterId  Int
+  claimDate   DateTime  @default(now())
+  menuItem    String
+
+  student     Student   @relation(fields: [studentId], references: [id])
+  qrToken     QRToken   @relation(fields: [qrTokenId], references: [id])
+  semester    Semester  @relation(fields: [semesterId], references: [id])
+}
