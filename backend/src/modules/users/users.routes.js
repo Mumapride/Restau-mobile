@@ -1,5 +1,5 @@
 const router = require('express').Router();
 
-// Developer A - qr token routes go here
+// Developer A - users routes go here
 
 module.exports = router;
