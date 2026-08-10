@@ -7,6 +7,8 @@ import {
   StyleSheet,
   ActivityIndicator,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
   ScrollView
 } from 'react-native';
 import { registerStudent } from '../../api/auth.api';
@@ -18,6 +20,8 @@ export default function RegisterScreen({ navigation }) {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleRegister = async () => {
     if (!firstName || !lastName || !matricule || !password || !confirmPassword) {
@@ -44,111 +48,227 @@ export default function RegisterScreen({ navigation }) {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Restau</Text>
-      <Text style={styles.subtitle}>Create Account</Text>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={styles.container}
+    >
+      <ScrollView contentContainerStyle={styles.scrollContent}>
 
-      <TextInput
-        style={styles.input}
-        placeholder="First Name"
-        value={firstName}
-        onChangeText={setFirstName}
-      />
+        {/* Logo and Title */}
+        <View style={styles.logoContainer}>
+          <View style={styles.logoCircle}>
+            <Text style={styles.logoIcon}>🍽️</Text>
+          </View>
+          <Text style={styles.appName}>QR Restaurant</Text>
+          <Text style={styles.appSubtitle}>Management System</Text>
+        </View>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Last Name"
-        value={lastName}
-        onChangeText={setLastName}
-      />
+        {/* Card */}
+        <View style={styles.card}>
+          <Text style={styles.welcomeText}>Create Account</Text>
+          <Text style={styles.subtitle}>Register to get started</Text>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Matricule"
-        value={matricule}
-        onChangeText={setMatricule}
-        autoCapitalize="characters"
-      />
+          <Text style={styles.label}>First Name</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter your first name"
+            placeholderTextColor="#aaa"
+            value={firstName}
+            onChangeText={setFirstName}
+          />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
+          <Text style={styles.label}>Last Name</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter your last name"
+            placeholderTextColor="#aaa"
+            value={lastName}
+            onChangeText={setLastName}
+          />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Confirm Password"
-        value={confirmPassword}
-        onChangeText={setConfirmPassword}
-        secureTextEntry
-      />
+          <Text style={styles.label}>Matricule</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter your matricule"
+            placeholderTextColor="#aaa"
+            value={matricule}
+            onChangeText={setMatricule}
+            autoCapitalize="characters"
+          />
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={handleRegister}
-        disabled={loading}
-      >
-        {loading ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text style={styles.buttonText}>Register</Text>
-        )}
-      </TouchableOpacity>
+          <Text style={styles.label}>Password</Text>
+          <View style={styles.passwordContainer}>
+            <TextInput
+              style={styles.passwordInput}
+              placeholder="Enter your password"
+              placeholderTextColor="#aaa"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry={!showPassword}
+            />
+            <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+              <Text style={styles.showText}>
+                {showPassword ? 'Hide' : 'Show'}
+              </Text>
+            </TouchableOpacity>
+          </View>
 
-      <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-        <Text style={styles.link}>Already have an account? Login</Text>
-      </TouchableOpacity>
-    </ScrollView>
+          <Text style={styles.label}>Confirm Password</Text>
+          <View style={styles.passwordContainer}>
+            <TextInput
+              style={styles.passwordInput}
+              placeholder="Confirm your password"
+              placeholderTextColor="#aaa"
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              secureTextEntry={!showConfirmPassword}
+            />
+            <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
+              <Text style={styles.showText}>
+                {showConfirmPassword ? 'Hide' : 'Show'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity
+            style={styles.button}
+            onPress={handleRegister}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.buttonText}>Register</Text>
+            )}
+          </TouchableOpacity>
+
+          <View style={styles.loginRow}>
+            <Text style={styles.loginText}>Already have an account? </Text>
+            <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+              <Text style={styles.loginLink}>Login</Text>
+            </TouchableOpacity>
+          </View>
+
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    paddingHorizontal: 30,
-    paddingVertical: 50,
-    backgroundColor: '#fff'
+    flex: 1,
+    backgroundColor: '#1B5E3A',
   },
-  title: {
-    fontSize: 36,
+  scrollContent: {
+    flexGrow: 1,
+    alignItems: 'center',
+    paddingVertical: 60,
+    paddingHorizontal: 20,
+  },
+  logoContainer: {
+    alignItems: 'center',
+    marginBottom: 30,
+  },
+  logoCircle: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  logoIcon: {
+    fontSize: 40,
+  },
+  appName: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  appSubtitle: {
+    fontSize: 13,
+    color: '#c8e6c9',
+  },
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 25,
+    width: '100%',
+  },
+  welcomeText: {
+    fontSize: 22,
     fontWeight: 'bold',
     color: '#1B5E3A',
-    textAlign: 'center',
-    marginBottom: 8
+    marginBottom: 4,
   },
   subtitle: {
-    fontSize: 18,
+    fontSize: 13,
+    color: '#888',
+    marginBottom: 25,
+  },
+  label: {
+    fontSize: 13,
     color: '#555',
-    textAlign: 'center',
-    marginBottom: 40
+    marginBottom: 6,
+    fontWeight: '600',
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 15,
+    borderColor: '#e0e0e0',
+    borderRadius: 10,
+    padding: 13,
     marginBottom: 15,
-    fontSize: 16
+    fontSize: 15,
+    color: '#333',
+    backgroundColor: '#fafafa',
+  },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    borderRadius: 10,
+    paddingHorizontal: 13,
+    marginBottom: 15,
+    backgroundColor: '#fafafa',
+  },
+  passwordInput: {
+    flex: 1,
+    paddingVertical: 13,
+    fontSize: 15,
+    color: '#333',
+  },
+  showText: {
+    color: '#1B5E3A',
+    fontWeight: '600',
+    fontSize: 13,
   },
   button: {
     backgroundColor: '#1B5E3A',
     padding: 15,
-    borderRadius: 8,
+    borderRadius: 10,
     alignItems: 'center',
-    marginBottom: 15
+    marginBottom: 20,
+    marginTop: 5,
   },
   buttonText: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
-  link: {
+  loginRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  loginText: {
+    color: '#888',
+    fontSize: 13,
+  },
+  loginLink: {
     color: '#1B5E3A',
-    textAlign: 'center',
-    fontSize: 14
-  }
+    fontWeight: 'bold',
+    fontSize: 13,
+  },
 });

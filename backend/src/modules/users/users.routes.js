@@ -1,5 +1,7 @@
 const router = require('express').Router();
+const { getMyProfile } = require('./users.controller');
+const { protect, requireRole } = require('../../middleware/auth.middleware');
 
-// Developer A - users routes go here
+router.get('/students/me', protect, requireRole('STUDENT'), getMyProfile);
 
 module.exports = router;
