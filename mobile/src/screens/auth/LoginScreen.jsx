@@ -1,22 +1,15 @@
 import React, { useState } from 'react';
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  ActivityIndicator,
-  Alert,
-  Image,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView
+  View, Text, TextInput, TouchableOpacity, StyleSheet,
+  ActivityIndicator, Alert, KeyboardAvoidingView, Platform, ScrollView
 } from 'react-native';
-import { loginStudent } from '../../api/auth.api';
+import { loginStudent, loginAdmin } from '../../api/auth.api';
 import useAuthStore from '../../store/authStore';
 
 export default function LoginScreen({ navigation }) {
+  const [isAdmin, setIsAdmin] = useState(false);
   const [matricule, setMatricule] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -24,19 +17,34 @@ export default function LoginScreen({ navigation }) {
   const { setAuth } = useAuthStore();
 
   const handleLogin = async () => {
-    if (!matricule || !password) {
-      Alert.alert('Error', 'Please fill in all fields');
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const result = await loginStudent(matricule, password);
-      setAuth(result.token, result.user);
-    } catch (error) {
-      Alert.alert('Login Failed', error.response?.data?.message || 'Something went wrong');
-    } finally {
-      setLoading(false);
+    if (isAdmin) {
+      if (!email || !password) {
+        Alert.alert('Error', 'Please fill in all fields');
+        return;
+      }
+      try {
+        setLoading(true);
+        const result = await loginAdmin(email, password);
+        setAuth(result.token, result.user);
+      } catch (error) {
+        Alert.alert('Login Failed', error.response?.data?.message || 'Something went wrong');
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      if (!matricule || !password) {
+        Alert.alert('Error', 'Please fill in all fields');
+        return;
+      }
+      try {
+        setLoading(true);
+        const result = await loginStudent(matricule, password);
+        setAuth(result.token, result.user);
+      } catch (error) {
+        Alert.alert('Login Failed', error.response?.data?.message || 'Something went wrong');
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -47,7 +55,7 @@ export default function LoginScreen({ navigation }) {
     >
       <ScrollView contentContainerStyle={styles.scrollContent}>
 
-        {/* Logo and Title */}
+        {/* Logo */}
         <View style={styles.logoContainer}>
           <View style={styles.logoCircle}>
             <Text style={styles.logoIcon}>🍽️</Text>
@@ -56,23 +64,62 @@ export default function LoginScreen({ navigation }) {
           <Text style={styles.appSubtitle}>Management System</Text>
         </View>
 
+        {/* Toggle Student / Admin */}
+        <View style={styles.toggleContainer}>
+          <TouchableOpacity
+            style={[styles.toggleButton, !isAdmin && styles.toggleActive]}
+            onPress={() => setIsAdmin(false)}
+          >
+            <Text style={[styles.toggleText, !isAdmin && styles.toggleTextActive]}>
+              Student
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.toggleButton, isAdmin && styles.toggleActive]}
+            onPress={() => setIsAdmin(true)}
+          >
+            <Text style={[styles.toggleText, isAdmin && styles.toggleTextActive]}>
+              Admin
+            </Text>
+          </TouchableOpacity>
+        </View>
+
         {/* Card */}
         <View style={styles.card}>
           <Text style={styles.welcomeText}>Welcome Back!</Text>
-          <Text style={styles.loginSubtitle}>Login to your account</Text>
+          <Text style={styles.loginSubtitle}>
+            {isAdmin ? 'Admin Login' : 'Student Login'}
+          </Text>
 
-          {/* Matricule Input */}
-          <Text style={styles.label}>Matricule</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter your matricule"
-            placeholderTextColor="#aaa"
-            value={matricule}
-            onChangeText={setMatricule}
-            autoCapitalize="characters"
-          />
+          {/* Matricule or Email */}
+          {isAdmin ? (
+            <>
+              <Text style={styles.label}>Email</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter your email"
+                placeholderTextColor="#aaa"
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+              />
+            </>
+          ) : (
+            <>
+              <Text style={styles.label}>Matricule</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter your matricule"
+                placeholderTextColor="#aaa"
+                value={matricule}
+                onChangeText={setMatricule}
+                autoCapitalize="characters"
+              />
+            </>
+          )}
 
-          {/* Password Input */}
+          {/* Password */}
           <Text style={styles.label}>Password</Text>
           <View style={styles.passwordContainer}>
             <TextInput
@@ -103,13 +150,15 @@ export default function LoginScreen({ navigation }) {
             )}
           </TouchableOpacity>
 
-          {/* Register Link */}
-          <View style={styles.registerRow}>
-            <Text style={styles.registerText}>Don't have an account? </Text>
-            <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-              <Text style={styles.registerLink}>Register</Text>
-            </TouchableOpacity>
-          </View>
+          {/* Register link only for students */}
+          {!isAdmin && (
+            <View style={styles.registerRow}>
+              <Text style={styles.registerText}>Don't have an account? </Text>
+              <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+                <Text style={styles.registerLink}>Register</Text>
+              </TouchableOpacity>
+            </View>
+          )}
 
         </View>
       </ScrollView>
@@ -130,7 +179,7 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     alignItems: 'center',
-    marginBottom: 30,
+    marginBottom: 20,
   },
   logoCircle: {
     width: 80,
@@ -152,6 +201,31 @@ const styles = StyleSheet.create({
   appSubtitle: {
     fontSize: 13,
     color: '#c8e6c9',
+  },
+  toggleContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#145c30',
+    borderRadius: 25,
+    padding: 4,
+    marginBottom: 20,
+    width: '80%',
+  },
+  toggleButton: {
+    flex: 1,
+    paddingVertical: 8,
+    borderRadius: 22,
+    alignItems: 'center',
+  },
+  toggleActive: {
+    backgroundColor: '#fff',
+  },
+  toggleText: {
+    color: '#c8e6c9',
+    fontWeight: '600',
+    fontSize: 14,
+  },
+  toggleTextActive: {
+    color: '#1B5E3A',
   },
   card: {
     backgroundColor: '#fff',
