@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
+  Switch,
   ActivityIndicator,
 } from "react-native";
 
@@ -17,6 +18,7 @@ const CreateMealPlanScreen = ({ navigation }) => {
   const [description, setDescription] = useState("");
   const [credits, setCredits] = useState("");
   const [pricePerCredit, setPricePerCredit] = useState("");
+  const [isActive, setIsActive] = useState(true);
   const [loading, setLoading] = useState(false);
 
   const handleCreate = async () => {
@@ -26,18 +28,12 @@ const CreateMealPlanScreen = ({ navigation }) => {
     }
 
     if (!credits || Number(credits) <= 0) {
-      Alert.alert("Error", "Credits must be greater than 0.");
+      Alert.alert("Error", "Please enter a valid number of credits.");
       return;
     }
 
-    if (
-      pricePerCredit === "" ||
-      Number(pricePerCredit) < 0
-    ) {
-      Alert.alert(
-        "Error",
-        "Price per credit cannot be negative."
-      );
+    if (!pricePerCredit || Number(pricePerCredit) < 0) {
+      Alert.alert("Error", "Please enter a valid price per credit.");
       return;
     }
 
@@ -49,6 +45,7 @@ const CreateMealPlanScreen = ({ navigation }) => {
         description: description.trim(),
         credits: Number(credits),
         pricePerCredit: Number(pricePerCredit),
+        isActive,
       };
 
       await createMealPlan(mealPlanData);
@@ -69,7 +66,6 @@ const CreateMealPlanScreen = ({ navigation }) => {
       Alert.alert(
         "Error",
         error.response?.data?.message ||
-          error.message ||
           "Unable to create meal plan."
       );
     } finally {
@@ -106,6 +102,7 @@ const CreateMealPlanScreen = ({ navigation }) => {
           value={description}
           onChangeText={setDescription}
           multiline
+          numberOfLines={4}
         />
 
         <Text style={styles.label}>Meal Credits</Text>
@@ -122,11 +119,26 @@ const CreateMealPlanScreen = ({ navigation }) => {
 
         <TextInput
           style={styles.input}
-          placeholder="e.g. 100"
+          placeholder="e.g. 1000"
           value={pricePerCredit}
           onChangeText={setPricePerCredit}
           keyboardType="decimal-pad"
         />
+
+        <View style={styles.switchRow}>
+          <View>
+            <Text style={styles.label}>Active Plan</Text>
+
+            <Text style={styles.switchDescription}>
+              Make this plan available to students
+            </Text>
+          </View>
+
+          <Switch
+            value={isActive}
+            onValueChange={setIsActive}
+          />
+        </View>
 
         <TouchableOpacity
           style={[
@@ -203,6 +215,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 15,
+    backgroundColor: "#FFFFFF",
   },
 
   textArea: {
@@ -210,12 +223,26 @@ const styles = StyleSheet.create({
     textAlignVertical: "top",
   },
 
+  switchRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 20,
+    marginBottom: 20,
+  },
+
+  switchDescription: {
+    color: "#6B7280",
+    fontSize: 12,
+    marginTop: 3,
+  },
+
   createButton: {
     backgroundColor: "#2563EB",
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: "center",
-    marginTop: 25,
+    marginTop: 15,
   },
 
   disabledButton: {

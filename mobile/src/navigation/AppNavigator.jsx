@@ -1,19 +1,23 @@
-import React, { useEffect } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import useAuthStore from '../store/authStore';
+import React, { useEffect } from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+
+import useAuthStore from "../store/authStore";
 
 // Auth screens
-import LoginScreen from '../screens/auth/LoginScreen';
-import RegisterScreen from '../screens/auth/RegisterScreen';
+import LoginScreen from "../screens/auth/LoginScreen";
+import RegisterScreen from "../screens/auth/RegisterScreen";
 
 // Student navigator
-import StudentNavigator from './StudentNavigator';
+import StudentNavigator from "./StudentNavigator";
+
+// Admin navigator
+import AdminNavigator from "./AdminNavigator";
 
 const Stack = createNativeStackNavigator();
 
 export default function AppNavigator() {
-  const { token, loadAuth } = useAuthStore();
+  const { token, user, loadAuth } = useAuthStore();
 
   useEffect(() => {
     loadAuth();
@@ -22,15 +26,28 @@ export default function AppNavigator() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {token ? (
-          // If logged in show student screens
-          <Stack.Screen name="Student" component={StudentNavigator} />
-        ) : (
-          // If not logged in show auth screens
+        {!token ? (
           <>
-            <Stack.Screen name="Login" component={LoginScreen} />
-            <Stack.Screen name="Register" component={RegisterScreen} />
+            <Stack.Screen
+              name="Login"
+              component={LoginScreen}
+            />
+
+            <Stack.Screen
+              name="Register"
+              component={RegisterScreen}
+            />
           </>
+        ) : user?.role === "ADMIN" ? (
+          <Stack.Screen
+            name="Admin"
+            component={AdminNavigator}
+          />
+        ) : (
+          <Stack.Screen
+            name="Student"
+            component={StudentNavigator}
+          />
         )}
       </Stack.Navigator>
     </NavigationContainer>

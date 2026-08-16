@@ -33,3 +33,12 @@ export const loginStudent = async (
 
   return response.data;
 };
+
+export const loginAdmin = async (email, password) => {
+  const response = await api.post("/auth/admin/login", {
+    email,
+    password,
+  });
+
+  return response.data;
+};

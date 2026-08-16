@@ -10,16 +10,28 @@ import {
   ActivityIndicator,
 } from "react-native";
 
-import { createMealPlan } from "../../api/mealPlans.api";
+import { updateMealPlan } from "../../api/mealPlans.api";
 
-const CreateMealPlanScreen = ({ navigation }) => {
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [credits, setCredits] = useState("");
-  const [pricePerCredit, setPricePerCredit] = useState("");
+const EditMealPlanScreen = ({ route, navigation }) => {
+  const { mealPlan } = route.params;
+
+  const [name, setName] = useState(mealPlan.name || "");
+
+  const [description, setDescription] = useState(
+    mealPlan.description || ""
+  );
+
+  const [credits, setCredits] = useState(
+    String(mealPlan.credits ?? "")
+  );
+
+  const [pricePerCredit, setPricePerCredit] = useState(
+    String(mealPlan.pricePerCredit ?? "")
+  );
+
   const [loading, setLoading] = useState(false);
 
-  const handleCreate = async () => {
+  const handleUpdate = async () => {
     if (!name.trim()) {
       Alert.alert("Error", "Please enter a meal plan name.");
       return;
@@ -44,18 +56,21 @@ const CreateMealPlanScreen = ({ navigation }) => {
     try {
       setLoading(true);
 
-      const mealPlanData = {
+      const updatedData = {
         name: name.trim(),
         description: description.trim(),
         credits: Number(credits),
         pricePerCredit: Number(pricePerCredit),
       };
 
-      await createMealPlan(mealPlanData);
+      await updateMealPlan(
+        mealPlan.id,
+        updatedData
+      );
 
       Alert.alert(
         "Success",
-        "Meal plan created successfully.",
+        "Meal plan updated successfully.",
         [
           {
             text: "OK",
@@ -64,13 +79,13 @@ const CreateMealPlanScreen = ({ navigation }) => {
         ]
       );
     } catch (error) {
-      console.error("Create meal plan error:", error);
+      console.error("Update meal plan error:", error);
 
       Alert.alert(
         "Error",
         error.response?.data?.message ||
           error.message ||
-          "Unable to create meal plan."
+          "Unable to update meal plan."
       );
     } finally {
       setLoading(false);
@@ -82,10 +97,10 @@ const CreateMealPlanScreen = ({ navigation }) => {
       style={styles.container}
       contentContainerStyle={styles.content}
     >
-      <Text style={styles.title}>Create Meal Plan</Text>
+      <Text style={styles.title}>Edit Meal Plan</Text>
 
       <Text style={styles.subtitle}>
-        Add a new meal plan for students
+        Update the meal plan information
       </Text>
 
       <View style={styles.form}>
@@ -93,18 +108,18 @@ const CreateMealPlanScreen = ({ navigation }) => {
 
         <TextInput
           style={styles.input}
-          placeholder="e.g. One Week Plan"
           value={name}
           onChangeText={setName}
+          placeholder="Meal plan name"
         />
 
         <Text style={styles.label}>Description</Text>
 
         <TextInput
           style={[styles.input, styles.textArea]}
-          placeholder="Describe this meal plan"
           value={description}
           onChangeText={setDescription}
+          placeholder="Meal plan description"
           multiline
         />
 
@@ -112,35 +127,35 @@ const CreateMealPlanScreen = ({ navigation }) => {
 
         <TextInput
           style={styles.input}
-          placeholder="e.g. 5"
           value={credits}
           onChangeText={setCredits}
           keyboardType="numeric"
+          placeholder="Number of credits"
         />
 
         <Text style={styles.label}>Price Per Credit</Text>
 
         <TextInput
           style={styles.input}
-          placeholder="e.g. 100"
           value={pricePerCredit}
           onChangeText={setPricePerCredit}
           keyboardType="decimal-pad"
+          placeholder="Price per credit"
         />
 
         <TouchableOpacity
           style={[
-            styles.createButton,
+            styles.updateButton,
             loading && styles.disabledButton,
           ]}
-          onPress={handleCreate}
+          onPress={handleUpdate}
           disabled={loading}
         >
           {loading ? (
             <ActivityIndicator color="#FFFFFF" />
           ) : (
             <Text style={styles.buttonText}>
-              Create Meal Plan
+              Save Changes
             </Text>
           )}
         </TouchableOpacity>
@@ -210,7 +225,7 @@ const styles = StyleSheet.create({
     textAlignVertical: "top",
   },
 
-  createButton: {
+  updateButton: {
     backgroundColor: "#2563EB",
     paddingVertical: 14,
     borderRadius: 8,
@@ -240,4 +255,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CreateMealPlanScreen;
+export default EditMealPlanScreen;
