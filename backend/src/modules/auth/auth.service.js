@@ -2,7 +2,7 @@ const prisma = require('../../config/db');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-const registerStudent = async (firstName, lastName, matricule, password) => {
+const registerStudent = async (firstName, lastName, matricule, email, password) => {
   // Step 1: Check if matricule already exists
   const existing = await prisma.student.findUnique({
     where: { matricule: matricule.toUpperCase() }
@@ -12,10 +12,19 @@ const registerStudent = async (firstName, lastName, matricule, password) => {
     throw new Error('Matricule already registered');
   }
 
-  // Step 2: Hash the password
+  // Step 2: Check if email already exists
+  const existingEmail = await prisma.student.findUnique({
+    where: { email: email.toLowerCase() }
+  });
+
+  if (existingEmail) {
+    throw new Error('Email already registered');
+  }
+
+  // Step 3: Hash the password
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  // Step 3: Create User and Student together
+  // Step 4: Create User and Student together
   const user = await prisma.user.create({
     data: {
       firstName,
@@ -24,7 +33,8 @@ const registerStudent = async (firstName, lastName, matricule, password) => {
       role: 'STUDENT',
       student: {
         create: {
-          matricule: matricule.toUpperCase()
+          matricule: matricule.toUpperCase(),
+          email: email.toLowerCase()
         }
       }
     },
@@ -38,6 +48,7 @@ const registerStudent = async (firstName, lastName, matricule, password) => {
       firstName: user.firstName,
       lastName: user.lastName,
       matricule: user.student.matricule,
+      email: user.student.email,
       role: user.role
     }
   };
