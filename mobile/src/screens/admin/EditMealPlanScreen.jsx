@@ -12,33 +12,44 @@ import {
 
 import { updateMealPlan } from "../../api/mealPlans.api";
 
-const EditMealPlanScreen = ({ route, navigation }) => {
+const EditMealPlanScreen = ({
+  route,
+  navigation,
+}) => {
   const { mealPlan } = route.params;
 
-  const [name, setName] = useState(mealPlan.name || "");
-
-  const [description, setDescription] = useState(
-    mealPlan.description || ""
+  const [name, setName] = useState(
+    mealPlan.name || ""
   );
+
+  const [description, setDescription] =
+    useState(mealPlan.description || "");
 
   const [credits, setCredits] = useState(
     String(mealPlan.credits ?? "")
   );
 
-  const [pricePerCredit, setPricePerCredit] = useState(
-    String(mealPlan.pricePerCredit ?? "")
-  );
+  const [pricePerCredit, setPricePerCredit] =
+    useState(
+      String(mealPlan.pricePerCredit ?? "")
+    );
 
   const [loading, setLoading] = useState(false);
 
   const handleUpdate = async () => {
     if (!name.trim()) {
-      Alert.alert("Error", "Please enter a meal plan name.");
+      Alert.alert(
+        "Error",
+        "Please enter a meal plan name."
+      );
       return;
     }
 
     if (!credits || Number(credits) <= 0) {
-      Alert.alert("Error", "Credits must be greater than 0.");
+      Alert.alert(
+        "Error",
+        "Credits must be greater than 0."
+      );
       return;
     }
 
@@ -79,7 +90,10 @@ const EditMealPlanScreen = ({ route, navigation }) => {
         ]
       );
     } catch (error) {
-      console.error("Update meal plan error:", error);
+      console.error(
+        "Update meal plan error:",
+        error
+      );
 
       Alert.alert(
         "Error",
@@ -96,34 +110,66 @@ const EditMealPlanScreen = ({ route, navigation }) => {
     <ScrollView
       style={styles.container}
       contentContainerStyle={styles.content}
+      keyboardShouldPersistTaps="handled"
     >
-      <Text style={styles.title}>Edit Meal Plan</Text>
+      {/* Header */}
 
-      <Text style={styles.subtitle}>
-        Update the meal plan information
-      </Text>
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => navigation.goBack()}
+        disabled={loading}
+      >
+        <Text style={styles.backText}>
+          ← Back
+        </Text>
+      </TouchableOpacity>
+
+      <View style={styles.header}>
+        <Text style={styles.title}>
+          Edit Meal Plan
+        </Text>
+
+        <Text style={styles.subtitle}>
+          Update the meal plan information
+        </Text>
+      </View>
+
+      {/* Form */}
 
       <View style={styles.form}>
-        <Text style={styles.label}>Plan Name</Text>
+        <Text style={styles.sectionTitle}>
+          Plan Information
+        </Text>
+
+        <Text style={styles.label}>
+          Plan Name
+        </Text>
 
         <TextInput
           style={styles.input}
           value={name}
           onChangeText={setName}
           placeholder="Meal plan name"
+          placeholderTextColor="#9CA3AF"
         />
 
-        <Text style={styles.label}>Description</Text>
+        <Text style={styles.label}>
+          Description
+        </Text>
 
         <TextInput
           style={[styles.input, styles.textArea]}
           value={description}
           onChangeText={setDescription}
           placeholder="Meal plan description"
+          placeholderTextColor="#9CA3AF"
           multiline
+          numberOfLines={4}
         />
 
-        <Text style={styles.label}>Meal Credits</Text>
+        <Text style={styles.label}>
+          Meal Credits
+        </Text>
 
         <TextInput
           style={styles.input}
@@ -131,17 +177,37 @@ const EditMealPlanScreen = ({ route, navigation }) => {
           onChangeText={setCredits}
           keyboardType="numeric"
           placeholder="Number of credits"
+          placeholderTextColor="#9CA3AF"
         />
 
-        <Text style={styles.label}>Price Per Credit</Text>
+        <Text style={styles.helperText}>
+          Number of meals included in this plan
+        </Text>
 
-        <TextInput
-          style={styles.input}
-          value={pricePerCredit}
-          onChangeText={setPricePerCredit}
-          keyboardType="decimal-pad"
-          placeholder="Price per credit"
-        />
+        <Text style={styles.label}>
+          Price Per Credit
+        </Text>
+
+        <View style={styles.priceInputContainer}>
+          <Text style={styles.currencyText}>
+            FCFA
+          </Text>
+
+          <TextInput
+            style={styles.priceInput}
+            value={pricePerCredit}
+            onChangeText={setPricePerCredit}
+            keyboardType="decimal-pad"
+            placeholder="Price per credit"
+            placeholderTextColor="#9CA3AF"
+          />
+        </View>
+
+        <Text style={styles.helperText}>
+          Amount charged for each meal credit
+        </Text>
+
+        {/* Save */}
 
         <TouchableOpacity
           style={[
@@ -159,6 +225,8 @@ const EditMealPlanScreen = ({ route, navigation }) => {
             </Text>
           )}
         </TouchableOpacity>
+
+        {/* Cancel */}
 
         <TouchableOpacity
           style={styles.cancelButton}
@@ -182,7 +250,21 @@ const styles = StyleSheet.create({
 
   content: {
     padding: 20,
-    paddingBottom: 40,
+    paddingBottom: 45,
+  },
+
+  backButton: {
+    marginBottom: 18,
+  },
+
+  backText: {
+    color: "#1B5E3A",
+    fontSize: 15,
+    fontWeight: "700",
+  },
+
+  header: {
+    marginBottom: 22,
   },
 
   title: {
@@ -193,42 +275,82 @@ const styles = StyleSheet.create({
 
   subtitle: {
     marginTop: 5,
-    marginBottom: 25,
     color: "#6B7280",
+    fontSize: 14,
   },
 
   form: {
     backgroundColor: "#FFFFFF",
     padding: 20,
-    borderRadius: 12,
+    borderRadius: 14,
+    elevation: 2,
+  },
+
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#1B5E3A",
+    marginBottom: 5,
   },
 
   label: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: "600",
     color: "#374151",
     marginBottom: 8,
-    marginTop: 15,
+    marginTop: 19,
   },
 
   input: {
     borderWidth: 1,
     borderColor: "#D1D5DB",
-    borderRadius: 8,
+    borderRadius: 9,
     paddingHorizontal: 14,
-    paddingVertical: 12,
+    paddingVertical: 13,
     fontSize: 15,
+    color: "#1F2937",
+    backgroundColor: "#FFFFFF",
   },
 
   textArea: {
-    minHeight: 100,
+    minHeight: 105,
     textAlignVertical: "top",
   },
 
+  helperText: {
+    marginTop: 5,
+    color: "#9CA3AF",
+    fontSize: 12,
+  },
+
+  priceInputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#D1D5DB",
+    borderRadius: 9,
+    backgroundColor: "#FFFFFF",
+  },
+
+  currencyText: {
+    paddingLeft: 14,
+    color: "#1B5E3A",
+    fontWeight: "700",
+    fontSize: 13,
+  },
+
+  priceInput: {
+    flex: 1,
+    paddingHorizontal: 10,
+    paddingVertical: 13,
+    fontSize: 15,
+    color: "#1F2937",
+  },
+
   updateButton: {
-    backgroundColor: "#2563EB",
-    paddingVertical: 14,
-    borderRadius: 8,
+    backgroundColor: "#1B5E3A",
+    paddingVertical: 15,
+    borderRadius: 9,
     alignItems: "center",
     marginTop: 25,
   },
@@ -246,12 +368,13 @@ const styles = StyleSheet.create({
   cancelButton: {
     paddingVertical: 14,
     alignItems: "center",
-    marginTop: 10,
+    marginTop: 8,
   },
 
   cancelText: {
     color: "#6B7280",
     fontWeight: "600",
+    fontSize: 14,
   },
 });
 
