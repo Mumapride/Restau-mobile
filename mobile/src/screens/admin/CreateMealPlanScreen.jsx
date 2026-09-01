@@ -86,19 +86,57 @@ const CreateMealPlanScreen = ({ navigation }) => {
 
       <View style={styles.form}>
         <Text style={styles.label}>Plan Name</Text>
+      keyboardShouldPersistTaps="handled"
+      </View>
+      {/* Header */}
+
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => navigation.goBack()}
+        disabled={loading}
+      >
+        <Text style={styles.backText}>
+          ← Back
+        </Text>
+      </TouchableOpacity>
+
+      <View style={styles.header}>
+        <Text style={styles.title}>
+          Create Meal Plan
+        </Text>
+
+        <Text style={styles.subtitle}>
+          Add a new meal plan for students
+        </Text>
+      </View>
+
+      {/* Form */}
+
+      <View style={styles.form}>
+        <Text style={styles.sectionTitle}>
+          Plan Information
+        </Text>
+
+        <Text style={styles.label}>
+          Plan Name
+        </Text>
 
         <TextInput
           style={styles.input}
           placeholder="e.g. One Week Plan"
+          placeholderTextColor="#9CA3AF"
           value={name}
           onChangeText={setName}
         />
 
-        <Text style={styles.label}>Description</Text>
+        <Text style={styles.label}>
+          Description
+        </Text>
 
         <TextInput
           style={[styles.input, styles.textArea]}
           placeholder="Describe this meal plan"
+          placeholderTextColor="#9CA3AF"
           value={description}
           onChangeText={setDescription}
           multiline
@@ -110,24 +148,46 @@ const CreateMealPlanScreen = ({ navigation }) => {
         <TextInput
           style={styles.input}
           placeholder="e.g. 5"
+          placeholderTextColor="#9CA3AF"
           value={credits}
           onChangeText={setCredits}
           keyboardType="numeric"
         />
 
-        <Text style={styles.label}>Price Per Credit</Text>
+        <Text style={styles.helperText}>
+          Number of meals included in this plan
+        </Text>
 
-        <TextInput
-          style={styles.input}
-          placeholder="e.g. 1000"
-          value={pricePerCredit}
-          onChangeText={setPricePerCredit}
-          keyboardType="decimal-pad"
-        />
+        <Text style={styles.label}>
+          Price Per Credit
+        </Text>
 
-        <View style={styles.switchRow}>
-          <View>
-            <Text style={styles.label}>Active Plan</Text>
+        <View style={styles.priceInputContainer}>
+          <Text style={styles.currencyText}>
+            FCFA
+          </Text>
+
+          <TextInput
+            style={styles.priceInput}
+            placeholder="e.g. 1000"
+            placeholderTextColor="#9CA3AF"
+            value={pricePerCredit}
+            onChangeText={setPricePerCredit}
+            keyboardType="decimal-pad"
+          />
+        </View>
+
+        <Text style={styles.helperText}>
+          Amount charged for each meal credit
+        </Text>
+
+        {/* Active Plan */}
+
+        <View style={styles.switchCard}>
+          <View style={styles.switchTextContainer}>
+            <Text style={styles.switchTitle}>
+              Active Plan
+            </Text>
 
             <Text style={styles.switchDescription}>
               Make this plan available to students
@@ -137,8 +197,17 @@ const CreateMealPlanScreen = ({ navigation }) => {
           <Switch
             value={isActive}
             onValueChange={setIsActive}
+            trackColor={{
+              false: "#D1D5DB",
+              true: "#A8C7B3",
+            }}
+            thumbColor={
+              isActive ? "#1B5E3A" : "#F4F4F5"
+            }
           />
         </View>
+
+        {/* Create */}
 
         <TouchableOpacity
           style={[
@@ -156,6 +225,8 @@ const CreateMealPlanScreen = ({ navigation }) => {
             </Text>
           )}
         </TouchableOpacity>
+
+        {/* Cancel */}
 
         <TouchableOpacity
           style={styles.cancelButton}
@@ -179,7 +250,21 @@ const styles = StyleSheet.create({
 
   content: {
     padding: 20,
-    paddingBottom: 40,
+    paddingBottom: 45,
+  },
+
+  backButton: {
+    marginBottom: 18,
+  },
+
+  backText: {
+    color: "#1B5E3A",
+    fontSize: 15,
+    fontWeight: "700",
+  },
+
+  header: {
+    marginBottom: 22,
   },
 
   title: {
@@ -190,59 +275,112 @@ const styles = StyleSheet.create({
 
   subtitle: {
     marginTop: 5,
-    marginBottom: 25,
     color: "#6B7280",
+    fontSize: 14,
   },
 
   form: {
     backgroundColor: "#FFFFFF",
     padding: 20,
-    borderRadius: 12,
+    borderRadius: 14,
+    elevation: 2,
+  },
+
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#1B5E3A",
+    marginBottom: 5,
   },
 
   label: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: "600",
     color: "#374151",
     marginBottom: 8,
-    marginTop: 15,
+    marginTop: 19,
   },
 
   input: {
     borderWidth: 1,
     borderColor: "#D1D5DB",
-    borderRadius: 8,
+    borderRadius: 9,
     paddingHorizontal: 14,
-    paddingVertical: 12,
+    paddingVertical: 13,
     fontSize: 15,
+    color: "#1F2937",
     backgroundColor: "#FFFFFF",
   },
 
   textArea: {
-    minHeight: 100,
+    minHeight: 105,
     textAlignVertical: "top",
   },
 
-  switchRow: {
+  helperText: {
+    marginTop: 5,
+    color: "#9CA3AF",
+    fontSize: 12,
+  },
+
+  priceInputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#D1D5DB",
+    borderRadius: 9,
+    backgroundColor: "#FFFFFF",
+  },
+
+  currencyText: {
+    paddingLeft: 14,
+    color: "#1B5E3A",
+    fontWeight: "700",
+    fontSize: 13,
+  },
+
+  priceInput: {
+    flex: 1,
+    paddingHorizontal: 10,
+    paddingVertical: 13,
+    fontSize: 15,
+    color: "#1F2937",
+  },
+
+  switchCard: {
+    marginTop: 25,
+    padding: 15,
+    borderRadius: 10,
+    backgroundColor: "#F8FAF9",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginTop: 20,
-    marginBottom: 20,
+  },
+
+  switchTextContainer: {
+    flex: 1,
+    paddingRight: 10,
+  },
+
+  switchTitle: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: "#1F2937",
   },
 
   switchDescription: {
+    marginTop: 4,
     color: "#6B7280",
     fontSize: 12,
-    marginTop: 3,
+    lineHeight: 17,
   },
 
   createButton: {
-    backgroundColor: "#2563EB",
-    paddingVertical: 14,
-    borderRadius: 8,
+    backgroundColor: "#1B5E3A",
+    paddingVertical: 15,
+    borderRadius: 9,
     alignItems: "center",
-    marginTop: 15,
+    marginTop: 25,
   },
 
   disabledButton: {
@@ -258,12 +396,13 @@ const styles = StyleSheet.create({
   cancelButton: {
     paddingVertical: 14,
     alignItems: "center",
-    marginTop: 10,
+    marginTop: 8,
   },
 
   cancelText: {
     color: "#6B7280",
     fontWeight: "600",
+    fontSize: 14,
   },
 });
 
