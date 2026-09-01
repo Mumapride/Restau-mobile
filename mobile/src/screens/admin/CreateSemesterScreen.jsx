@@ -1,3 +1,4 @@
+```jsx
 import React, { useState } from "react";
 import {
   View,
@@ -8,6 +9,7 @@ import {
   Alert,
   ActivityIndicator,
   ScrollView,
+  StatusBar,
 } from "react-native";
 
 import { createSemester } from "../../api/semester.api";
@@ -74,219 +76,407 @@ const CreateSemesterScreen = ({ navigation }) => {
   };
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.content}
-      showsVerticalScrollIndicator={false}
-    >
-      {/* Header */}
+    <View style={styles.screen}>
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor="#087F4E"
+      />
 
+      {/* Green Header */}
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
-        >
-          <Text style={styles.backText}>← Back</Text>
-        </TouchableOpacity>
-
-        <Text style={styles.title}>Create Semester</Text>
-
-        <Text style={styles.subtitle}>
-          Add a new academic semester
-        </Text>
-      </View>
-
-      {/* Form Card */}
-
-      <View style={styles.formCard}>
-        <Text style={styles.formTitle}>
-          Semester Information
-        </Text>
-
-        {/* Semester Name */}
-
-        <Text style={styles.label}>Semester Name</Text>
-
-        <TextInput
-          style={styles.input}
-          placeholder="e.g. 2026/2027 First Semester"
-          placeholderTextColor="#9CA3AF"
-          value={name}
-          onChangeText={setName}
-        />
-
-        {/* Start Date */}
-
-        <Text style={styles.label}>Start Date</Text>
-
-        <TextInput
-          style={styles.input}
-          placeholder="YYYY-MM-DD"
-          placeholderTextColor="#9CA3AF"
-          value={startDate}
-          onChangeText={setStartDate}
-          keyboardType="numbers-and-punctuation"
-        />
-
-        <Text style={styles.dateHint}>
-          Example: 2026-09-01
-        </Text>
-
-        {/* End Date */}
-
-        <Text style={styles.label}>End Date</Text>
-
-        <TextInput
-          style={styles.input}
-          placeholder="YYYY-MM-DD"
-          placeholderTextColor="#9CA3AF"
-          value={endDate}
-          onChangeText={setEndDate}
-          keyboardType="numbers-and-punctuation"
-        />
-
-        <Text style={styles.dateHint}>
-          Example: 2026-12-20
-        </Text>
-
-        {/* Create Button */}
-
-        <TouchableOpacity
-          style={[
-            styles.primaryButton,
-            loading && styles.disabledButton,
-          ]}
-          onPress={handleCreate}
           disabled={loading}
         >
-          {loading ? (
-            <ActivityIndicator color="#FFFFFF" />
-          ) : (
-            <Text style={styles.primaryButtonText}>
-              Create Semester
+          <Text style={styles.backIcon}>‹</Text>
+        </TouchableOpacity>
+
+        <View style={styles.headerTextContainer}>
+          <Text style={styles.headerTitle}>
+            Create Semester
+          </Text>
+
+          <Text style={styles.headerSubtitle}>
+            Academic semester management
+          </Text>
+        </View>
+      </View>
+
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
+        {/* Page Introduction */}
+        <View style={styles.intro}>
+          <Text style={styles.pageTitle}>
+            Create Semester
+          </Text>
+
+          <Text style={styles.pageSubtitle}>
+            Add a new academic semester
+          </Text>
+        </View>
+
+        {/* Form Card */}
+        <View style={styles.formCard}>
+          <Text style={styles.formTitle}>
+            Semester Information
+          </Text>
+
+          <Text style={styles.formDescription}>
+            Enter the semester details below.
+          </Text>
+
+          {/* Semester Name */}
+          <View style={styles.field}>
+            <View style={styles.labelRow}>
+              <View style={styles.iconBox}>
+                <Text style={styles.iconText}>▣</Text>
+              </View>
+
+              <Text style={styles.label}>
+                Semester Name
+              </Text>
+            </View>
+
+            <TextInput
+              style={styles.input}
+              placeholder="e.g. 2026/2027 First Semester"
+              placeholderTextColor="#9AAFA5"
+              value={name}
+              onChangeText={setName}
+              editable={!loading}
+            />
+          </View>
+
+          {/* Start Date */}
+          <View style={styles.field}>
+            <View style={styles.labelRow}>
+              <View style={styles.iconBox}>
+                <Text style={styles.iconText}>◷</Text>
+              </View>
+
+              <Text style={styles.label}>
+                Start Date
+              </Text>
+            </View>
+
+            <TextInput
+              style={styles.input}
+              placeholder="YYYY-MM-DD"
+              placeholderTextColor="#9AAFA5"
+              value={startDate}
+              onChangeText={setStartDate}
+              keyboardType="numbers-and-punctuation"
+              editable={!loading}
+            />
+
+            <Text style={styles.hint}>
+              Example: 2026-09-01
             </Text>
-          )}
-        </TouchableOpacity>
+          </View>
 
-        {/* Cancel */}
+          {/* End Date */}
+          <View style={styles.field}>
+            <View style={styles.labelRow}>
+              <View style={styles.iconBox}>
+                <Text style={styles.iconText}>◷</Text>
+              </View>
 
-        <TouchableOpacity
-          style={styles.cancelButton}
-          onPress={() => navigation.goBack()}
-          disabled={loading}
-        >
-          <Text style={styles.cancelText}>Cancel</Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+              <Text style={styles.label}>
+                End Date
+              </Text>
+            </View>
+
+            <TextInput
+              style={styles.input}
+              placeholder="YYYY-MM-DD"
+              placeholderTextColor="#9AAFA5"
+              value={endDate}
+              onChangeText={setEndDate}
+              keyboardType="numbers-and-punctuation"
+              editable={!loading}
+            />
+
+            <Text style={styles.hint}>
+              Example: 2026-12-20
+            </Text>
+          </View>
+
+          {/* Create Button */}
+          <TouchableOpacity
+            style={[
+              styles.primaryButton,
+              loading && styles.disabledButton,
+            ]}
+            onPress={handleCreate}
+            disabled={loading}
+            activeOpacity={0.85}
+          >
+            {loading ? (
+              <ActivityIndicator color="#FFFFFF" />
+            ) : (
+              <>
+                <Text style={styles.plusIcon}>+</Text>
+
+                <Text style={styles.primaryButtonText}>
+                  Create Semester
+                </Text>
+              </>
+            )}
+          </TouchableOpacity>
+
+          {/* Cancel Button */}
+          <TouchableOpacity
+            style={styles.cancelButton}
+            onPress={() => navigation.goBack()}
+            disabled={loading}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.cancelText}>
+              Cancel
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  screen: {
     flex: 1,
-    backgroundColor: "#F5F7FA",
+    backgroundColor: "#F4F8F6",
   },
 
-  content: {
-    padding: 20,
-    paddingBottom: 40,
-  },
+  /* =========================
+     HEADER
+  ========================= */
 
   header: {
-    marginBottom: 22,
+    backgroundColor: "#087F4E",
+    paddingHorizontal: 18,
+    paddingTop: 14,
+    paddingBottom: 18,
+    flexDirection: "row",
+    alignItems: "center",
   },
 
   backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 8,
+  },
+
+  backIcon: {
+    color: "#FFFFFF",
+    fontSize: 34,
+    fontWeight: "300",
+    lineHeight: 36,
+  },
+
+  headerTextContainer: {
+    flex: 1,
+  },
+
+  headerTitle: {
+    color: "#FFFFFF",
+    fontSize: 18,
+    fontWeight: "700",
+  },
+
+  headerSubtitle: {
+    color: "#D8F0E5",
+    fontSize: 11,
+    marginTop: 2,
+  },
+
+  /* =========================
+     CONTENT
+  ========================= */
+
+  container: {
+    flex: 1,
+  },
+
+  content: {
+    paddingHorizontal: 16,
+    paddingTop: 18,
+    paddingBottom: 40,
+  },
+
+  intro: {
     marginBottom: 15,
+    paddingHorizontal: 2,
   },
 
-  backText: {
-    color: "#1B5E3A",
-    fontSize: 15,
+  pageTitle: {
+    fontSize: 22,
     fontWeight: "700",
+    color: "#102E24",
   },
 
-  title: {
-    fontSize: 28,
-    fontWeight: "700",
-    color: "#1F2937",
+  pageSubtitle: {
+    fontSize: 13,
+    color: "#668177",
+    marginTop: 4,
   },
 
-  subtitle: {
-    marginTop: 5,
-    color: "#6B7280",
-    fontSize: 14,
-  },
+  /* =========================
+     FORM CARD
+  ========================= */
 
   formCard: {
     backgroundColor: "#FFFFFF",
-    borderRadius: 14,
-    padding: 20,
-    elevation: 2,
+    borderRadius: 18,
+    padding: 18,
+
+    shadowColor: "#164D38",
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.07,
+    shadowRadius: 8,
+
+    elevation: 3,
   },
 
   formTitle: {
+    color: "#102E24",
     fontSize: 18,
     fontWeight: "700",
-    color: "#1B5E3A",
+  },
+
+  formDescription: {
+    color: "#789088",
+    fontSize: 12,
+    marginTop: 4,
+    marginBottom: 7,
+  },
+
+  /* =========================
+     FIELDS
+  ========================= */
+
+  field: {
+    marginTop: 18,
+  },
+
+  labelRow: {
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 8,
+  },
+
+  iconBox: {
+    width: 34,
+    height: 34,
+    borderRadius: 10,
+    backgroundColor: "#E5F4ED",
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 10,
+  },
+
+  iconText: {
+    color: "#087F4E",
+    fontSize: 17,
+    fontWeight: "700",
   },
 
   label: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#374151",
-    marginTop: 18,
-    marginBottom: 8,
+    color: "#24483B",
+    fontSize: 13,
+    fontWeight: "700",
   },
 
   input: {
-    backgroundColor: "#FFFFFF",
+    height: 48,
     borderWidth: 1,
-    borderColor: "#D1D5DB",
-    borderRadius: 9,
+    borderColor: "#D8E9E1",
+    backgroundColor: "#FBFDFC",
+    borderRadius: 11,
     paddingHorizontal: 14,
-    paddingVertical: 13,
-    fontSize: 15,
-    color: "#1F2937",
+    color: "#16372B",
+    fontSize: 14,
   },
 
-  dateHint: {
-    color: "#9CA3AF",
-    fontSize: 12,
+  hint: {
+    color: "#91A59D",
+    fontSize: 11,
     marginTop: 5,
+    marginLeft: 2,
   },
+
+  /* =========================
+     BUTTONS
+  ========================= */
 
   primaryButton: {
-    backgroundColor: "#1B5E3A",
-    paddingVertical: 15,
-    borderRadius: 9,
+    height: 50,
+    backgroundColor: "#087F4E",
+    borderRadius: 11,
+    marginTop: 27,
+
+    flexDirection: "row",
     alignItems: "center",
-    marginTop: 28,
+    justifyContent: "center",
+
+    shadowColor: "#087F4E",
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.18,
+    shadowRadius: 5,
+
+    elevation: 3,
+  },
+
+  plusIcon: {
+    color: "#FFFFFF",
+    fontSize: 21,
+    fontWeight: "400",
+    marginRight: 7,
+    lineHeight: 22,
+  },
+
+  primaryButtonText: {
+    color: "#FFFFFF",
+    fontSize: 14,
+    fontWeight: "700",
   },
 
   disabledButton: {
     opacity: 0.6,
   },
 
-  primaryButtonText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "700",
-  },
-
   cancelButton: {
-    paddingVertical: 14,
+    height: 48,
+    borderWidth: 1,
+    borderColor: "#087F4E",
+    borderRadius: 11,
+    marginTop: 10,
+
     alignItems: "center",
-    marginTop: 8,
+    justifyContent: "center",
+
+    backgroundColor: "#FFFFFF",
   },
 
   cancelText: {
-    color: "#1B5E3A",
-    fontSize: 15,
-    fontWeight: "600",
+    color: "#087F4E",
+    fontSize: 14,
+    fontWeight: "700",
   },
 });
 
 export default CreateSemesterScreen;
+```

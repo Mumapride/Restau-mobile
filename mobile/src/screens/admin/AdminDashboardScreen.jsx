@@ -1,4 +1,3 @@
-```jsx
 import React from "react";
 import {
   View,
@@ -7,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
+  StatusBar,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -25,10 +25,8 @@ const AdminDashboardScreen = ({ navigation }) => {
           style: "destructive",
           onPress: async () => {
             try {
-              // Remove authentication token
               await AsyncStorage.removeItem("token");
 
-              // Return to login screen and clear navigation history
               navigation.reset({
                 index: 0,
                 routes: [{ name: "Login" }],
@@ -48,453 +46,670 @@ const AdminDashboardScreen = ({ navigation }) => {
   };
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.content}
-      showsVerticalScrollIndicator={false}
-    >
-      {/* Header */}
+    <View style={styles.screen}>
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor="#087A4B"
+      />
 
-      <View style={styles.header}>
-        <View style={styles.headerTextContainer}>
-          <Text style={styles.welcome}>Welcome, Admin</Text>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* =====================================================
+            GREEN HEADER
+        ====================================================== */}
 
-          <Text style={styles.subtitle}>
+        <View style={styles.topHeader}>
+          <View style={styles.headerLeft}>
+            <View style={styles.menuButton}>
+              <View style={styles.menuLine} />
+              <View style={styles.menuLine} />
+              <View style={styles.menuLine} />
+            </View>
+
+            <View style={styles.brandContainer}>
+              <Text style={styles.brandName}>
+                Restau
+              </Text>
+
+              <Text style={styles.brandSubtitle}>
+                Management System
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.avatar}>
+            <Text style={styles.avatarText}>A</Text>
+          </View>
+        </View>
+
+        {/* =====================================================
+            MAIN WHITE CONTENT
+        ====================================================== */}
+
+        <View style={styles.mainContent}>
+
+          {/* Welcome */}
+
+          <View style={styles.welcomeContainer}>
+            <Text style={styles.welcome}>
+              Welcome, Admin
+            </Text>
+
+            <Text style={styles.subtitle}>
+              Restaurant Management System
+            </Text>
+          </View>
+
+          {/* =================================================
+              OVERVIEW
+          ================================================== */}
+
+          <Text style={styles.sectionTitle}>
+            Overview
+          </Text>
+
+          <View style={styles.statsContainer}>
+
+            {/* Students */}
+
+            <View style={styles.statCard}>
+              <View style={styles.statIconContainer}>
+                <Text style={styles.statIcon}>
+                  ♙
+                </Text>
+              </View>
+
+              <Text style={styles.statNumber}>
+                0
+              </Text>
+
+              <Text style={styles.statLabel}>
+                Students
+              </Text>
+            </View>
+
+            {/* Subscriptions */}
+
+            <View style={styles.statCard}>
+              <View style={styles.statIconContainer}>
+                <Text style={styles.statIcon}>
+                  ▤
+                </Text>
+              </View>
+
+              <Text style={styles.statNumber}>
+                0
+              </Text>
+
+              <Text style={styles.statLabel}>
+                Subscriptions
+              </Text>
+            </View>
+
+            {/* Pending Payments */}
+
+            <View style={styles.statCard}>
+              <View style={styles.statIconContainer}>
+                <Text style={styles.statIcon}>
+                  ◷
+                </Text>
+              </View>
+
+              <Text style={styles.statNumber}>
+                0
+              </Text>
+
+              <Text style={styles.statLabel}>
+                Pending Payments
+              </Text>
+            </View>
+
+            {/* Meals Claimed */}
+
+            <View style={styles.statCard}>
+              <View style={styles.statIconContainer}>
+                <Text style={styles.statIcon}>
+                  ♨
+                </Text>
+              </View>
+
+              <Text style={styles.statNumber}>
+                0
+              </Text>
+
+              <Text style={styles.statLabel}>
+                Meals Claimed
+              </Text>
+            </View>
+
+          </View>
+
+          {/* =================================================
+              MANAGEMENT
+          ================================================== */}
+
+          <View style={styles.managementHeader}>
+            <Text style={styles.sectionTitle}>
+              Management
+            </Text>
+
+            <Text style={styles.sectionSubtitle}>
+              Manage the restaurant system
+            </Text>
+          </View>
+
+          <View style={styles.menuContainer}>
+
+            {/* Semesters */}
+
+            <TouchableOpacity
+              style={styles.menuItem}
+              activeOpacity={0.75}
+              onPress={() =>
+                navigation.navigate("Semesters")
+              }
+            >
+              <View style={styles.menuIconContainer}>
+                <Text style={styles.menuIcon}>
+                  ▣
+                </Text>
+              </View>
+
+              <View style={styles.menuTextContainer}>
+                <Text style={styles.menuTitle}>
+                  Semesters
+                </Text>
+
+                <Text style={styles.menuDescription}>
+                  Create and manage academic semesters
+                </Text>
+              </View>
+
+              <Text style={styles.arrow}>
+                ›
+              </Text>
+            </TouchableOpacity>
+
+            {/* Meal Plans */}
+
+            <TouchableOpacity
+              style={styles.menuItem}
+              activeOpacity={0.75}
+              onPress={() =>
+                navigation.navigate("MealPlans")
+              }
+            >
+              <View style={styles.menuIconContainer}>
+                <Text style={styles.menuIcon}>
+                  ♨
+                </Text>
+              </View>
+
+              <View style={styles.menuTextContainer}>
+                <Text style={styles.menuTitle}>
+                  Meal Plans
+                </Text>
+
+                <Text style={styles.menuDescription}>
+                  Manage available meal plans
+                </Text>
+              </View>
+
+              <Text style={styles.arrow}>
+                ›
+              </Text>
+            </TouchableOpacity>
+
+            {/* Subscriptions */}
+
+            <TouchableOpacity
+              style={styles.menuItem}
+              activeOpacity={0.75}
+              onPress={() =>
+                navigation.navigate("Subscriptions")
+              }
+            >
+              <View style={styles.menuIconContainer}>
+                <Text style={styles.menuIcon}>
+                  ▤
+                </Text>
+              </View>
+
+              <View style={styles.menuTextContainer}>
+                <Text style={styles.menuTitle}>
+                  Subscriptions
+                </Text>
+
+                <Text style={styles.menuDescription}>
+                  Monitor student subscriptions
+                </Text>
+              </View>
+
+              <Text style={styles.arrow}>
+                ›
+              </Text>
+            </TouchableOpacity>
+
+            {/* Payments */}
+
+            <TouchableOpacity
+              style={styles.menuItem}
+              activeOpacity={0.75}
+              onPress={() =>
+                navigation.navigate("Payments")
+              }
+            >
+              <View style={styles.menuIconContainer}>
+                <Text style={styles.menuIcon}>
+                  ◷
+                </Text>
+              </View>
+
+              <View style={styles.menuTextContainer}>
+                <Text style={styles.menuTitle}>
+                  Payments
+                </Text>
+
+                <Text style={styles.menuDescription}>
+                  Review and manage payments
+                </Text>
+              </View>
+
+              <Text style={styles.arrow}>
+                ›
+              </Text>
+            </TouchableOpacity>
+
+            {/* Students */}
+
+            <TouchableOpacity
+              style={styles.menuItem}
+              activeOpacity={0.75}
+              onPress={() =>
+                navigation.navigate("Students")
+              }
+            >
+              <View style={styles.menuIconContainer}>
+                <Text style={styles.menuIcon}>
+                  ♙
+                </Text>
+              </View>
+
+              <View style={styles.menuTextContainer}>
+                <Text style={styles.menuTitle}>
+                  Students
+                </Text>
+
+                <Text style={styles.menuDescription}>
+                  Manage student accounts
+                </Text>
+              </View>
+
+              <Text style={styles.arrow}>
+                ›
+              </Text>
+            </TouchableOpacity>
+
+            {/* Reports */}
+
+            <TouchableOpacity
+              style={styles.menuItem}
+              activeOpacity={0.75}
+              onPress={() =>
+                navigation.navigate("Reports")
+              }
+            >
+              <View style={styles.menuIconContainer}>
+                <Text style={styles.menuIcon}>
+                  ▥
+                </Text>
+              </View>
+
+              <View style={styles.menuTextContainer}>
+                <Text style={styles.menuTitle}>
+                  Reports
+                </Text>
+
+                <Text style={styles.menuDescription}>
+                  View meal and transaction reports
+                </Text>
+              </View>
+
+              <Text style={styles.arrow}>
+                ›
+              </Text>
+            </TouchableOpacity>
+
+            {/* Meal Claims */}
+
+            <TouchableOpacity
+              style={styles.menuItem}
+              activeOpacity={0.75}
+              onPress={() =>
+                navigation.navigate("MealClaims")
+              }
+            >
+              <View style={styles.menuIconContainer}>
+                <Text style={styles.menuIcon}>
+                  ♨
+                </Text>
+              </View>
+
+              <View style={styles.menuTextContainer}>
+                <Text style={styles.menuTitle}>
+                  Meal Claims
+                </Text>
+
+                <Text style={styles.menuDescription}>
+                  Monitor student meal claims
+                </Text>
+              </View>
+
+              <Text style={styles.arrow}>
+                ›
+              </Text>
+            </TouchableOpacity>
+
+          </View>
+
+          {/* =================================================
+              LOGOUT
+          ================================================== */}
+
+          <TouchableOpacity
+            style={styles.logoutButton}
+            activeOpacity={0.75}
+            onPress={handleLogout}
+          >
+            <Text style={styles.logoutIcon}>
+              ↪
+            </Text>
+
+            <Text style={styles.logoutText}>
+              Logout
+            </Text>
+          </TouchableOpacity>
+
+          <Text style={styles.footerText}>
             Restau Management System
           </Text>
+
         </View>
-
-        <View style={styles.avatar}>
-          <Text style={styles.avatarText}>A</Text>
-        </View>
-      </View>
-
-      {/* Overview */}
-
-      <Text style={styles.sectionTitle}>Overview</Text>
-
-      <View style={styles.statsContainer}>
-        <View style={styles.statCard}>
-          <View style={styles.statIconContainer}>
-            <Text style={styles.statIcon}>👨‍🎓</Text>
-          </View>
-
-          <Text style={styles.statNumber}>0</Text>
-
-          <Text style={styles.statLabel}>
-            Students
-          </Text>
-        </View>
-
-        <View style={styles.statCard}>
-          <View style={styles.statIconContainer}>
-            <Text style={styles.statIcon}>📋</Text>
-          </View>
-
-          <Text style={styles.statNumber}>0</Text>
-
-          <Text style={styles.statLabel}>
-            Subscriptions
-          </Text>
-        </View>
-
-        <View style={styles.statCard}>
-          <View style={styles.statIconContainer}>
-            <Text style={styles.statIcon}>💳</Text>
-          </View>
-
-          <Text style={styles.statNumber}>0</Text>
-
-          <Text style={styles.statLabel}>
-            Pending Payments
-          </Text>
-        </View>
-
-        <View style={styles.statCard}>
-          <View style={styles.statIconContainer}>
-            <Text style={styles.statIcon}>🍽️</Text>
-          </View>
-
-          <Text style={styles.statNumber}>0</Text>
-
-          <Text style={styles.statLabel}>
-            Meals Claimed
-          </Text>
-        </View>
-      </View>
-
-      {/* Management */}
-
-      <View style={styles.sectionHeader}>
-        <View>
-          <Text style={styles.sectionTitle}>
-            Management
-          </Text>
-
-          <Text style={styles.sectionSubtitle}>
-            Manage the restaurant system
-          </Text>
-        </View>
-      </View>
-
-      <View style={styles.menuContainer}>
-        {/* Semesters */}
-
-        <TouchableOpacity
-          style={styles.menuItem}
-          activeOpacity={0.7}
-          onPress={() => navigation.navigate("Semesters")}
-        >
-          <View style={styles.menuIconContainer}>
-            <Text style={styles.menuIcon}>📅</Text>
-          </View>
-
-          <View style={styles.menuTextContainer}>
-            <Text style={styles.menuTitle}>
-              Semesters
-            </Text>
-
-            <Text style={styles.menuDescription}>
-              Create and manage academic semesters
-            </Text>
-          </View>
-
-          <Text style={styles.arrow}>›</Text>
-        </TouchableOpacity>
-
-        {/* Meal Plans */}
-
-        <TouchableOpacity
-          style={styles.menuItem}
-          activeOpacity={0.7}
-          onPress={() => navigation.navigate("MealPlans")}
-        >
-          <View style={styles.menuIconContainer}>
-            <Text style={styles.menuIcon}>🍽️</Text>
-          </View>
-
-          <View style={styles.menuTextContainer}>
-            <Text style={styles.menuTitle}>
-              Meal Plans
-            </Text>
-
-            <Text style={styles.menuDescription}>
-              Manage available meal plans
-            </Text>
-          </View>
-
-          <Text style={styles.arrow}>›</Text>
-        </TouchableOpacity>
-
-        {/* Subscriptions */}
-
-        <TouchableOpacity
-          style={styles.menuItem}
-          activeOpacity={0.7}
-          onPress={() =>
-            navigation.navigate("Subscriptions")
-          }
-        >
-          <View style={styles.menuIconContainer}>
-            <Text style={styles.menuIcon}>📋</Text>
-          </View>
-
-          <View style={styles.menuTextContainer}>
-            <Text style={styles.menuTitle}>
-              Subscriptions
-            </Text>
-
-            <Text style={styles.menuDescription}>
-              Monitor student subscriptions
-            </Text>
-          </View>
-
-          <Text style={styles.arrow}>›</Text>
-        </TouchableOpacity>
-
-        {/* Payments */}
-
-        <TouchableOpacity
-          style={styles.menuItem}
-          activeOpacity={0.7}
-          onPress={() => navigation.navigate("Payments")}
-        >
-          <View style={styles.menuIconContainer}>
-            <Text style={styles.menuIcon}>💳</Text>
-          </View>
-
-          <View style={styles.menuTextContainer}>
-            <Text style={styles.menuTitle}>
-              Payments
-            </Text>
-
-            <Text style={styles.menuDescription}>
-              Review and manage payments
-            </Text>
-          </View>
-
-          <Text style={styles.arrow}>›</Text>
-        </TouchableOpacity>
-
-        {/* Students */}
-
-        <TouchableOpacity
-          style={styles.menuItem}
-          activeOpacity={0.7}
-          onPress={() => navigation.navigate("Students")}
-        >
-          <View style={styles.menuIconContainer}>
-            <Text style={styles.menuIcon}>👨‍🎓</Text>
-          </View>
-
-          <View style={styles.menuTextContainer}>
-            <Text style={styles.menuTitle}>
-              Students
-            </Text>
-
-            <Text style={styles.menuDescription}>
-              Manage student accounts
-            </Text>
-          </View>
-
-          <Text style={styles.arrow}>›</Text>
-        </TouchableOpacity>
-
-        {/* Reports */}
-
-        <TouchableOpacity
-          style={styles.menuItem}
-          activeOpacity={0.7}
-          onPress={() => navigation.navigate("Reports")}
-        >
-          <View style={styles.menuIconContainer}>
-            <Text style={styles.menuIcon}>📊</Text>
-          </View>
-
-          <View style={styles.menuTextContainer}>
-            <Text style={styles.menuTitle}>
-              Reports
-            </Text>
-
-            <Text style={styles.menuDescription}>
-              View meal and transaction reports
-            </Text>
-          </View>
-
-          <Text style={styles.arrow}>›</Text>
-        </TouchableOpacity>
-
-        {/* Meal Claims */}
-
-        <TouchableOpacity
-          style={styles.menuItem}
-          activeOpacity={0.7}
-          onPress={() =>
-            navigation.navigate("MealClaims")
-          }
-        >
-          <View style={styles.menuIconContainer}>
-            <Text style={styles.menuIcon}>🍴</Text>
-          </View>
-
-          <View style={styles.menuTextContainer}>
-            <Text style={styles.menuTitle}>
-              Meal Claims
-            </Text>
-
-            <Text style={styles.menuDescription}>
-              Monitor student meal claims
-            </Text>
-          </View>
-
-          <Text style={styles.arrow}>›</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Logout */}
-
-      <TouchableOpacity
-        style={styles.logoutButton}
-        activeOpacity={0.7}
-        onPress={handleLogout}
-      >
-        <View style={styles.logoutIconContainer}>
-          <Text style={styles.logoutIcon}>↪</Text>
-        </View>
-
-        <Text style={styles.logoutText}>
-          Logout
-        </Text>
-      </TouchableOpacity>
-
-      <Text style={styles.footerText}>
-        Restau Management System
-      </Text>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  /* =========================================================
+     SCREEN
+  ========================================================== */
+
+  screen: {
+    flex: 1,
+    backgroundColor: "#087A4B",
+  },
+
   container: {
     flex: 1,
-    backgroundColor: "#F5F7FA",
+    backgroundColor: "#087A4B",
   },
 
   content: {
-    padding: 20,
-    paddingBottom: 40,
+    paddingBottom: 35,
   },
 
-  /* Header */
+  /* =========================================================
+     TOP GREEN HEADER
+  ========================================================== */
 
-  header: {
+  topHeader: {
+    height: 92,
+    backgroundColor: "#087A4B",
+    paddingHorizontal: 20,
+    paddingTop: 18,
+    paddingBottom: 14,
+
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 28,
+    justifyContent: "space-between",
   },
 
-  headerTextContainer: {
-    flex: 1,
+  headerLeft: {
+    flexDirection: "row",
+    alignItems: "center",
   },
 
-  welcome: {
-    fontSize: 27,
-    fontWeight: "700",
-    color: "#1F2937",
+  menuButton: {
+    width: 34,
+    height: 34,
+    justifyContent: "center",
+    marginRight: 12,
   },
 
-  subtitle: {
-    marginTop: 5,
-    fontSize: 14,
-    color: "#6B7280",
+  menuLine: {
+    width: 20,
+    height: 2,
+    backgroundColor: "#FFFFFF",
+    marginVertical: 2.5,
+    borderRadius: 2,
+  },
+
+  brandContainer: {
+    alignItems: "center",
+  },
+
+  brandName: {
+    color: "#FFFFFF",
+    fontSize: 17,
+    fontWeight: "800",
+  },
+
+  brandSubtitle: {
+    color: "#D9F2E7",
+    fontSize: 10,
+    marginTop: 1,
   },
 
   avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: "#1B5E3A",
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: "#FFFFFF",
     justifyContent: "center",
     alignItems: "center",
-    marginLeft: 15,
   },
 
   avatarText: {
-    color: "#FFFFFF",
-    fontSize: 18,
-    fontWeight: "700",
+    color: "#087A4B",
+    fontSize: 16,
+    fontWeight: "800",
   },
 
-  /* Sections */
+  /* =========================================================
+     WHITE CONTENT AREA
+  ========================================================== */
 
-  sectionHeader: {
-    marginBottom: 10,
+  mainContent: {
+    backgroundColor: "#FFFFFF",
+
+    borderTopLeftRadius: 22,
+    borderTopRightRadius: 22,
+
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 30,
+
+    minHeight: 750,
   },
+
+  /* =========================================================
+     WELCOME
+  ========================================================== */
+
+  welcomeContainer: {
+    marginBottom: 22,
+  },
+
+  welcome: {
+    color: "#10231B",
+    fontSize: 22,
+    fontWeight: "800",
+  },
+
+  subtitle: {
+    color: "#789087",
+    fontSize: 12,
+    marginTop: 4,
+  },
+
+  /* =========================================================
+     SECTION TITLES
+  ========================================================== */
 
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#1F2937",
-    marginBottom: 6,
+    color: "#10231B",
+    fontSize: 16,
+    fontWeight: "800",
+  },
+
+  managementHeader: {
+    marginTop: 3,
+    marginBottom: 13,
   },
 
   sectionSubtitle: {
-    fontSize: 13,
-    color: "#6B7280",
-    marginBottom: 14,
+    color: "#789087",
+    fontSize: 11,
+    marginTop: 4,
   },
 
-  /* Statistics */
+  /* =========================================================
+     STATISTICS
+  ========================================================== */
 
   statsContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
-    marginBottom: 24,
+    marginTop: 13,
+    marginBottom: 25,
   },
 
   statCard: {
-    width: "48%",
+    width: "48.2%",
     backgroundColor: "#FFFFFF",
-    padding: 17,
+
+    borderWidth: 1,
+    borderColor: "#E3F0EA",
+
     borderRadius: 14,
-    marginBottom: 12,
 
-    elevation: 2,
+    paddingHorizontal: 13,
+    paddingVertical: 13,
 
-    shadowColor: "#000",
+    marginBottom: 10,
+
+    shadowColor: "#087A4B",
     shadowOffset: {
       width: 0,
-      height: 1,
+      height: 2,
     },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
+    shadowOpacity: 0.06,
+    shadowRadius: 5,
+
+    elevation: 2,
   },
 
   statIconContainer: {
-    width: 38,
-    height: 38,
+    width: 34,
+    height: 34,
     borderRadius: 10,
-    backgroundColor: "#EAF4EE",
+
+    backgroundColor: "#E5F5EE",
+
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 12,
+
+    marginBottom: 8,
   },
 
   statIcon: {
-    fontSize: 19,
+    color: "#087A4B",
+    fontSize: 20,
+    fontWeight: "700",
   },
 
   statNumber: {
-    fontSize: 25,
-    fontWeight: "700",
-    color: "#1B5E3A",
+    color: "#087A4B",
+    fontSize: 21,
+    fontWeight: "800",
   },
 
   statLabel: {
-    marginTop: 4,
-    color: "#6B7280",
-    fontSize: 13,
+    color: "#71847C",
+    fontSize: 11,
+    marginTop: 2,
   },
 
-  /* Management */
+  /* =========================================================
+     MANAGEMENT MENU
+  ========================================================== */
 
   menuContainer: {
     marginBottom: 20,
   },
 
   menuItem: {
+    minHeight: 66,
+
     backgroundColor: "#FFFFFF",
-    padding: 15,
-    borderRadius: 14,
-    marginBottom: 12,
+
+    borderWidth: 1,
+    borderColor: "#E4F0EB",
+
+    borderRadius: 13,
+
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+
+    marginBottom: 9,
+
     flexDirection: "row",
     alignItems: "center",
 
-    elevation: 2,
-
-    shadowColor: "#000",
+    shadowColor: "#087A4B",
     shadowOffset: {
       width: 0,
       height: 1,
     },
-    shadowOpacity: 0.05,
+    shadowOpacity: 0.035,
     shadowRadius: 4,
+
+    elevation: 1,
   },
 
   menuIconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 12,
-    backgroundColor: "#EAF4EE",
+    width: 40,
+    height: 40,
+
+    borderRadius: 11,
+
+    backgroundColor: "#E7F5EF",
+
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 14,
+
+    marginRight: 12,
   },
 
   menuIcon: {
-    fontSize: 23,
+    color: "#087A4B",
+    fontSize: 20,
+    fontWeight: "700",
   },
 
   menuTextContainer: {
@@ -502,61 +717,69 @@ const styles = StyleSheet.create({
   },
 
   menuTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#1F2937",
+    color: "#153128",
+    fontSize: 13,
+    fontWeight: "800",
   },
 
   menuDescription: {
-    marginTop: 4,
-    fontSize: 12,
-    color: "#6B7280",
-    lineHeight: 17,
+    color: "#81928B",
+    fontSize: 10.5,
+    marginTop: 3,
+    lineHeight: 14,
   },
 
   arrow: {
-    fontSize: 28,
-    color: "#9CA3AF",
-    marginLeft: 8,
+    color: "#087A4B",
+    fontSize: 25,
+    fontWeight: "300",
+    marginLeft: 7,
   },
 
-  /* Logout */
+  /* =========================================================
+     LOGOUT
+  ========================================================== */
 
   logoutButton: {
+    height: 48,
+
     backgroundColor: "#FFFFFF",
+
     borderWidth: 1,
-    borderColor: "#FECACA",
-    paddingVertical: 15,
+    borderColor: "#F3D7D7",
+
     borderRadius: 12,
+
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 5,
-  },
 
-  logoutIconContainer: {
-    marginRight: 8,
+    marginTop: 2,
   },
 
   logoutIcon: {
-    fontSize: 21,
-    color: "#DC2626",
+    color: "#D64545",
+    fontSize: 19,
     fontWeight: "700",
+    marginRight: 7,
   },
 
   logoutText: {
-    color: "#DC2626",
-    fontSize: 15,
-    fontWeight: "700",
+    color: "#D64545",
+    fontSize: 13,
+    fontWeight: "800",
   },
+
+  /* =========================================================
+     FOOTER
+  ========================================================== */
 
   footerText: {
     textAlign: "center",
-    color: "#9CA3AF",
-    fontSize: 11,
-    marginTop: 20,
+    color: "#A0AEA8",
+    fontSize: 9.5,
+    marginTop: 18,
   },
 });
 
 export default AdminDashboardScreen;
-```

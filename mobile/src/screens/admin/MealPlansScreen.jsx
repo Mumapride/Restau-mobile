@@ -96,9 +96,15 @@ const MealPlansScreen = ({ navigation }) => {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
+        <View style={styles.loadingIcon}>
+          <Text style={styles.loadingIconText}>
+            🍴
+          </Text>
+        </View>
+
         <ActivityIndicator
-          size="large"
-          color="#1B5E3A"
+          size="small"
+          color="#087443"
         />
 
         <Text style={styles.loadingText}>
@@ -113,37 +119,46 @@ const MealPlansScreen = ({ navigation }) => {
       <ScrollView
         style={styles.container}
         contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
             onRefresh={handleRefresh}
-            tintColor="#1B5E3A"
+            tintColor="#087443"
           />
         }
       >
-        {/* Header */}
+        {/* Green Header */}
 
         <View style={styles.header}>
-          <View style={styles.headerTextContainer}>
-            <Text style={styles.title}>
-              Meal Plans
-            </Text>
+          <View style={styles.headerTopRow}>
+            <View style={styles.headerTextContainer}>
+              <Text style={styles.headerTitle}>
+                Meal Plans
+              </Text>
 
-            <Text style={styles.subtitle}>
-              Manage meal plans available to students
-            </Text>
+              <Text style={styles.headerSubtitle}>
+                Manage available meal plans
+              </Text>
+            </View>
+
+            <TouchableOpacity
+              style={styles.headerAddButton}
+              onPress={() =>
+                navigation.navigate(
+                  "CreateMealPlan"
+                )
+              }
+            >
+              <Text style={styles.headerAddIcon}>
+                +
+              </Text>
+
+              <Text style={styles.headerAddText}>
+                Add
+              </Text>
+            </TouchableOpacity>
           </View>
-
-          <TouchableOpacity
-            style={styles.addButton}
-            onPress={() =>
-              navigation.navigate("CreateMealPlan")
-            }
-          >
-            <Text style={styles.addButtonText}>
-              + Add
-            </Text>
-          </TouchableOpacity>
         </View>
 
         {/* Summary */}
@@ -151,11 +166,11 @@ const MealPlansScreen = ({ navigation }) => {
         <View style={styles.summaryCard}>
           <View style={styles.summaryIcon}>
             <Text style={styles.summaryIconText}>
-              🍽
+              ▣
             </Text>
           </View>
 
-          <View>
+          <View style={styles.summaryContent}>
             <Text style={styles.summaryNumber}>
               {mealPlans.length}
             </Text>
@@ -164,15 +179,28 @@ const MealPlansScreen = ({ navigation }) => {
               Total Meal Plans
             </Text>
           </View>
+
+          <View style={styles.summaryStatus}>
+            <View style={styles.statusDot} />
+
+            <Text style={styles.summaryStatusText}>
+              {mealPlans.filter(
+                (plan) => plan.isActive
+              ).length}{" "}
+              Active
+            </Text>
+          </View>
         </View>
 
         {/* Empty State */}
 
         {mealPlans.length === 0 ? (
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyIcon}>
-              🍽️
-            </Text>
+            <View style={styles.emptyIcon}>
+              <Text style={styles.emptyIconText}>
+                🍽
+              </Text>
+            </View>
 
             <Text style={styles.emptyTitle}>
               No Meal Plans
@@ -180,8 +208,8 @@ const MealPlansScreen = ({ navigation }) => {
 
             <Text style={styles.emptyText}>
               There are currently no meal plans.
-              Create one to make it available to
-              students.
+              Create one to make it available
+              to students.
             </Text>
 
             <TouchableOpacity
@@ -192,6 +220,10 @@ const MealPlansScreen = ({ navigation }) => {
                 )
               }
             >
+              <Text style={styles.emptyButtonIcon}>
+                +
+              </Text>
+
               <Text style={styles.emptyButtonText}>
                 Create Meal Plan
               </Text>
@@ -199,82 +231,123 @@ const MealPlansScreen = ({ navigation }) => {
           </View>
         ) : (
           <View>
-            <Text style={styles.sectionTitle}>
-              Available Plans
-            </Text>
+            <View style={styles.sectionHeader}>
+              <View>
+                <Text style={styles.sectionTitle}>
+                  Available Plans
+                </Text>
+
+                <Text style={styles.sectionSubtitle}>
+                  Meal plans currently configured
+                </Text>
+              </View>
+
+              <View style={styles.countBadge}>
+                <Text style={styles.countBadgeText}>
+                  {mealPlans.length}
+                </Text>
+              </View>
+            </View>
 
             {mealPlans.map((mealPlan) => (
               <View
                 key={mealPlan.id}
                 style={styles.card}
               >
-                {/* Card Header */}
+                {/* Card Top */}
 
-                <View style={styles.cardHeader}>
+                <View style={styles.cardTop}>
+                  <View style={styles.planIcon}>
+                    <Text style={styles.planIconText}>
+                      🍽
+                    </Text>
+                  </View>
+
                   <View style={styles.planTitleContainer}>
-                    <Text style={styles.planName}>
+                    <Text
+                      style={styles.planName}
+                      numberOfLines={1}
+                    >
                       {mealPlan.name}
                     </Text>
 
+                    <Text style={styles.planDescription}>
+                      {mealPlan.description ||
+                        "No description provided"}
+                    </Text>
+                  </View>
+
+                  <View
+                    style={[
+                      styles.statusBadge,
+                      mealPlan.isActive
+                        ? styles.activeBadge
+                        : styles.inactiveBadge,
+                    ]}
+                  >
                     <View
                       style={[
-                        styles.statusBadge,
+                        styles.badgeDot,
                         mealPlan.isActive
-                          ? styles.activeBadge
-                          : styles.inactiveBadge,
+                          ? styles.activeDot
+                          : styles.inactiveDot,
+                      ]}
+                    />
+
+                    <Text
+                      style={[
+                        styles.statusText,
+                        mealPlan.isActive
+                          ? styles.activeText
+                          : styles.inactiveText,
                       ]}
                     >
-                      <Text
-                        style={[
-                          styles.statusText,
-                          mealPlan.isActive
-                            ? styles.activeText
-                            : styles.inactiveText,
-                        ]}
-                      >
-                        {mealPlan.isActive
-                          ? "Active"
-                          : "Inactive"}
-                      </Text>
-                    </View>
+                      {mealPlan.isActive
+                        ? "Active"
+                        : "Inactive"}
+                    </Text>
                   </View>
                 </View>
 
-                {/* Description */}
+                {/* Statistics */}
 
-                {mealPlan.description ? (
-                  <Text style={styles.description}>
-                    {mealPlan.description}
-                  </Text>
-                ) : (
-                  <Text style={styles.noDescription}>
-                    No description provided
-                  </Text>
-                )}
+                <View style={styles.statsContainer}>
+                  <View style={styles.statBox}>
+                    <View style={styles.statIcon}>
+                      <Text style={styles.statIconText}>
+                        ◷
+                      </Text>
+                    </View>
 
-                {/* Information */}
+                    <View>
+                      <Text style={styles.statLabel}>
+                        Meal Credits
+                      </Text>
 
-                <View style={styles.infoContainer}>
-                  <View style={styles.infoBox}>
-                    <Text style={styles.infoLabel}>
-                      Credits
-                    </Text>
-
-                    <Text style={styles.infoValue}>
-                      {mealPlan.credits}
-                    </Text>
+                      <Text style={styles.statValue}>
+                        {mealPlan.credits}
+                      </Text>
+                    </View>
                   </View>
 
-                  <View style={styles.divider} />
+                  <View style={styles.statDivider} />
 
-                  <View style={styles.infoBox}>
-                    <Text style={styles.infoLabel}>
-                      Price / Credit
-                    </Text>
+                  <View style={styles.statBox}>
+                    <View style={styles.statIcon}>
+                      <Text style={styles.statIconText}>
+                        ₣
+                      </Text>
+                    </View>
 
-                    <Text style={styles.infoValue}>
-                      {mealPlan.pricePerCredit}
-                    </Text>
+                    <View>
+                      <Text style={styles.statLabel}>
+                        Price / Credit
+                      </Text>
+
+                      <Text style={styles.statValue}>
+                        {mealPlan.pricePerCredit} FCFA
+                      </Text>
+                    </View>
                   </View>
                 </View>
 
@@ -292,6 +365,10 @@ const MealPlansScreen = ({ navigation }) => {
                       )
                     }
                   >
+                    <Text style={styles.editIcon}>
+                      ✎
+                    </Text>
+
                     <Text style={styles.editButtonText}>
                       Edit
                     </Text>
@@ -303,6 +380,10 @@ const MealPlansScreen = ({ navigation }) => {
                       handleDelete(mealPlan)
                     }
                   >
+                    <Text style={styles.deleteIcon}>
+                      ×
+                    </Text>
+
                     <Text
                       style={styles.deleteButtonText}
                     >
@@ -322,7 +403,9 @@ const MealPlansScreen = ({ navigation }) => {
         <TouchableOpacity
           style={styles.floatingButton}
           onPress={() =>
-            navigation.navigate("CreateMealPlan")
+            navigation.navigate(
+              "CreateMealPlan"
+            )
           }
         >
           <Text style={styles.floatingButtonText}>
@@ -337,7 +420,7 @@ const MealPlansScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: "#F5F7FA",
+    backgroundColor: "#F4FAF7",
   },
 
   container: {
@@ -345,7 +428,6 @@ const styles = StyleSheet.create({
   },
 
   content: {
-    padding: 20,
     paddingBottom: 100,
   },
 
@@ -353,20 +435,41 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#F5F7FA",
+    backgroundColor: "#F4FAF7",
+  },
+
+  loadingIcon: {
+    width: 64,
+    height: 64,
+    borderRadius: 20,
+    backgroundColor: "#E2F4EA",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 15,
+  },
+
+  loadingIconText: {
+    fontSize: 28,
   },
 
   loadingText: {
-    marginTop: 10,
-    color: "#6B7280",
-    fontSize: 14,
+    marginTop: 9,
+    color: "#789187",
+    fontSize: 13,
   },
 
   header: {
+    backgroundColor: "#087443",
+    paddingHorizontal: 18,
+    paddingTop: 20,
+    paddingBottom: 22,
+    borderBottomLeftRadius: 22,
+    borderBottomRightRadius: 22,
+  },
+
+  headerTopRow: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 20,
   },
 
   headerTextContainer: {
@@ -374,269 +477,448 @@ const styles = StyleSheet.create({
     paddingRight: 10,
   },
 
-  title: {
-    fontSize: 28,
-    fontWeight: "700",
-    color: "#1F2937",
-  },
-
-  subtitle: {
-    marginTop: 5,
-    color: "#6B7280",
-    fontSize: 14,
-    lineHeight: 20,
-  },
-
-  addButton: {
-    backgroundColor: "#1B5E3A",
-    paddingHorizontal: 16,
-    paddingVertical: 11,
-    borderRadius: 9,
-  },
-
-  addButtonText: {
+  headerTitle: {
     color: "#FFFFFF",
-    fontSize: 14,
-    fontWeight: "700",
+    fontSize: 23,
+    fontWeight: "800",
+  },
+
+  headerSubtitle: {
+    color: "#D7F2E3",
+    fontSize: 12,
+    marginTop: 4,
+  },
+
+  headerAddButton: {
+    backgroundColor: "#FFFFFF",
+    minWidth: 74,
+    height: 40,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  headerAddIcon: {
+    color: "#087443",
+    fontSize: 21,
+    fontWeight: "800",
+    marginRight: 5,
+  },
+
+  headerAddText: {
+    color: "#087443",
+    fontSize: 13,
+    fontWeight: "800",
   },
 
   summaryCard: {
     backgroundColor: "#FFFFFF",
-    borderRadius: 14,
-    padding: 18,
+    marginHorizontal: 16,
+    marginTop: -8,
+    borderRadius: 16,
+    minHeight: 78,
+    padding: 13,
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 25,
-    elevation: 2,
+    borderWidth: 1,
+    borderColor: "#E0EFE7",
+    shadowColor: "#075C37",
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
   },
 
   summaryIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: "#E8F3EC",
+    width: 50,
+    height: 50,
+    borderRadius: 14,
+    backgroundColor: "#E5F5ED",
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 14,
+    marginRight: 12,
   },
 
   summaryIconText: {
-    fontSize: 23,
+    color: "#087443",
+    fontSize: 22,
+  },
+
+  summaryContent: {
+    flex: 1,
   },
 
   summaryNumber: {
-    fontSize: 22,
-    fontWeight: "700",
-    color: "#1B5E3A",
+    color: "#10251C",
+    fontSize: 21,
+    fontWeight: "800",
   },
 
   summaryLabel: {
+    color: "#789187",
+    fontSize: 11,
     marginTop: 2,
-    fontSize: 13,
-    color: "#6B7280",
+  },
+
+  summaryStatus: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#EAF8F1",
+    borderRadius: 20,
+    paddingHorizontal: 9,
+    paddingVertical: 6,
+  },
+
+  statusDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: "#087443",
+    marginRight: 5,
+  },
+
+  summaryStatusText: {
+    color: "#087443",
+    fontSize: 10,
+    fontWeight: "800",
+  },
+
+  sectionHeader: {
+    marginHorizontal: 16,
+    marginTop: 24,
+    marginBottom: 11,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
 
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#1F2937",
-    marginBottom: 12,
+    color: "#10251C",
+    fontSize: 17,
+    fontWeight: "800",
+  },
+
+  sectionSubtitle: {
+    color: "#789187",
+    fontSize: 11,
+    marginTop: 3,
+  },
+
+  countBadge: {
+    minWidth: 30,
+    height: 30,
+    borderRadius: 10,
+    backgroundColor: "#DFF2E8",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  countBadgeText: {
+    color: "#087443",
+    fontSize: 12,
+    fontWeight: "800",
   },
 
   card: {
     backgroundColor: "#FFFFFF",
-    borderRadius: 14,
-    padding: 18,
-    marginBottom: 15,
+    marginHorizontal: 16,
+    marginBottom: 13,
+    borderRadius: 16,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: "#E0EFE7",
+    shadowColor: "#075C37",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.06,
+    shadowRadius: 7,
     elevation: 2,
   },
 
-  cardHeader: {
-    marginBottom: 8,
-  },
-
-  planTitleContainer: {
+  cardTop: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
   },
 
-  planName: {
-    flex: 1,
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#1F2937",
+  planIcon: {
+    width: 45,
+    height: 45,
+    borderRadius: 13,
+    backgroundColor: "#E7F6EE",
+    justifyContent: "center",
+    alignItems: "center",
     marginRight: 10,
   },
 
+  planIconText: {
+    fontSize: 20,
+  },
+
+  planTitleContainer: {
+    flex: 1,
+    paddingRight: 7,
+  },
+
+  planName: {
+    color: "#10251C",
+    fontSize: 15,
+    fontWeight: "800",
+  },
+
+  planDescription: {
+    color: "#82978E",
+    fontSize: 10,
+    marginTop: 3,
+  },
+
   statusBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    flexDirection: "row",
+    alignItems: "center",
     borderRadius: 20,
+    paddingHorizontal: 8,
+    paddingVertical: 5,
   },
 
   activeBadge: {
-    backgroundColor: "#E8F3EC",
+    backgroundColor: "#DDF4E8",
   },
 
   inactiveBadge: {
-    backgroundColor: "#F3F4F6",
+    backgroundColor: "#EFF2F0",
+  },
+
+  badgeDot: {
+    width: 5,
+    height: 5,
+    borderRadius: 3,
+    marginRight: 4,
+  },
+
+  activeDot: {
+    backgroundColor: "#087443",
+  },
+
+  inactiveDot: {
+    backgroundColor: "#84928C",
   },
 
   statusText: {
-    fontSize: 11,
-    fontWeight: "700",
+    fontSize: 9,
+    fontWeight: "800",
   },
 
   activeText: {
-    color: "#1B5E3A",
+    color: "#087443",
   },
 
   inactiveText: {
-    color: "#6B7280",
+    color: "#718079",
   },
 
-  description: {
-    color: "#6B7280",
-    fontSize: 14,
-    lineHeight: 20,
-    marginTop: 4,
-  },
-
-  noDescription: {
-    color: "#9CA3AF",
-    fontSize: 13,
-    fontStyle: "italic",
-    marginTop: 4,
-  },
-
-  infoContainer: {
+  statsContainer: {
+    backgroundColor: "#F5FBF8",
+    borderRadius: 12,
+    marginTop: 13,
+    padding: 11,
     flexDirection: "row",
-    backgroundColor: "#F8FAF9",
-    borderRadius: 10,
-    padding: 14,
-    marginTop: 16,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#E5F1EB",
+  },
+
+  statBox: {
+    flex: 1,
+    flexDirection: "row",
     alignItems: "center",
   },
 
-  infoBox: {
-    flex: 1,
-  },
-
-  infoLabel: {
-    color: "#6B7280",
-    fontSize: 12,
-    marginBottom: 5,
-  },
-
-  infoValue: {
-    color: "#1B5E3A",
-    fontSize: 16,
-    fontWeight: "700",
-  },
-
-  divider: {
-    width: 1,
-    height: 35,
-    backgroundColor: "#DDE5DF",
-    marginHorizontal: 15,
-  },
-
-  actions: {
-    flexDirection: "row",
-    marginTop: 15,
-  },
-
-  editButton: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: "#1B5E3A",
-    paddingVertical: 11,
-    borderRadius: 8,
+  statIcon: {
+    width: 31,
+    height: 31,
+    borderRadius: 9,
+    backgroundColor: "#E2F4EA",
+    justifyContent: "center",
     alignItems: "center",
     marginRight: 7,
   },
 
-  editButtonText: {
-    color: "#1B5E3A",
-    fontWeight: "700",
+  statIconText: {
+    color: "#087443",
+    fontSize: 13,
+    fontWeight: "800",
+  },
+
+  statLabel: {
+    color: "#7C9188",
+    fontSize: 9,
+  },
+
+  statValue: {
+    color: "#16382B",
+    fontSize: 12,
+    fontWeight: "800",
+    marginTop: 2,
+  },
+
+  statDivider: {
+    width: 1,
+    height: 32,
+    backgroundColor: "#DCEAE3",
+    marginHorizontal: 9,
+  },
+
+  actions: {
+    flexDirection: "row",
+    marginTop: 11,
+  },
+
+  editButton: {
+    flex: 1,
+    height: 40,
+    borderRadius: 9,
+    borderWidth: 1,
+    borderColor: "#087443",
+    backgroundColor: "#FFFFFF",
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "row",
+    marginRight: 5,
+  },
+
+  editIcon: {
+    color: "#087443",
     fontSize: 14,
+    fontWeight: "800",
+    marginRight: 5,
+  },
+
+  editButtonText: {
+    color: "#087443",
+    fontSize: 12,
+    fontWeight: "800",
   },
 
   deleteButton: {
     flex: 1,
+    height: 40,
+    borderRadius: 9,
     borderWidth: 1,
-    borderColor: "#DC2626",
-    paddingVertical: 11,
-    borderRadius: 8,
+    borderColor: "#E9CACA",
+    backgroundColor: "#FFF9F9",
+    justifyContent: "center",
     alignItems: "center",
-    marginLeft: 7,
+    flexDirection: "row",
+    marginLeft: 5,
+  },
+
+  deleteIcon: {
+    color: "#C63B3B",
+    fontSize: 18,
+    fontWeight: "600",
+    marginRight: 5,
   },
 
   deleteButtonText: {
-    color: "#DC2626",
-    fontWeight: "700",
-    fontSize: 14,
+    color: "#C63B3B",
+    fontSize: 12,
+    fontWeight: "800",
   },
 
   emptyContainer: {
     backgroundColor: "#FFFFFF",
-    borderRadius: 14,
-    padding: 30,
+    marginHorizontal: 16,
+    marginTop: 22,
+    padding: 28,
+    borderRadius: 18,
     alignItems: "center",
-    elevation: 2,
+    borderWidth: 1,
+    borderColor: "#E0EFE7",
   },
 
   emptyIcon: {
-    fontSize: 45,
-    marginBottom: 12,
+    width: 65,
+    height: 65,
+    borderRadius: 20,
+    backgroundColor: "#E5F5ED",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 14,
+  },
+
+  emptyIconText: {
+    fontSize: 30,
   },
 
   emptyTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#1F2937",
+    color: "#10251C",
+    fontSize: 19,
+    fontWeight: "800",
   },
 
   emptyText: {
     marginTop: 8,
     textAlign: "center",
-    color: "#6B7280",
-    fontSize: 14,
-    lineHeight: 20,
+    color: "#789187",
+    fontSize: 12,
+    lineHeight: 18,
   },
 
   emptyButton: {
-    backgroundColor: "#1B5E3A",
+    height: 45,
     paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 8,
-    marginTop: 20,
+    borderRadius: 10,
+    backgroundColor: "#087443",
+    marginTop: 18,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  emptyButtonIcon: {
+    color: "#FFFFFF",
+    fontSize: 19,
+    fontWeight: "800",
+    marginRight: 7,
   },
 
   emptyButtonText: {
     color: "#FFFFFF",
-    fontWeight: "700",
+    fontSize: 12,
+    fontWeight: "800",
   },
 
   floatingButton: {
     position: "absolute",
-    right: 20,
-    bottom: 25,
+    right: 18,
+    bottom: 22,
     width: 55,
     height: 55,
-    borderRadius: 28,
-    backgroundColor: "#1B5E3A",
+    borderRadius: 18,
+    backgroundColor: "#087443",
     justifyContent: "center",
     alignItems: "center",
-    elevation: 5,
+    shadowColor: "#075C37",
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.22,
+    shadowRadius: 7,
+    elevation: 6,
   },
 
   floatingButtonText: {
     color: "#FFFFFF",
-    fontSize: 30,
+    fontSize: 29,
     fontWeight: "400",
-    lineHeight: 34,
+    lineHeight: 32,
   },
 });
 
