@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "http:// 192.168.1.188:5000/api";
+const BASE_URL = "http://192.168.1.188:5000/api";
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -28,6 +28,15 @@ export const loginStudent = async (
 ) => {
   const response = await api.post("/auth/student/login", {
     matricule,
+    password,
+  });
+
+  return response.data;
+};
+
+export const loginAdmin = async (email, password) => {
+  const response = await api.post("/auth/admin/login", {
+    email,
     password,
   });
 
