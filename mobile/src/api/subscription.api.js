@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "http://10.206.52.86:5000/api";
+const BASE_URL = "http:/10.207.8.154:5000/api";
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -25,5 +25,5 @@ export const createSubscription = async (subscriptionData) => {
     subscriptionData
   );
 
-  return response.data;
+  return response.data; 
 };

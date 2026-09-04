@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-import useAuthStore from "../store/authStore";
+import useAuthStore from "../store/useAuthStore";
 
 // Auth screens
 import LoginScreen from "../screens/auth/LoginScreen";

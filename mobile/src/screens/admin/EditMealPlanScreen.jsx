@@ -13,7 +13,7 @@ import {
 
 import { createMealPlan } from "../../api/mealPlans.api";
 
-const CreateMealPlanScreen = ({ navigation }) => {
+const EditMealPlanScreen = ({ navigation }) => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [credits, setCredits] = useState("");
@@ -602,4 +602,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CreateMealPlanScreen;
+export default EditMealPlanScreen;

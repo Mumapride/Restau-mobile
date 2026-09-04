@@ -16,7 +16,7 @@ import {
   getTodaysMealClaims,
 } from "../../api/mealClaims.api";
 
-import useAuthStore from "../../store/authStore";
+import useAuthStore from "../../store/useAuthStore";
 
 export default function MealClaimsScreen({ navigation }) {
   const { token } = useAuthStore();
