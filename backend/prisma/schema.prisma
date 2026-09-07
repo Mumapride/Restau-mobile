@@ -28,6 +28,7 @@ enum Role {
 model Student {
   id            Int            @id @default(autoincrement())
   matricule     String         @unique
+  email         String         @unique
   userId        Int            @unique
   user          User           @relation(fields: [userId], references: [id])
   subscriptions Subscription[]

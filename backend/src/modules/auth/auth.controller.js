@@ -2,14 +2,20 @@ const { registerStudent, loginStudent, loginAdmin } = require('./auth.service');
 
 const studentRegister = async (req, res) => {
   try {
-    const { firstName, lastName, matricule, password } = req.body;
+    const { firstName, lastName, matricule, email, password } = req.body;
 
     // Make sure all fields are provided
-    if (!firstName || !lastName || !matricule || !password) {
+    if (!firstName || !lastName || !matricule || !email || !password) {
       return res.status(400).json({ message: 'All fields are required' });
     }
 
-    const result = await registerStudent(firstName, lastName, matricule, password);
+    // Basic email format check
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(email)) {
+      return res.status(400).json({ message: 'Please enter a valid email address' });
+    }
+
+    const result = await registerStudent(firstName, lastName, matricule, email, password);
     res.status(201).json(result);
 
   } catch (error) {

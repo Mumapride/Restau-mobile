@@ -1,0 +1,23 @@
+Summary of the runtime crash and fixes
+
+Root cause:
+- After merging `admin-development`, the app crashed at bundle completion because Metro tried to require navigation and screen modules that were malformed or exported incorrect defaults.
+- Specific issues: a stray Markdown code-fence in `CreateSemesterScreen.jsx` broke module parsing; several admin screen files exported the wrong component identifiers (copy/paste errors), and the auth store filename (`authStore.js`) did not match the exported identifier (`useAuthStore`), which caused confusion.
+- Resulting errors: "'' is not a function" and "Cannot read property 'default' of undefined" during module load/require.
+
+What I changed to fix it:
+1. Removed stray markdown fences from `CreateSemesterScreen.jsx` so the module parses and exports correctly.
+2. Fixed incorrect default exports:
+   - `EditMealPlanScreen.jsx`: renamed internal component to `EditMealPlanScreen` and exported it by default.
+   - `SubscriptionsScreen.jsx`: replaced duplicated details component with a minimal `SubscriptionsScreen` default export (placeholder) so the file name matches the export.
+3. Normalized the auth store:
+   - Created `src/store/useAuthStore.js` (copied implementation) and updated imports; removed the old `src/store/authStore.js`.
+4. Removed temporary debug console logs added during debugging from `App.js`, `AppNavigator.jsx`, `AdminNavigator.jsx`, and `StudentNavigator.jsx`.
+
+How to verify:
+- From `mobile/` run `npx expo start -c`, open Expo Go, and reload the app.
+- Correct startup sequence in logs should include: "App: rendering, about to require AppNavigator" followed by "App: required AppNavigator successfully" and then navigators loading (no module parse/require errors).
+
+Notes:
+- I did not rewrite Git history or remove audit trails. I created small, safe edits to restore correct exports and parsing.
+- The file `FIX_SUMMARY.txt` is informational only and does not affect app code or runtime.

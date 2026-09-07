@@ -12,9 +12,17 @@ import useAuthStore from '../../store/authStore';
 import axios from 'axios';
 import { BASE_URL } from '../../api/auth.api';
 
+const DAY_LABELS = {
+  TUESDAY: 'Tue',
+  WEDNESDAY: 'Wed',
+  THURSDAY: 'Thu',
+  FRIDAY: 'Fri',
+};
+
 export default function StudentDashboardScreen({ navigation }) {
   const { token, user } = useAuthStore();
   const [profile, setProfile] = useState(null);
+  const [menu, setMenu] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const fetchProfile = async () => {
@@ -25,13 +33,29 @@ export default function StudentDashboardScreen({ navigation }) {
       setProfile(response.data);
     } catch (error) {
       Alert.alert('Error', 'Could not load profile');
-    } finally {
-      setLoading(false);
     }
   };
 
+  const fetchMenu = async () => {
+    try {
+      const response = await axios.get(`${BASE_URL}/menu-schedule`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setMenu(response.data);
+    } catch (error) {
+      // Non-critical — dashboard still works without the menu section.
+      setMenu([]);
+    }
+  };
+
+  const loadDashboard = async () => {
+    setLoading(true);
+    await Promise.all([fetchProfile(), fetchMenu()]);
+    setLoading(false);
+  };
+
   useEffect(() => {
-    fetchProfile();
+    loadDashboard();
   }, []);
 
   if (loading) {
@@ -102,19 +126,52 @@ export default function StudentDashboardScreen({ navigation }) {
       {/* Quick Actions */}
       <Text style={styles.sectionTitle}>Quick Actions</Text>
       <View style={styles.actionsRow}>
-        <TouchableOpacity style={styles.actionButton}>
+        <TouchableOpacity
+          style={styles.actionButton}
+          onPress={() => navigation.navigate('Meal Plans')}
+        >
           <Text style={styles.actionIcon}>📋</Text>
           <Text style={styles.actionText}>Meal Plans</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.actionButton}>
+        <TouchableOpacity
+          style={styles.actionButton}
+          onPress={() => navigation.navigate('My QR Code')}
+        >
           <Text style={styles.actionIcon}>📱</Text>
           <Text style={styles.actionText}>My QR Code</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.actionButton}>
+        <TouchableOpacity
+          style={styles.actionButton}
+          onPress={() => navigation.navigate('History')}
+        >
           <Text style={styles.actionIcon}>🕐</Text>
           <Text style={styles.actionText}>History</Text>
         </TouchableOpacity>
       </View>
+
+      {/* This Week's Menu */}
+      <Text style={styles.sectionTitle}>This Week's Menu</Text>
+      {menu.length === 0 ? (
+        <View style={styles.menuEmptyCard}>
+          <Text style={styles.noPlanText}>Menu not published yet.</Text>
+        </View>
+      ) : (
+        <View style={styles.menuList}>
+          {menu.map((item) => (
+            <View key={item.day} style={styles.menuRow}>
+              <View style={styles.menuDayPill}>
+                <Text style={styles.menuDayText}>{DAY_LABELS[item.day] || item.day}</Text>
+              </View>
+              <View style={styles.menuInfo}>
+                <Text style={styles.menuName}>{item.mealName}</Text>
+                {item.description ? (
+                  <Text style={styles.menuDescription}>{item.description}</Text>
+                ) : null}
+              </View>
+            </View>
+          ))}
+        </View>
+      )}
 
       {/* No Plan Notice */}
       {!profile?.mealPlan && (
@@ -249,6 +306,55 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: '#555',
     textAlign: 'center',
+  },
+  menuList: {
+    backgroundColor: '#fff',
+    marginHorizontal: 15,
+    borderRadius: 12,
+    padding: 5,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 5,
+    elevation: 2,
+  },
+  menuRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+  },
+  menuDayPill: {
+    backgroundColor: '#e8f5e9',
+    borderRadius: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    marginRight: 12,
+  },
+  menuDayText: {
+    color: '#1B5E3A',
+    fontWeight: 'bold',
+    fontSize: 12,
+  },
+  menuInfo: {
+    flex: 1,
+  },
+  menuName: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#333',
+  },
+  menuDescription: {
+    fontSize: 12,
+    color: '#888',
+    marginTop: 2,
+  },
+  menuEmptyCard: {
+    backgroundColor: '#fff',
+    marginHorizontal: 15,
+    borderRadius: 12,
+    padding: 15,
+    marginBottom: 20,
+    alignItems: 'center',
   },
   noPlanCard: {
     backgroundColor: '#fff',
