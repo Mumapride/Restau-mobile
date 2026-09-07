@@ -1,12 +1,16 @@
-import React, { useEffect } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import useAuthStore from '../store/authStore';
+import React, { useEffect } from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+
+import useAuthStore from "../store/useAuthStore";
 
 import LoginScreen from '../screens/auth/LoginScreen';
 import StudentNavigator from './StudentNavigator';
 import AdminNavigator from './AdminNavigator';
 import RegisterScreen from '../screens/auth/RegisterScreen';
+
+// Admin navigator
+import AdminNavigator from "./AdminNavigator";
 
 const Stack = createNativeStackNavigator();
 

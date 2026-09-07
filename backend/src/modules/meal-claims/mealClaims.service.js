@@ -1,39 +1,87 @@
-const prisma = require('../../config/db');
+const prisma = require("../../config/db");
 
-/**
- * Returns the logged-in student's meal claim history, newest first.
- * Each entry includes how many credits were left immediately after that meal.
- */
-const getStudentMealHistory = async (studentId) => {
-  const student = await prisma.student.findUnique({
-    where: { id: studentId },
+// Get all meal claims
+const getMealClaims = async () => {
+  const mealClaims = await prisma.mealClaim.findMany({
+    orderBy: {
+      claimDate: "desc",
+    },
     include: {
-      subscriptions: {
-        orderBy: { createdAt: 'asc' },
+      student: {
+        include: {
+          user: true,
+        },
       },
-      mealClaims: {
-        orderBy: { claimDate: 'asc' },
+      semester: true,
+      qrToken: true,
+    },
+  });
+
+  return mealClaims;
+};
+
+// Get today's meal claims
+const getTodaysMealClaims = async () => {
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0);
+
+  const endOfDay = new Date();
+  endOfDay.setHours(23, 59, 59, 999);
+
+  const mealClaims = await prisma.mealClaim.findMany({
+    where: {
+      claimDate: {
+        gte: startOfDay,
+        lte: endOfDay,
       },
+    },
+    orderBy: {
+      claimDate: "desc",
+    },
+    include: {
+      student: {
+        include: {
+          user: true,
+        },
+      },
+      semester: true,
+      qrToken: true,
+    },
+  });
+
+  return mealClaims;
+};
+
+// Get meal claims for a specific student
+const getMealClaimsByStudent = async (studentId) => {
+  const student = await prisma.student.findUnique({
+    where: {
+      id: Number(studentId),
     },
   });
 
   if (!student) {
-    throw new Error('Student not found');
+    throw new Error("Student not found");
   }
 
-  // Use the most recent subscription to know the starting credit total.
-  const activeSubscription = student.subscriptions[student.subscriptions.length - 1];
-  const totalCredits = activeSubscription ? activeSubscription.credits : 0;
+  const mealClaims = await prisma.mealClaim.findMany({
+    where: {
+      studentId: Number(studentId),
+    },
+    orderBy: {
+      claimDate: "desc",
+    },
+    include: {
+      semester: true,
+      qrToken: true,
+    },
+  });
 
-  const history = student.mealClaims.map((claim, index) => ({
-    id: claim.id,
-    date: claim.claimDate,
-    menuItem: claim.menuItem,
-    creditsRemainingAfter: Math.max(totalCredits - (index + 1), 0),
-  }));
-
-  // Newest claims first for display.
-  return history.reverse();
+  return mealClaims;
 };
 
-module.exports = { getStudentMealHistory };
+module.exports = {
+  getMealClaims,
+  getTodaysMealClaims,
+  getMealClaimsByStudent,
+};

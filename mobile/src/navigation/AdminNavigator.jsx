@@ -1,62 +1,86 @@
-import React from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import useAuthStore from '../store/authStore';
+import React from "react";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-const Tab = createBottomTabNavigator();
+import AdminDashboardScreen from "../screens/admin/AdminDashboardScreen";
 
-const AdminDashboardPlaceholder = () => {
-  const { clearAuth } = useAuthStore();
+// Meal Plans
+import MealPlansScreen from "../screens/admin/MealPlansScreen";
+import CreateMealPlanScreen from "../screens/admin/CreateMealPlanScreen";
+import EditMealPlanScreen from "../screens/admin/EditMealPlanScreen";
 
-  return (
-    <View style={styles.container}>
-      <Text style={styles.text}>Admin Dashboard</Text>
-      <Text style={styles.subtext}>Coming Soon</Text>
-      <TouchableOpacity style={styles.button} onPress={clearAuth}>
-        <Text style={styles.buttonText}>Logout</Text>
-      </TouchableOpacity>
-    </View>
-  );
-};
+// Semesters
+import SemestersScreen from "../screens/admin/SemestersScreen";
+import CreateSemesterScreen from "../screens/admin/CreateSemesterScreen";
+import EditSemesterScreen from "../screens/admin/EditSemesterScreen";
+
+//subscription
+import SubscriptionsScreen from "../screens/admin/SubscriptionsScreen";
+import SubscriptionDetailsScreen from "../screens/admin/SubscriptionDetailsScreen";
+
+import MealClaimsScreen from "../screens/admin/MealClaimsScreen";
+const Stack = createNativeStackNavigator();
 
 export default function AdminNavigator() {
   return (
-    <Tab.Navigator>
-      <Tab.Screen name="Dashboard" component={AdminDashboardPlaceholder} />
-    </Tab.Navigator>
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
+      {/* Dashboard */}
+      <Stack.Screen
+        name="AdminDashboard"
+        component={AdminDashboardScreen}
+      />
+
+      {/* Meal Plans */}
+      <Stack.Screen
+        name="MealPlans"
+        component={MealPlansScreen}
+      />
+
+      <Stack.Screen
+        name="CreateMealPlan"
+        component={CreateMealPlanScreen}
+      />
+
+      <Stack.Screen
+        name="EditMealPlan"
+        component={EditMealPlanScreen}
+      />
+
+      {/* Semesters */}
+      <Stack.Screen
+        name="Semesters"
+        component={SemestersScreen}
+      />
+
+      <Stack.Screen
+        name="CreateSemester"
+        component={CreateSemesterScreen}
+      />
+
+      <Stack.Screen
+        name="EditSemester"
+        component={EditSemesterScreen}
+      />
+      {/* Subscription */}
+      <Stack.Screen
+        name="Subscriptions"
+        component={SubscriptionsScreen}
+      />
+
+      <Stack.Screen
+        name="SubscriptionDetails"
+        component={SubscriptionDetailsScreen}
+      />
+
+      <Stack.Screen
+  name="MealClaims"
+  component={MealClaimsScreen}
+/>
+    </Stack.Navigator>
+
+    
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f5f5f5',
-  },
-  text: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#1B5E3A',
-    marginBottom: 8,
-  },
-  subtext: {
-    fontSize: 14,
-    color: '#888',
-    marginBottom: 40,
-  },
-  button: {
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#ff4444',
-    borderRadius: 10,
-    padding: 15,
-    width: 200,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: '#ff4444',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-});

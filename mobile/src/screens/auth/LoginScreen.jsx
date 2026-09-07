@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
   ActivityIndicator, Alert, KeyboardAvoidingView, Platform, ScrollView
@@ -250,6 +250,35 @@ const styles = StyleSheet.create({
     marginBottom: 6,
     fontWeight: '600',
   },
+
+  switchContainer: {
+    flexDirection: "row",
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: "#1B5E3A",
+    borderRadius: 8,
+    overflow: "hidden",
+  },
+
+  switchButton: {
+    flex: 1,
+    padding: 12,
+    alignItems: "center",
+  },
+
+  activeSwitch: {
+    backgroundColor: "#1B5E3A",
+  },
+
+  switchText: {
+    color: "#1B5E3A",
+    fontWeight: "600",
+  },
+
+  activeSwitchText: {
+    color: "#fff",
+  },
+
   input: {
     borderWidth: 1,
     borderColor: '#e0e0e0',
@@ -281,15 +310,17 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontSize: 13,
   },
+
   button: {
-    backgroundColor: '#1B5E3A',
+    backgroundColor: "#1B5E3A",
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
     marginBottom: 20,
   },
+
   buttonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
     fontWeight: 'bold',
   },

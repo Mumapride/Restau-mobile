@@ -1,12 +1,49 @@
-const { getStudentMealHistory } = require('./mealClaims.service');
+const mealClaimsService = require("./mealClaims.service");
 
-const getMyMealHistory = async (req, res) => {
+// Get all meal claims
+const getMealClaims = async (req, res) => {
   try {
-    const history = await getStudentMealHistory(req.user.studentId);
-    res.status(200).json(history);
+    const mealClaims = await mealClaimsService.getMealClaims();
+
+    res.json(mealClaims);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(500).json({
+      message: error.message,
+    });
   }
 };
 
-module.exports = { getMyMealHistory };
+// Get today's meal claims
+const getTodaysMealClaims = async (req, res) => {
+  try {
+    const mealClaims = await mealClaimsService.getTodaysMealClaims();
+
+    res.json(mealClaims);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
+// Get meal claims by student
+const getMealClaimsByStudent = async (req, res) => {
+  try {
+    const mealClaims =
+      await mealClaimsService.getMealClaimsByStudent(
+        req.params.id
+      );
+
+    res.json(mealClaims);
+  } catch (error) {
+    res.status(404).json({
+      message: error.message,
+    });
+  }
+};
+
+module.exports = {
+  getMealClaims,
+  getTodaysMealClaims,
+  getMealClaimsByStudent,
+};

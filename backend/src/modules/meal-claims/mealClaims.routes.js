@@ -1,8 +1,37 @@
-const router = require('express').Router();
-const { getMyMealHistory } = require('./mealClaims.controller');
-const { protect, requireRole } = require('../../middleware/auth.middleware');
+const express = require("express");
 
-// GET /api/meal-claims/student/me
-router.get('/student/me', protect, requireRole('STUDENT'), getMyMealHistory);
+const {
+  getMealClaims,
+  getTodaysMealClaims,
+  getMealClaimsByStudent,
+} = require("./mealClaims.controller");
+
+const {
+  protect,
+  requireRole,
+} = require("../../middleware/auth.middleware");
+
+const router = express.Router();
+
+router.get(
+  "/",
+  protect,
+  requireRole("ADMIN"),
+  getMealClaims
+);
+
+router.get(
+  "/today",
+  protect,
+  requireRole("ADMIN"),
+  getTodaysMealClaims
+);
+
+router.get(
+  "/student/:id",
+  protect,
+  requireRole("ADMIN"),
+  getMealClaimsByStudent
+);
 
 module.exports = router;

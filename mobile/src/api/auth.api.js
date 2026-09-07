@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from "axios";
 
 export const BASE_URL = 'http://72.20.10.3:5000/api';
 
@@ -14,14 +14,28 @@ export const registerStudent = async (firstName, lastName, matricule, email, pas
     email,
     password
   });
+
   return response.data;
 };
 
-export const loginStudent = async (matricule, password) => {
-  const response = await api.post('/auth/student/login', {
+export const loginStudent = async (
+  matricule,
+  password
+) => {
+  const response = await api.post("/auth/student/login", {
     matricule,
-    password
+    password,
   });
+
+  return response.data;
+};
+
+export const loginAdmin = async (email, password) => {
+  const response = await api.post("/auth/admin/login", {
+    email,
+    password,
+  });
+
   return response.data;
 };
 export const loginAdmin = async (email, password) => {
