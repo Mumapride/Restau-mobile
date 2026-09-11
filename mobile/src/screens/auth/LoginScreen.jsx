@@ -4,7 +4,7 @@ import {
   ActivityIndicator, Alert, KeyboardAvoidingView, Platform, ScrollView
 } from 'react-native';
 import { loginStudent, loginAdmin } from '../../api/auth.api';
-import useAuthStore from '../../store/authStore';
+import useAuthStore from '../../store/useAuthStore';
 
 export default function LoginScreen({ navigation }) {
   const [isAdmin, setIsAdmin] = useState(false);

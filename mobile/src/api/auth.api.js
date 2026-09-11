@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const BASE_URL = 'http://72.20.10.3:5000/api';
+export const BASE_URL = 'http://172.20.10.3:5000/api';
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -30,14 +30,6 @@ export const loginStudent = async (
   return response.data;
 };
 
-export const loginAdmin = async (email, password) => {
-  const response = await api.post("/auth/admin/login", {
-    email,
-    password,
-  });
-
-  return response.data;
-};
 export const loginAdmin = async (email, password) => {
   const response = await api.post('/auth/admin/login', {
     email,

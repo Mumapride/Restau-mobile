@@ -9,8 +9,7 @@ import StudentNavigator from './StudentNavigator';
 import AdminNavigator from './AdminNavigator';
 import RegisterScreen from '../screens/auth/RegisterScreen';
 
-// Admin navigator
-import AdminNavigator from "./AdminNavigator";
+
 
 const Stack = createNativeStackNavigator();
 
