@@ -18,7 +18,7 @@ app.use("/api/qr-tokens", require("./modules/qr-tokens/qrTokens.routes"));
 
 // Developer B routes
 app.use(
-  "/api/semester",
+  "/api/semesters",
   require("./modules/semester/semester.routes")
 );
 

@@ -1,15 +1,12 @@
-import React, { useEffect } from "react";
-import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-
-import useAuthStore from "../store/useAuthStore";
+import React, { useEffect } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import useAuthStore from '../store/useAuthStore';
 
 import LoginScreen from '../screens/auth/LoginScreen';
+import RegisterScreen from '../screens/auth/RegisterScreen';
 import StudentNavigator from './StudentNavigator';
 import AdminNavigator from './AdminNavigator';
-import RegisterScreen from '../screens/auth/RegisterScreen';
-
-
 
 const Stack = createNativeStackNavigator();
 
@@ -24,10 +21,10 @@ export default function AppNavigator() {
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {!token ? (
-        <>
-          <Stack.Screen name="Login" component={LoginScreen} />
-          <Stack.Screen name="Register" component={RegisterScreen} />
-        </>
+          <>
+            <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen name="Register" component={RegisterScreen} />
+          </>
         ) : user?.role === 'ADMIN' ? (
           <Stack.Screen name="Admin" component={AdminNavigator} />
         ) : (

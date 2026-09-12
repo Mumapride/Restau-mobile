@@ -45,6 +45,7 @@ const registerStudent = async (firstName, lastName, matricule, email, password) 
     message: 'Account created successfully',
     user: {
       id: user.id,
+      studentId: user.student.id,
       firstName: user.firstName,
       lastName: user.lastName,
       matricule: user.student.matricule,
@@ -91,6 +92,7 @@ const loginStudent = async (matricule, password) => {
     token,
     user: {
       id: student.user.id,
+      studentId: student.id,
       firstName: student.user.firstName,
       lastName: student.user.lastName,
       matricule: student.matricule,

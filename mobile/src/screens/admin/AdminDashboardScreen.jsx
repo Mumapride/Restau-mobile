@@ -9,42 +9,26 @@ import {
   StatusBar,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import useAuthStore from '../../store/useAuthStore';
+
 
 const AdminDashboardScreen = ({ navigation }) => {
+  const { clearAuth } = useAuthStore();
+
   const handleLogout = () => {
-    Alert.alert(
-      "Logout",
-      "Are you sure you want to logout?",
-      [
-        {
-          text: "Cancel",
-          style: "cancel",
-        },
-        {
-          text: "Logout",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              await AsyncStorage.removeItem("token");
-
-              navigation.reset({
-                index: 0,
-                routes: [{ name: "Login" }],
-              });
-            } catch (error) {
-              console.error("Logout error:", error);
-
-              Alert.alert(
-                "Error",
-                "Unable to logout. Please try again."
-              );
-            }
-          },
-        },
-      ]
-    );
-  };
-
+  Alert.alert(
+    "Logout",
+    "Are you sure you want to logout?",
+    [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Logout",
+        style: "destructive",
+        onPress: () => clearAuth()
+      }
+    ]
+  );
+};
   return (
     <View style={styles.screen}>
       <StatusBar

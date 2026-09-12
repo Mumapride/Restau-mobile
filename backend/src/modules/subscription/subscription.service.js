@@ -1,53 +1,35 @@
 const prisma = require("../../config/db");
 
-// Create subscription
 const createSubscription = async ({
   studentId,
   mealPlanId,
   semesterId,
+  paymentMethod,
 }) => {
   // Check student
   const student = await prisma.student.findUnique({
-    where: {
-      id: Number(studentId),
-    },
+    where: { id: Number(studentId) }
   });
-
-  if (!student) {
-    throw new Error("Student not found");
-  }
+  if (!student) throw new Error('Student not found');
 
   // Check meal plan
   const mealPlan = await prisma.mealPlan.findUnique({
-    where: {
-      id: Number(mealPlanId),
-    },
+    where: { id: Number(mealPlanId) }
   });
-
-  if (!mealPlan) {
-    throw new Error("Meal plan not found");
-  }
-
-  if (!mealPlan.isActive) {
-    throw new Error("Meal plan is inactive");
-  }
+  if (!mealPlan) throw new Error('Meal plan not found');
+  if (!mealPlan.isActive) throw new Error('Meal plan is inactive');
 
   // Check semester
   const semester = await prisma.semester.findUnique({
-    where: {
-      id: Number(semesterId),
-    },
+    where: { id: Number(semesterId) }
   });
+  if (!semester) throw new Error('Semester not found');
+  if (!semester.isActive) throw new Error('Semester is inactive');
 
-  if (!semester) {
-    throw new Error("Semester not found");
-  }
+  // Calculate total amount
+  const totalAmount = mealPlan.credits * mealPlan.pricePerCredit;
 
-  if (!semester.isActive) {
-    throw new Error("Semester is inactive");
-  }
-
-  // Create subscription using credits from meal plan
+  // Create subscription
   const subscription = await prisma.subscription.create({
     data: {
       studentId: Number(studentId),
@@ -59,10 +41,28 @@ const createSubscription = async ({
       student: true,
       mealPlan: true,
       semester: true,
-    },
+    }
   });
 
-  return subscription;
+  // Create payment record and mark as VERIFIED automatically (simulated payment)
+  await prisma.payment.create({
+    data: {
+      subscriptionId: subscription.id,
+      amount: totalAmount,
+      method: paymentMethod || 'MTN_MOMO',
+      status: 'VERIFIED',
+    }
+  });
+
+  return {
+    subscription,
+    payment: {
+      amount: totalAmount,
+      method: paymentMethod || 'MTN_MOMO',
+      status: 'VERIFIED',
+      creditsAdded: mealPlan.credits
+    }
+  };
 };
 
 // Get subscriptions
