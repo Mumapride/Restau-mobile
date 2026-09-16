@@ -1,5 +1,7 @@
 const router = require('express').Router();
+const { getMyQR } = require('./qrTokens.controller');
+const { protect, requireRole } = require('../../middleware/auth.middleware');
 
-// Developer A - qr token routes go here
+router.get('/my-qr', protect, requireRole('STUDENT'), getMyQR);
 
 module.exports = router;

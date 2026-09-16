@@ -7,19 +7,13 @@ const registerStudent = async (firstName, lastName, matricule, email, password) 
   const existing = await prisma.student.findUnique({
     where: { matricule: matricule.toUpperCase() }
   });
-
-  if (existing) {
-    throw new Error('Matricule already registered');
-  }
+  if (existing) throw new Error('Matricule already registered');
 
   // Step 2: Check if email already exists
-  const existingEmail = await prisma.student.findUnique({
+  const existingEmail = await prisma.student.findFirst({
     where: { email: email.toLowerCase() }
   });
-
-  if (existingEmail) {
-    throw new Error('Email already registered');
-  }
+  if (existingEmail) throw new Error('Email already registered');
 
   // Step 3: Hash the password
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -39,6 +33,16 @@ const registerStudent = async (firstName, lastName, matricule, email, password) 
       }
     },
     include: { student: true }
+  });
+
+  // Step 5: Automatically create QR token for this student
+  // QR token needs a subscriptionId but student has no subscription yet
+  // So we create a standalone QR token without subscription
+  const qrToken = await prisma.qRToken.create({
+    data: {
+      studentId: user.student.id,
+      subscriptionId: null
+    }
   });
 
   return {

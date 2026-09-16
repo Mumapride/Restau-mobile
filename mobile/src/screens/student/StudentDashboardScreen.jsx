@@ -94,10 +94,10 @@ export default function StudentDashboardScreen({ navigation }) {
           <Text style={styles.statLabel}>Credits</Text>
         </View>
         <View style={styles.statCard}>
-          <Text style={styles.statNumber}>
-            {profile?.mealPlan ? profile.mealPlan.name : 'None'}
-          </Text>
-          <Text style={styles.statLabel}>Plan</Text>
+         <Text style={styles.planNameText} numberOfLines={2}>
+          {profile?.mealPlan ? profile.mealPlan.name : 'None'}
+         </Text>
+         <Text style={styles.statLabel}>Plan</Text>
         </View>
         <View style={styles.statCard}>
           <Text style={styles.statNumber}>
@@ -180,8 +180,11 @@ export default function StudentDashboardScreen({ navigation }) {
           <Text style={styles.noPlanText}>
             You don't have an active meal plan. Buy a plan to start eating at the Restau.
           </Text>
-          <TouchableOpacity style={styles.buyButton}>
-            <Text style={styles.buyButtonText}>Buy a Meal Plan</Text>
+          <TouchableOpacity
+           style={styles.buyButton}
+           onPress={() => navigation.navigate('Meal Plans')}
+          >
+          <Text style={styles.buyButtonText}>Buy a Meal Plan</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -200,6 +203,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  planNameText: {
+  fontSize: 14,
+  fontWeight: 'bold',
+  color: '#1B5E3A',
+  textAlign: 'center',
+},
   header: {
     backgroundColor: '#1B5E3A',
     padding: 25,

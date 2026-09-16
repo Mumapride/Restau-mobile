@@ -121,14 +121,14 @@ enum PayStatus {
   REJECTED
 }
 model QRToken {
-  id             Int         @id @default(autoincrement())
-  studentId      Int         @unique
-  subscriptionId Int
-  token          String      @unique @default(uuid())
-  createdAt      DateTime    @default(now())
+  id             Int          @id @default(autoincrement())
+  studentId      Int          @unique
+  subscriptionId Int?
+  token          String       @unique @default(uuid())
+  createdAt      DateTime     @default(now())
 
-  student        Student     @relation(fields: [studentId], references: [id])
-  subscription   Subscription @relation(fields: [subscriptionId], references: [id])
+  student        Student      @relation(fields: [studentId], references: [id])
+  subscription   Subscription? @relation(fields: [subscriptionId], references: [id])
   mealClaims     MealClaim[]
 }
 model MealClaim {

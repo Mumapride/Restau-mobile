@@ -1,6 +1,7 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { Ionicons } from '@expo/vector-icons';
 
 import StudentDashboardScreen from '../screens/student/StudentDashboardScreen';
 import MealPlansScreen from '../screens/student/MealPlansScreen';
@@ -12,9 +13,30 @@ import PaymentScreen from '../screens/student/PaymentScreen';
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
+const TAB_ICONS = {
+  Dashboard: 'home',
+  'Meal Plans': 'restaurant',
+  'My QR Code': 'qr-code',
+  History: 'time',
+  Profile: 'person',
+};
+
 function StudentTabs() {
   return (
-    <Tab.Navigator>
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        headerShown: false,
+        tabBarActiveTintColor: '#1B5E3A',
+        tabBarInactiveTintColor: '#999',
+        tabBarIcon: ({ color, size, focused }) => (
+          <Ionicons
+            name={focused ? TAB_ICONS[route.name] : `${TAB_ICONS[route.name]}-outline`}
+            size={size}
+            color={color}
+          />
+        ),
+      })}
+    >
       <Tab.Screen name="Dashboard" component={StudentDashboardScreen} />
       <Tab.Screen name="Meal Plans" component={MealPlansScreen} />
       <Tab.Screen name="My QR Code" component={MyQRCodeScreen} />

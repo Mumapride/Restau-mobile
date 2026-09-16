@@ -27,16 +27,16 @@ const formatTime = (isoDate) =>
   });
 
 export default function MealHistoryScreen() {
-  const { token } = useAuthStore();
+  const { token, user } = useAuthStore();
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
   const fetchHistory = async () => {
     try {
-      const response = await axios.get(`${BASE_URL}/meal-claims/student/me`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await axios.get(`${BASE_URL}/meal-claims/student/${user.studentId}`, {
+     headers: { Authorization: `Bearer ${token}` },
+ });
       setHistory(response.data);
     } catch (error) {
       Alert.alert('Error', 'Could not load meal history');
