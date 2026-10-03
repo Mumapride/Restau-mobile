@@ -5,7 +5,6 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
-  ActivityIndicator,
   RefreshControl,
   Alert,
 } from "react-native";
@@ -17,6 +16,18 @@ import {
 } from "../../api/mealClaims.api";
 
 import useAuthStore from "../../store/useAuthStore";
+import {
+  EmptyState,
+  InfoRow,
+  LoadingView,
+  ScreenHeader,
+} from "../../components";
+import {
+  COLORS,
+  RADIUS,
+  SHADOWS,
+  SPACING,
+} from "../../theme/tokens";
 
 export default function MealClaimsScreen({ navigation }) {
   const { token } = useAuthStore();
@@ -93,48 +104,30 @@ export default function MealClaimsScreen({ navigation }) {
 
         <View style={styles.divider} />
 
-        <View style={styles.detailRow}>
-          <Text style={styles.detailLabel}>Meal</Text>
-          <Text style={styles.detailValue}>
-            {item.menuItem || "N/A"}
-          </Text>
-        </View>
-
-        <View style={styles.detailRow}>
-          <Text style={styles.detailLabel}>Date</Text>
-          <Text style={styles.detailValue}>
-            {formatDate(item.claimDate)}
-          </Text>
-        </View>
-
-        <View style={styles.detailRow}>
-          <Text style={styles.detailLabel}>Semester</Text>
-          <Text style={styles.detailValue}>
-            {item.semester?.name || "N/A"}
-          </Text>
-        </View>
+        <InfoRow
+          label="Meal"
+          value={item.menuItem || "N/A"}
+        />
+        <InfoRow
+          label="Date"
+          value={formatDate(item.claimDate)}
+        />
+        <InfoRow
+          label="Semester"
+          value={item.semester?.name || "N/A"}
+        />
       </View>
     );
   };
 
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.backButton}
-        >
-          <Text style={styles.backText}>‹</Text>
-        </TouchableOpacity>
-
-        <View>
-          <Text style={styles.title}>Meal Claims</Text>
-          <Text style={styles.subtitle}>
-            Monitor student meal claims
-          </Text>
-        </View>
-      </View>
+      <ScreenHeader
+        title="Meal Claims"
+        subtitle="Monitor student meal claims"
+        showBack
+        onBack={() => navigation.goBack()}
+      />
 
       {/* Filter */}
       <View style={styles.filterContainer}>
@@ -181,16 +174,7 @@ export default function MealClaimsScreen({ navigation }) {
 
       {/* Content */}
       {loading ? (
-        <View style={styles.center}>
-          <ActivityIndicator
-            size="large"
-            color="#1B5E3A"
-          />
-
-          <Text style={styles.loadingText}>
-            Loading meal claims...
-          </Text>
-        </View>
+        <LoadingView message="Loading meal claims..." />
       ) : (
         <FlatList
           data={claims}
@@ -200,7 +184,8 @@ export default function MealClaimsScreen({ navigation }) {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={handleRefresh}
-              colors={["#1B5E3A"]}
+              colors={[COLORS.primary]}
+              tintColor={COLORS.primary}
             />
           }
           contentContainerStyle={
@@ -209,19 +194,15 @@ export default function MealClaimsScreen({ navigation }) {
               : styles.list
           }
           ListEmptyComponent={
-            <View style={styles.empty}>
-              <Text style={styles.emptyIcon}>🍽️</Text>
-
-              <Text style={styles.emptyTitle}>
-                No Meal Claims
-              </Text>
-
-              <Text style={styles.emptyText}>
-                {showTodayOnly
+            <EmptyState
+              icon="fast-food-outline"
+              title="No Meal Claims"
+              message={
+                showTodayOnly
                   ? "No meals have been claimed today."
-                  : "There are no meal claims yet."}
-              </Text>
-            </View>
+                  : "There are no meal claims yet."
+              }
+            />
           }
         />
       )}
@@ -232,78 +213,51 @@ export default function MealClaimsScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F5F7FA",
-  },
-
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    paddingTop: 50,
-    paddingBottom: 20,
-    backgroundColor: "#FFFFFF",
-  },
-
-  backButton: {
-    marginRight: 15,
-  },
-
-  backText: {
-    fontSize: 40,
-    color: "#1B5E3A",
-    lineHeight: 40,
-  },
-
-  title: {
-    fontSize: 24,
-    fontWeight: "700",
-    color: "#1F2937",
-  },
-
-  subtitle: {
-    marginTop: 3,
-    color: "#6B7280",
-    fontSize: 13,
+    backgroundColor: COLORS.background,
   },
 
   filterContainer: {
     flexDirection: "row",
-    padding: 15,
-    backgroundColor: "#FFFFFF",
+    padding: SPACING.lg,
+    backgroundColor: COLORS.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
   },
 
   filterButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 20,
-    marginRight: 10,
-    backgroundColor: "#F0F2F5",
+    paddingVertical: SPACING.sm,
+    paddingHorizontal: SPACING.lg,
+    borderRadius: 999,
+    marginRight: SPACING.sm,
+    backgroundColor: COLORS.surfaceAlt,
   },
 
   activeFilter: {
-    backgroundColor: "#1B5E3A",
+    backgroundColor: COLORS.primary,
   },
 
   filterText: {
-    color: "#555",
+    color: COLORS.text,
     fontWeight: "600",
   },
 
   activeFilterText: {
-    color: "#FFFFFF",
+    color: COLORS.onPrimary,
   },
 
   list: {
-    padding: 15,
-    paddingBottom: 30,
+    padding: SPACING.lg,
+    paddingBottom: SPACING.xl,
   },
 
   card: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    elevation: 2,
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.lg,
+    marginBottom: SPACING.md,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    ...SHADOWS.md,
   },
 
   cardHeader: {
@@ -314,94 +268,43 @@ const styles = StyleSheet.create({
 
   studentInfo: {
     flex: 1,
+    paddingRight: SPACING.md,
   },
 
   studentName: {
     fontSize: 17,
     fontWeight: "700",
-    color: "#1F2937",
+    color: COLORS.text,
   },
 
   matricule: {
-    marginTop: 4,
+    marginTop: SPACING.xs,
     fontSize: 13,
-    color: "#6B7280",
+    color: COLORS.textSecondary,
   },
 
   badge: {
-    backgroundColor: "#E8F5E9",
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 15,
+    backgroundColor: COLORS.successLight,
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: SPACING.xs,
+    borderRadius: 999,
   },
 
   badgeText: {
-    color: "#1B5E3A",
+    color: COLORS.success,
     fontSize: 10,
     fontWeight: "700",
   },
 
   divider: {
     height: 1,
-    backgroundColor: "#E5E7EB",
-    marginVertical: 12,
-  },
-
-  detailRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 8,
-  },
-
-  detailLabel: {
-    color: "#6B7280",
-    fontSize: 13,
-  },
-
-  detailValue: {
-    color: "#1F2937",
-    fontSize: 13,
-    fontWeight: "600",
-    maxWidth: "65%",
-    textAlign: "right",
-  },
-
-  center: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
-  loadingText: {
-    marginTop: 10,
-    color: "#6B7280",
+    backgroundColor: COLORS.border,
+    marginVertical: SPACING.md,
   },
 
   emptyContainer: {
     flexGrow: 1,
     justifyContent: "center",
-  },
-
-  empty: {
-    alignItems: "center",
-    paddingHorizontal: 30,
-  },
-
-  emptyIcon: {
-    fontSize: 50,
-    marginBottom: 15,
-  },
-
-  emptyTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#1F2937",
-  },
-
-  emptyText: {
-    marginTop: 8,
-    textAlign: "center",
-    color: "#6B7280",
-    fontSize: 14,
+    padding: SPACING.lg,
   },
 });

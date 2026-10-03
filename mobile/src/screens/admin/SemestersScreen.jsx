@@ -11,11 +11,24 @@ import {
 } from "react-native";
 
 import { useFocusEffect } from "@react-navigation/native";
+import { Ionicons } from "@expo/vector-icons";
 
 import {
   getActiveSemester,
   closeSemester,
 } from "../../api/semester.api";
+import {
+  LoadingView,
+  ScreenHeader,
+} from "../../components";
+import {
+  COLORS,
+  RADIUS,
+  SHADOWS,
+  SPACING,
+  TOUCH_TARGET,
+  TYPOGRAPHY,
+} from "../../theme/tokens";
 
 const SemestersScreen = ({ navigation }) => {
   const [semester, setSemester] = useState(null);
@@ -104,44 +117,31 @@ const SemestersScreen = ({ navigation }) => {
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator
-          size="large"
-          color="#1B5E3A"
-        />
-
-        <Text style={styles.loadingText}>
-          Loading semester...
-        </Text>
-      </View>
+      <LoadingView message="Loading semester..." />
     );
   }
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.content}
-      showsVerticalScrollIndicator={false}
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={handleRefresh}
-          tintColor="#1B5E3A"
-        />
-      }
-    >
-      {/* Header */}
+    <View style={styles.container}>
+      <ScreenHeader
+        title="Semesters"
+        subtitle="Manage academic semesters"
+        showBack
+        onBack={() => navigation.goBack()}
+      />
 
-      <View style={styles.header}>
-        <View>
-          <Text style={styles.title}>Semesters</Text>
-
-          <Text style={styles.subtitle}>
-            Manage academic semesters
-          </Text>
-        </View>
-      </View>
-
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            tintColor={COLORS.primary}
+          />
+        }
+      >
       {/* Active Semester */}
 
       <Text style={styles.sectionTitle}>
@@ -151,7 +151,11 @@ const SemestersScreen = ({ navigation }) => {
       {!semester ? (
         <View style={styles.emptyCard}>
           <View style={styles.emptyIconContainer}>
-            <Text style={styles.emptyIcon}>📅</Text>
+            <Ionicons
+              name="calendar-outline"
+              size={30}
+              color={COLORS.primary}
+            />
           </View>
 
           <Text style={styles.emptyTitle}>
@@ -171,7 +175,7 @@ const SemestersScreen = ({ navigation }) => {
             }
           >
             <Text style={styles.primaryButtonText}>
-              + Create Semester
+              Create Semester
             </Text>
           </TouchableOpacity>
         </View>
@@ -181,7 +185,11 @@ const SemestersScreen = ({ navigation }) => {
 
           <View style={styles.cardHeader}>
             <View style={styles.semesterIconContainer}>
-              <Text style={styles.semesterIcon}>📅</Text>
+              <Ionicons
+                name="calendar-outline"
+                size={24}
+                color={COLORS.primary}
+              />
             </View>
 
             <View style={styles.cardHeaderText}>
@@ -248,7 +256,7 @@ const SemestersScreen = ({ navigation }) => {
               disabled={closing}
             >
               {closing ? (
-                <ActivityIndicator color="#FFFFFF" />
+                <ActivityIndicator color={COLORS.onPrimary} />
               ) : (
                 <Text style={styles.closeButtonText}>
                   Close Semester
@@ -274,7 +282,11 @@ const SemestersScreen = ({ navigation }) => {
             }
           >
             <View style={styles.plusContainer}>
-              <Text style={styles.plusText}>+</Text>
+              <Ionicons
+                name="add"
+                size={24}
+                color={COLORS.primary}
+              />
             </View>
 
             <View style={styles.newSemesterText}>
@@ -287,88 +299,63 @@ const SemestersScreen = ({ navigation }) => {
               </Text>
             </View>
 
-            <Text style={styles.arrow}>›</Text>
+            <Ionicons
+              name="chevron-forward"
+              size={24}
+              color={COLORS.textMuted}
+            />
           </TouchableOpacity>
         </>
       )}
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F5F7FA",
+    backgroundColor: COLORS.background,
+  },
+
+  scroll: {
+    flex: 1,
   },
 
   content: {
-    padding: 20,
-    paddingBottom: 40,
-  },
-
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#F5F7FA",
-  },
-
-  loadingText: {
-    marginTop: 10,
-    color: "#6B7280",
-    fontSize: 14,
-  },
-
-  header: {
-    marginBottom: 25,
-  },
-
-  title: {
-    fontSize: 28,
-    fontWeight: "700",
-    color: "#1F2937",
-  },
-
-  subtitle: {
-    marginTop: 5,
-    color: "#6B7280",
-    fontSize: 14,
+    padding: SPACING.lg,
+    paddingBottom: SPACING.xxl,
   },
 
   sectionTitle: {
-    fontSize: 17,
-    fontWeight: "700",
-    color: "#1F2937",
-    marginBottom: 12,
-    marginTop: 5,
+    ...TYPOGRAPHY.h3,
+    color: COLORS.text,
+    marginBottom: SPACING.md,
+    marginTop: SPACING.xs,
   },
 
   semesterCard: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 14,
-    padding: 20,
-    elevation: 2,
-    marginBottom: 25,
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.lg,
+    ...SHADOWS.md,
+    marginBottom: SPACING.xl,
   },
 
   cardHeader: {
     flexDirection: "row",
     alignItems: "flex-start",
-    marginBottom: 22,
+    marginBottom: SPACING.xl,
   },
 
   semesterIconContainer: {
     width: 48,
     height: 48,
-    borderRadius: 12,
-    backgroundColor: "#E8F5EE",
+    borderRadius: RADIUS.md,
+    backgroundColor: COLORS.primaryLight,
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 14,
-  },
-
-  semesterIcon: {
-    fontSize: 24,
+    marginRight: SPACING.md,
   },
 
   cardHeaderText: {
@@ -376,44 +363,42 @@ const styles = StyleSheet.create({
   },
 
   semesterName: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#1F2937",
-    lineHeight: 24,
-    marginBottom: 8,
+    ...TYPOGRAPHY.h3,
+    color: COLORS.text,
+    marginBottom: SPACING.sm,
   },
 
   activeBadge: {
     alignSelf: "flex-start",
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#DCFCE7",
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 20,
+    backgroundColor: COLORS.primaryLight,
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: SPACING.xs,
+    borderRadius: 999,
   },
 
   activeDot: {
     width: 7,
     height: 7,
     borderRadius: 4,
-    backgroundColor: "#16A34A",
-    marginRight: 5,
+    backgroundColor: COLORS.success,
+    marginRight: SPACING.xs,
   },
 
   activeText: {
-    color: "#166534",
+    color: COLORS.success,
     fontSize: 10,
     fontWeight: "700",
   },
 
   dateSection: {
     flexDirection: "row",
-    backgroundColor: "#F9FAFB",
-    borderRadius: 10,
-    padding: 15,
+    backgroundColor: COLORS.surfaceAlt,
+    borderRadius: RADIUS.md,
+    padding: SPACING.lg,
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: SPACING.xl,
   },
 
   dateBox: {
@@ -422,134 +407,126 @@ const styles = StyleSheet.create({
 
   dateLabel: {
     fontSize: 10,
-    color: "#9CA3AF",
+    color: COLORS.textMuted,
     fontWeight: "700",
-    marginBottom: 6,
+    marginBottom: SPACING.xs,
   },
 
   dateValue: {
     fontSize: 14,
-    color: "#1F2937",
+    color: COLORS.text,
     fontWeight: "600",
   },
 
   dateDivider: {
     width: 1,
     height: 35,
-    backgroundColor: "#E5E7EB",
-    marginHorizontal: 15,
+    backgroundColor: COLORS.border,
+    marginHorizontal: SPACING.lg,
   },
 
   actions: {
     flexDirection: "row",
-    gap: 10,
+    gap: SPACING.sm,
   },
 
   editButton: {
     flex: 1,
     borderWidth: 1,
-    borderColor: "#1B5E3A",
-    paddingVertical: 13,
-    borderRadius: 9,
+    borderColor: COLORS.primary,
+    minHeight: TOUCH_TARGET,
+    borderRadius: RADIUS.md,
     alignItems: "center",
+    justifyContent: "center",
   },
 
   editButtonText: {
-    color: "#1B5E3A",
+    color: COLORS.primary,
     fontWeight: "700",
     fontSize: 14,
   },
 
   closeButton: {
     flex: 1,
-    backgroundColor: "#B91C1C",
-    paddingVertical: 13,
-    borderRadius: 9,
+    backgroundColor: COLORS.danger,
+    minHeight: TOUCH_TARGET,
+    borderRadius: RADIUS.md,
     alignItems: "center",
+    justifyContent: "center",
   },
 
   closeButtonText: {
-    color: "#FFFFFF",
+    color: COLORS.onPrimary,
     fontWeight: "700",
     fontSize: 14,
   },
 
   emptyCard: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 14,
-    padding: 28,
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.xxl,
     alignItems: "center",
-    elevation: 2,
-    marginBottom: 25,
+    ...SHADOWS.md,
+    marginBottom: SPACING.xl,
   },
 
   emptyIconContainer: {
     width: 65,
     height: 65,
     borderRadius: 33,
-    backgroundColor: "#E8F5EE",
+    backgroundColor: COLORS.primaryLight,
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 15,
-  },
-
-  emptyIcon: {
-    fontSize: 30,
+    marginBottom: SPACING.md,
   },
 
   emptyTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#1F2937",
+    ...TYPOGRAPHY.h2,
+    color: COLORS.text,
   },
 
   emptyText: {
-    color: "#6B7280",
-    marginTop: 8,
-    marginBottom: 22,
+    color: COLORS.textSecondary,
+    marginTop: SPACING.sm,
+    marginBottom: SPACING.xl,
     textAlign: "center",
     lineHeight: 20,
     fontSize: 13,
   },
 
   primaryButton: {
-    backgroundColor: "#1B5E3A",
-    paddingVertical: 14,
-    paddingHorizontal: 25,
-    borderRadius: 9,
+    backgroundColor: COLORS.primary,
+    minHeight: TOUCH_TARGET,
+    paddingHorizontal: SPACING.xl,
+    borderRadius: RADIUS.md,
     alignItems: "center",
+    justifyContent: "center",
   },
 
   primaryButtonText: {
-    color: "#FFFFFF",
+    color: COLORS.onPrimary,
     fontWeight: "700",
     fontSize: 15,
   },
 
   newSemesterCard: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 14,
-    padding: 16,
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.lg,
     flexDirection: "row",
     alignItems: "center",
-    elevation: 2,
-    marginBottom: 20,
+    ...SHADOWS.md,
+    marginBottom: SPACING.xl,
   },
 
   plusContainer: {
     width: 45,
     height: 45,
-    borderRadius: 12,
-    backgroundColor: "#E8F5EE",
+    borderRadius: RADIUS.md,
+    backgroundColor: COLORS.primaryLight,
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 14,
-  },
-
-  plusText: {
-    color: "#1B5E3A",
-    fontSize: 28,
-    fontWeight: "400",
+    marginRight: SPACING.md,
   },
 
   newSemesterText: {
@@ -559,19 +536,13 @@ const styles = StyleSheet.create({
   newSemesterTitle: {
     fontSize: 15,
     fontWeight: "700",
-    color: "#1F2937",
+    color: COLORS.text,
   },
 
   newSemesterDescription: {
-    marginTop: 4,
-    color: "#6B7280",
+    marginTop: SPACING.xs,
+    color: COLORS.textSecondary,
     fontSize: 12,
-  },
-
-  arrow: {
-    fontSize: 28,
-    color: "#9CA3AF",
-    marginLeft: 8,
   },
 });
 

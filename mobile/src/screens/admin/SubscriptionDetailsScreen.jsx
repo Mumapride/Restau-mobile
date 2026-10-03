@@ -11,6 +11,8 @@ import {
 import { useFocusEffect } from "@react-navigation/native";
 
 import { getSubscriptionById } from "../../api/subscription.api";
+import { Ionicons } from "@expo/vector-icons";
+import { COLORS, SHADOWS } from "../../theme/tokens";
 
 export default function SubscriptionDetailsScreen({
   route,
@@ -63,7 +65,7 @@ export default function SubscriptionDetailsScreen({
         <View style={styles.loadingCircle}>
           <ActivityIndicator
             size="large"
-            color="#1B5E3A"
+            color={COLORS.primary}
           />
         </View>
 
@@ -82,7 +84,11 @@ export default function SubscriptionDetailsScreen({
     return (
       <View style={styles.errorContainer}>
         <View style={styles.errorIconContainer}>
-          <Text style={styles.errorIcon}>!</Text>
+          <Ionicons
+            name="alert-circle"
+            size={27}
+            color={COLORS.danger}
+          />
         </View>
 
         <Text style={styles.errorTitle}>
@@ -106,9 +112,17 @@ export default function SubscriptionDetailsScreen({
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Text style={styles.backText}>
-            ← Go Back
-          </Text>
+          <View style={styles.backRow}>
+            <Ionicons
+              name="chevron-back"
+              size={18}
+              color={COLORS.primary}
+            />
+
+            <Text style={styles.backText}>
+              Go Back
+            </Text>
+          </View>
         </TouchableOpacity>
       </View>
     );
@@ -127,8 +141,8 @@ export default function SubscriptionDetailsScreen({
         <RefreshControl
           refreshing={refreshing}
           onRefresh={handleRefresh}
-          colors={["#1B5E3A"]}
-          tintColor="#1B5E3A"
+          colors={[COLORS.primary]}
+          tintColor={COLORS.primary}
         />
       }
     >
@@ -139,9 +153,17 @@ export default function SubscriptionDetailsScreen({
           style={styles.backTop}
           onPress={() => navigation.goBack()}
         >
-          <Text style={styles.backTopText}>
-            ← Back
-          </Text>
+          <View style={styles.backTopRow}>
+            <Ionicons
+              name="chevron-back"
+              size={18}
+              color={COLORS.primary}
+            />
+
+            <Text style={styles.backTopText}>
+              Back
+            </Text>
+          </View>
         </TouchableOpacity>
 
         <View style={styles.headerRow}>
@@ -156,9 +178,11 @@ export default function SubscriptionDetailsScreen({
           </View>
 
           <View style={styles.headerIcon}>
-            <Text style={styles.headerIconText}>
-              📋
-            </Text>
+            <Ionicons
+              name="receipt-outline"
+              size={22}
+              color={COLORS.primary}
+            />
           </View>
         </View>
       </View>
@@ -168,7 +192,11 @@ export default function SubscriptionDetailsScreen({
       <View style={styles.card}>
         <View style={styles.sectionHeader}>
           <View style={styles.sectionIcon}>
-            <Text>👨‍🎓</Text>
+            <Ionicons
+              name="person-outline"
+              size={20}
+              color={COLORS.primary}
+            />
           </View>
 
           <Text style={styles.sectionTitle}>
@@ -203,7 +231,11 @@ export default function SubscriptionDetailsScreen({
       <View style={styles.card}>
         <View style={styles.sectionHeader}>
           <View style={styles.sectionIcon}>
-            <Text>🍽️</Text>
+            <Ionicons
+              name="fast-food-outline"
+              size={20}
+              color={COLORS.primary}
+            />
           </View>
 
           <Text style={styles.sectionTitle}>
@@ -261,7 +293,11 @@ export default function SubscriptionDetailsScreen({
       <View style={styles.card}>
         <View style={styles.sectionHeader}>
           <View style={styles.sectionIcon}>
-            <Text>📅</Text>
+            <Ionicons
+              name="calendar-outline"
+              size={20}
+              color={COLORS.primary}
+            />
           </View>
 
           <Text style={styles.sectionTitle}>
@@ -313,7 +349,11 @@ export default function SubscriptionDetailsScreen({
       <View style={styles.card}>
         <View style={styles.sectionHeader}>
           <View style={styles.sectionIcon}>
-            <Text>💳</Text>
+            <Ionicons
+              name="card-outline"
+              size={20}
+              color={COLORS.primary}
+            />
           </View>
 
           <Text style={styles.sectionTitle}>
@@ -394,9 +434,11 @@ export default function SubscriptionDetailsScreen({
           ))
         ) : (
           <View style={styles.noPaymentContainer}>
-            <Text style={styles.noPaymentIcon}>
-              💳
-            </Text>
+            <Ionicons
+              name="card-outline"
+              size={32}
+              color={COLORS.textMuted}
+            />
 
             <Text style={styles.noPaymentText}>
               No payments recorded for this
@@ -426,7 +468,7 @@ export default function SubscriptionDetailsScreen({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F5F7FA",
+    backgroundColor: COLORS.background,
   },
 
   content: {
@@ -438,29 +480,29 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#F5F7FA",
+    backgroundColor: COLORS.background,
   },
 
   loadingCircle: {
     width: 70,
     height: 70,
     borderRadius: 35,
-    backgroundColor: "#E8F3ED",
+    backgroundColor: COLORS.primaryLight,
     justifyContent: "center",
     alignItems: "center",
   },
 
   loadingTitle: {
     marginTop: 18,
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: "700",
-    color: "#1F2937",
+    color: COLORS.text,
   },
 
   loadingText: {
     marginTop: 5,
     fontSize: 13,
-    color: "#6B7280",
+    color: COLORS.textSecondary,
   },
 
   header: {
@@ -471,10 +513,16 @@ const styles = StyleSheet.create({
     marginBottom: 17,
   },
 
+  backTopRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
   backTopText: {
-    color: "#1B5E3A",
+    color: COLORS.primary,
     fontSize: 15,
     fontWeight: "700",
+    marginLeft: 2,
   },
 
   headerRow: {
@@ -488,13 +536,13 @@ const styles = StyleSheet.create({
 
   title: {
     fontSize: 27,
-    fontWeight: "800",
-    color: "#1F2937",
+    fontWeight: "700",
+    color: COLORS.text,
   },
 
   subtitle: {
     marginTop: 5,
-    color: "#6B7280",
+    color: COLORS.textSecondary,
     fontSize: 13,
   },
 
@@ -502,29 +550,18 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: "#E8F3ED",
+    backgroundColor: COLORS.primaryLight,
     justifyContent: "center",
     alignItems: "center",
     marginLeft: 12,
   },
 
-  headerIconText: {
-    fontSize: 22,
-  },
-
   card: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderRadius: 16,
     padding: 18,
     marginBottom: 15,
-    elevation: 2,
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowRadius: 5,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    ...SHADOWS.md,
   },
 
   sectionHeader: {
@@ -536,8 +573,8 @@ const styles = StyleSheet.create({
   sectionIcon: {
     width: 38,
     height: 38,
-    borderRadius: 19,
-    backgroundColor: "#E8F3ED",
+    borderRadius: 10,
+    backgroundColor: COLORS.primaryLight,
     justifyContent: "center",
     alignItems: "center",
     marginRight: 10,
@@ -545,12 +582,12 @@ const styles = StyleSheet.create({
 
   sectionTitle: {
     fontSize: 18,
-    fontWeight: "800",
-    color: "#1B5E3A",
+    fontWeight: "700",
+    color: COLORS.text,
   },
 
   planHighlight: {
-    backgroundColor: "#F1F8F4",
+    backgroundColor: COLORS.primaryLight,
     padding: 14,
     borderRadius: 10,
     marginBottom: 8,
@@ -559,15 +596,15 @@ const styles = StyleSheet.create({
   planLabel: {
     fontSize: 10,
     fontWeight: "800",
-    color: "#6B7280",
+    color: COLORS.textSecondary,
     letterSpacing: 0.8,
   },
 
   planName: {
     marginTop: 5,
     fontSize: 16,
-    fontWeight: "800",
-    color: "#1B5E3A",
+    fontWeight: "700",
+    color: COLORS.primary,
   },
 
   infoRow: {
@@ -576,17 +613,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: "#F3F4F6",
+    borderBottomColor: COLORS.border,
   },
 
   label: {
-    color: "#6B7280",
+    color: COLORS.textSecondary,
     fontSize: 13,
     flex: 1,
   },
 
   value: {
-    color: "#374151",
+    color: COLORS.text,
     fontSize: 13,
     fontWeight: "700",
     flex: 1,
@@ -594,20 +631,20 @@ const styles = StyleSheet.create({
   },
 
   creditBadge: {
-    backgroundColor: "#E8F3ED",
+    backgroundColor: COLORS.primaryLight,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 15,
   },
 
   creditValue: {
-    color: "#1B5E3A",
+    color: COLORS.primary,
     fontSize: 15,
-    fontWeight: "800",
+    fontWeight: "700",
   },
 
   paymentCard: {
-    backgroundColor: "#F9FAFB",
+    backgroundColor: COLORS.background,
     borderRadius: 10,
     padding: 12,
     marginTop: 5,
@@ -625,27 +662,27 @@ const styles = StyleSheet.create({
   },
 
   verifiedBadge: {
-    backgroundColor: "#DCFCE7",
+    backgroundColor: COLORS.primaryLight,
   },
 
   verifiedText: {
-    color: "#166534",
+    color: COLORS.success,
   },
 
   pendingBadge: {
-    backgroundColor: "#FEF3C7",
+    backgroundColor: COLORS.warningLight,
   },
 
   pendingText: {
-    color: "#92400E",
+    color: COLORS.warning,
   },
 
   rejectedBadge: {
-    backgroundColor: "#FEE2E2",
+    backgroundColor: COLORS.dangerLight,
   },
 
   rejectedText: {
-    color: "#991B1B",
+    color: COLORS.danger,
   },
 
   noPaymentContainer: {
@@ -653,15 +690,11 @@ const styles = StyleSheet.create({
     paddingVertical: 18,
   },
 
-  noPaymentIcon: {
-    fontSize: 30,
-    marginBottom: 8,
-  },
-
   noPaymentText: {
-    color: "#6B7280",
+    color: COLORS.textSecondary,
     fontSize: 13,
     textAlign: "center",
+    marginTop: 8,
   },
 
   createdContainer: {
@@ -671,13 +704,13 @@ const styles = StyleSheet.create({
   },
 
   createdLabel: {
-    color: "#9CA3AF",
+    color: COLORS.textMuted,
     fontSize: 11,
   },
 
   createdText: {
     marginTop: 4,
-    color: "#6B7280",
+    color: COLORS.textSecondary,
     fontSize: 12,
     fontWeight: "600",
   },
@@ -687,48 +720,42 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 30,
-    backgroundColor: "#F5F7FA",
+    backgroundColor: COLORS.background,
   },
 
   errorIconContainer: {
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: "#FEE2E2",
+    backgroundColor: COLORS.dangerLight,
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 15,
   },
 
-  errorIcon: {
-    fontSize: 27,
-    fontWeight: "800",
-    color: "#DC2626",
-  },
-
   errorTitle: {
     fontSize: 20,
-    fontWeight: "800",
-    color: "#1F2937",
+    fontWeight: "700",
+    color: COLORS.text,
   },
 
   errorText: {
     marginTop: 8,
-    color: "#6B7280",
+    color: COLORS.textSecondary,
     textAlign: "center",
     fontSize: 13,
   },
 
   retryButton: {
     marginTop: 20,
-    backgroundColor: "#1B5E3A",
+    backgroundColor: COLORS.primary,
     paddingHorizontal: 28,
     paddingVertical: 13,
     borderRadius: 9,
   },
 
   retryText: {
-    color: "#FFFFFF",
+    color: COLORS.onPrimary,
     fontWeight: "700",
     fontSize: 14,
   },
@@ -738,8 +765,14 @@ const styles = StyleSheet.create({
     padding: 10,
   },
 
+  backRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
   backText: {
-    color: "#1B5E3A",
+    color: COLORS.primary,
     fontWeight: "700",
+    marginLeft: 2,
   },
 });

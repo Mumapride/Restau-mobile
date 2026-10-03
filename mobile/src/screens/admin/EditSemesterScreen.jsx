@@ -11,6 +11,15 @@ import {
 } from "react-native";
 
 import { updateSemester } from "../../api/semester.api";
+import { ScreenHeader } from "../../components";
+import {
+  COLORS,
+  RADIUS,
+  SHADOWS,
+  SPACING,
+  TOUCH_TARGET,
+  TYPOGRAPHY,
+} from "../../theme/tokens";
 
 const EditSemesterScreen = ({ route, navigation }) => {
   const { semester } = route.params;
@@ -87,28 +96,20 @@ const EditSemesterScreen = ({ route, navigation }) => {
   };
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.content}
-      showsVerticalScrollIndicator={false}
-    >
-      {/* Header */}
+    <View style={styles.container}>
+      <ScreenHeader
+        title="Edit Semester"
+        subtitle="Update semester information"
+        showBack
+        onBack={() => navigation.goBack()}
+      />
 
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Text style={styles.backText}>← Back</Text>
-        </TouchableOpacity>
-
-        <Text style={styles.title}>Edit Semester</Text>
-
-        <Text style={styles.subtitle}>
-          Update semester information
-        </Text>
-      </View>
-
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
       {/* Form */}
 
       <View style={styles.formCard}>
@@ -125,7 +126,7 @@ const EditSemesterScreen = ({ route, navigation }) => {
           value={name}
           onChangeText={setName}
           placeholder="Semester name"
-          placeholderTextColor="#9CA3AF"
+          placeholderTextColor={COLORS.textMuted}
         />
 
         {/* Start Date */}
@@ -137,7 +138,7 @@ const EditSemesterScreen = ({ route, navigation }) => {
           value={startDate}
           onChangeText={setStartDate}
           placeholder="YYYY-MM-DD"
-          placeholderTextColor="#9CA3AF"
+          placeholderTextColor={COLORS.textMuted}
           keyboardType="numbers-and-punctuation"
         />
 
@@ -150,7 +151,7 @@ const EditSemesterScreen = ({ route, navigation }) => {
           value={endDate}
           onChangeText={setEndDate}
           placeholder="YYYY-MM-DD"
-          placeholderTextColor="#9CA3AF"
+          placeholderTextColor={COLORS.textMuted}
           keyboardType="numbers-and-punctuation"
         />
 
@@ -165,7 +166,7 @@ const EditSemesterScreen = ({ route, navigation }) => {
           disabled={loading}
         >
           {loading ? (
-            <ActivityIndicator color="#FFFFFF" />
+            <ActivityIndicator color={COLORS.onPrimary} />
           ) : (
             <Text style={styles.primaryButtonText}>
               Save Changes
@@ -183,86 +184,66 @@ const EditSemesterScreen = ({ route, navigation }) => {
           <Text style={styles.cancelText}>Cancel</Text>
         </TouchableOpacity>
       </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F5F7FA",
+    backgroundColor: COLORS.background,
+  },
+
+  scroll: {
+    flex: 1,
   },
 
   content: {
-    padding: 20,
-    paddingBottom: 40,
-  },
-
-  header: {
-    marginBottom: 22,
-  },
-
-  backButton: {
-    marginBottom: 15,
-  },
-
-  backText: {
-    color: "#1B5E3A",
-    fontSize: 15,
-    fontWeight: "700",
-  },
-
-  title: {
-    fontSize: 28,
-    fontWeight: "700",
-    color: "#1F2937",
-  },
-
-  subtitle: {
-    marginTop: 5,
-    color: "#6B7280",
-    fontSize: 14,
+    padding: SPACING.lg,
+    paddingBottom: SPACING.xxl,
   },
 
   formCard: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 14,
-    padding: 20,
-    elevation: 2,
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.lg,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    ...SHADOWS.md,
   },
 
   formTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#1B5E3A",
-    marginBottom: 8,
+    ...TYPOGRAPHY.h3,
+    color: COLORS.primary,
+    marginBottom: SPACING.sm,
   },
 
   label: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#374151",
-    marginTop: 18,
-    marginBottom: 8,
+    ...TYPOGRAPHY.label,
+    color: COLORS.text,
+    marginTop: SPACING.lg,
+    marginBottom: SPACING.sm,
   },
 
   input: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
-    borderColor: "#D1D5DB",
-    borderRadius: 9,
-    paddingHorizontal: 14,
-    paddingVertical: 13,
+    borderColor: COLORS.border,
+    borderRadius: RADIUS.md,
+    paddingHorizontal: SPACING.md,
+    minHeight: TOUCH_TARGET,
     fontSize: 15,
-    color: "#1F2937",
+    color: COLORS.text,
   },
 
   primaryButton: {
-    backgroundColor: "#1B5E3A",
-    paddingVertical: 15,
-    borderRadius: 9,
+    backgroundColor: COLORS.primary,
+    minHeight: TOUCH_TARGET,
+    borderRadius: RADIUS.md,
     alignItems: "center",
-    marginTop: 28,
+    justifyContent: "center",
+    marginTop: SPACING.xl,
   },
 
   disabledButton: {
@@ -270,19 +251,20 @@ const styles = StyleSheet.create({
   },
 
   primaryButtonText: {
-    color: "#FFFFFF",
+    color: COLORS.onPrimary,
     fontSize: 16,
     fontWeight: "700",
   },
 
   cancelButton: {
-    paddingVertical: 14,
+    minHeight: TOUCH_TARGET,
     alignItems: "center",
-    marginTop: 8,
+    justifyContent: "center",
+    marginTop: SPACING.sm,
   },
 
   cancelText: {
-    color: "#1B5E3A",
+    color: COLORS.primary,
     fontSize: 15,
     fontWeight: "600",
   },

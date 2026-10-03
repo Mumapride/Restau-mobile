@@ -1,5 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
+import { COLORS } from "../../theme/tokens";
 
 export default function SubscriptionsScreen() {
   return (
@@ -15,15 +16,15 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#F5F7FA",
+    backgroundColor: COLORS.background,
   },
   title: {
     fontSize: 22,
     fontWeight: "700",
-    color: "#1B5E3A",
+    color: COLORS.primary,
     marginBottom: 8,
   },
   subtitle: {
-    color: "#6B7280",
+    color: COLORS.textSecondary,
   },
 });

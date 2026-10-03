@@ -2,16 +2,22 @@ import React, { useState } from 'react';
 import {
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   StyleSheet,
-  ActivityIndicator,
   Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView
 } from 'react-native';
 import { registerStudent } from '../../api/auth.api';
+import { COLORS, SPACING, TYPOGRAPHY } from '../../theme/tokens';
+import {
+  AppButton,
+  AppCard,
+  AppInput,
+  AppInputRightAction,
+  ScreenHeader,
+} from '../../components';
 
 export default function RegisterScreen({ navigation }) {
   const [firstName, setFirstName] = useState('');
@@ -49,238 +55,167 @@ export default function RegisterScreen({ navigation }) {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}
-    >
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+    <View style={styles.screen}>
+      <ScreenHeader
+        title="RESTAU"
+        subtitle="Create your student account"
+        variant="light"
+        showBack
+        onBack={() => (navigation.canGoBack() ? navigation.goBack() : navigation.navigate('Login'))}
+      />
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.flex}
+      >
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <AppCard style={styles.card}>
+            <Text style={styles.welcomeText}>Create Account</Text>
+            <Text style={styles.subtitle}>
+              Register to order your meals on campus
+            </Text>
 
-        {/* Logo and Title */}
-        <View style={styles.logoContainer}>
-          <View style={styles.logoCircle}>
-            <Text style={styles.logoIcon}>🍽️</Text>
-          </View>
-          <Text style={styles.appName}>QR Restaurant</Text>
-          <Text style={styles.appSubtitle}>Management System</Text>
-        </View>
+            <AppInput
+              label="First Name"
+              value={firstName}
+              onChangeText={setFirstName}
+              placeholder="Enter your first name"
+              icon="person-outline"
+            />
 
-        {/* Card */}
-        <View style={styles.card}>
-          <Text style={styles.welcomeText}>Create Account</Text>
-          <Text style={styles.subtitle}>Register to get started</Text>
+            <AppInput
+              label="Last Name"
+              value={lastName}
+              onChangeText={setLastName}
+              placeholder="Enter your last name"
+              icon="person-outline"
+            />
 
-          <Text style={styles.label}>First Name</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter your first name"
-            placeholderTextColor="#aaa"
-            value={firstName}
-            onChangeText={setFirstName}
-          />
+            <AppInput
+              label="Matricule"
+              value={matricule}
+              onChangeText={setMatricule}
+              placeholder="Enter your matricule"
+              autoCapitalize="characters"
+              icon="id-card-outline"
+            />
 
-          <Text style={styles.label}>Last Name</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter your last name"
-            placeholderTextColor="#aaa"
-            value={lastName}
-            onChangeText={setLastName}
-          />
+            <AppInput
+              label="Email"
+              value={email}
+              onChangeText={setEmail}
+              placeholder="Enter your email"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              icon="mail-outline"
+            />
 
-          <Text style={styles.label}>Matricule</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter your matricule"
-            placeholderTextColor="#aaa"
-            value={matricule}
-            onChangeText={setMatricule}
-            autoCapitalize="characters"
-          />
-
-          <Text style={styles.label}>Email</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter your email"
-            placeholderTextColor="#aaa"
-            value={email}
-            onChangeText={setEmail}
-            autoCapitalize="none"
-            keyboardType="email-address"
-          />
-
-          <Text style={styles.label}>Password</Text>
-          <View style={styles.passwordContainer}>
-            <TextInput
-              style={styles.passwordInput}
-              placeholder="Enter your password"
-              placeholderTextColor="#aaa"
+            <AppInput
+              label="Password"
               value={password}
               onChangeText={setPassword}
+              placeholder="Enter your password"
               secureTextEntry={!showPassword}
+              icon="lock-closed-outline"
+              rightAction={
+                <AppInputRightAction
+                  icon={showPassword ? 'eye-off-outline' : 'eye-outline'}
+                  label={showPassword ? 'Hide password' : 'Show password'}
+                  onPress={() => setShowPassword((v) => !v)}
+                />
+              }
             />
-            <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-              <Text style={styles.showText}>
-                {showPassword ? 'Hide' : 'Show'}
-              </Text>
-            </TouchableOpacity>
-          </View>
 
-          <Text style={styles.label}>Confirm Password</Text>
-          <View style={styles.passwordContainer}>
-            <TextInput
-              style={styles.passwordInput}
-              placeholder="Confirm your password"
-              placeholderTextColor="#aaa"
+            <AppInput
+              label="Confirm Password"
               value={confirmPassword}
               onChangeText={setConfirmPassword}
+              placeholder="Confirm your password"
               secureTextEntry={!showConfirmPassword}
+              icon="lock-closed-outline"
+              style={styles.lastInput}
+              rightAction={
+                <AppInputRightAction
+                  icon={showConfirmPassword ? 'eye-off-outline' : 'eye-outline'}
+                  label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                  onPress={() => setShowConfirmPassword((v) => !v)}
+                />
+              }
             />
-            <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
-              <Text style={styles.showText}>
-                {showConfirmPassword ? 'Hide' : 'Show'}
-              </Text>
-            </TouchableOpacity>
-          </View>
 
-          <TouchableOpacity
-            style={styles.button}
-            onPress={handleRegister}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.buttonText}>Register</Text>
-            )}
-          </TouchableOpacity>
+            <AppButton
+              title={loading ? 'Creating account…' : 'Register'}
+              onPress={handleRegister}
+              loading={loading}
+              disabled={loading}
+              icon="arrow-forward-outline"
+            />
 
-          <View style={styles.loginRow}>
-            <Text style={styles.loginText}>Already have an account? </Text>
-            <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-              <Text style={styles.loginLink}>Login</Text>
-            </TouchableOpacity>
-          </View>
-
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+            <View style={styles.loginRow}>
+              <Text style={styles.loginText}>Already have an account? </Text>
+              <TouchableOpacity
+                accessible
+                accessibilityRole="link"
+                accessibilityLabel="Go to Login"
+                onPress={() => navigation.navigate('Login')}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              >
+                <Text style={styles.loginLink}>Login</Text>
+              </TouchableOpacity>
+            </View>
+          </AppCard>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  screen: {
     flex: 1,
-    backgroundColor: '#1B5E3A',
+    backgroundColor: COLORS.background,
+  },
+  flex: {
+    flex: 1,
   },
   scrollContent: {
     flexGrow: 1,
-    alignItems: 'center',
-    paddingVertical: 60,
-    paddingHorizontal: 20,
-  },
-  logoContainer: {
-    alignItems: 'center',
-    marginBottom: 30,
-  },
-  logoCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: '#fff',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  logoIcon: {
-    fontSize: 40,
-  },
-  appName: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#fff',
-  },
-  appSubtitle: {
-    fontSize: 13,
-    color: '#c8e6c9',
+    paddingHorizontal: SPACING.lg,
+    paddingTop: SPACING.xl,
+    paddingBottom: SPACING.xxl,
   },
   card: {
-    backgroundColor: '#fff',
-    borderRadius: 20,
-    padding: 25,
     width: '100%',
   },
   welcomeText: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#1B5E3A',
-    marginBottom: 4,
+    ...TYPOGRAPHY.h1,
+    color: COLORS.text,
+    marginBottom: SPACING.xs,
   },
   subtitle: {
-    fontSize: 13,
-    color: '#888',
-    marginBottom: 25,
+    ...TYPOGRAPHY.bodySmall,
+    color: COLORS.textSecondary,
+    marginBottom: SPACING.xl,
   },
-  label: {
-    fontSize: 13,
-    color: '#555',
-    marginBottom: 6,
-    fontWeight: '600',
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-    borderRadius: 10,
-    padding: 13,
-    marginBottom: 15,
-    fontSize: 15,
-    color: '#333',
-    backgroundColor: '#fafafa',
-  },
-  passwordContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-    borderRadius: 10,
-    paddingHorizontal: 13,
-    marginBottom: 15,
-    backgroundColor: '#fafafa',
-  },
-  passwordInput: {
-    flex: 1,
-    paddingVertical: 13,
-    fontSize: 15,
-    color: '#333',
-  },
-  showText: {
-    color: '#1B5E3A',
-    fontWeight: '600',
-    fontSize: 13,
-  },
-  button: {
-    backgroundColor: '#1B5E3A',
-    padding: 15,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginBottom: 20,
-    marginTop: 5,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
+  lastInput: {
+    marginBottom: SPACING.lg,
   },
   loginRow: {
     flexDirection: 'row',
     justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: SPACING.lg,
+    flexWrap: 'wrap',
   },
   loginText: {
-    color: '#888',
-    fontSize: 13,
+    ...TYPOGRAPHY.bodySmall,
+    color: COLORS.textSecondary,
   },
   loginLink: {
-    color: '#1B5E3A',
-    fontWeight: 'bold',
-    fontSize: 13,
+    ...TYPOGRAPHY.label,
+    color: COLORS.primary,
   },
 });

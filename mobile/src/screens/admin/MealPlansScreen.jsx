@@ -6,7 +6,6 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
-  ActivityIndicator,
   RefreshControl,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
@@ -15,6 +14,19 @@ import {
   getMealPlans,
   deleteMealPlan,
 } from "../../api/mealPlans.api";
+import { Ionicons } from "@expo/vector-icons";
+import {
+  LoadingView,
+  ScreenHeader,
+} from "../../components";
+import {
+  COLORS,
+  RADIUS,
+  SHADOWS,
+  SPACING,
+  TOUCH_TARGET,
+  TYPOGRAPHY,
+} from "../../theme/tokens";
 
 const MealPlansScreen = ({ navigation }) => {
   const [mealPlans, setMealPlans] = useState([]);
@@ -95,27 +107,37 @@ const MealPlansScreen = ({ navigation }) => {
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <View style={styles.loadingIcon}>
-          <Text style={styles.loadingIconText}>
-            🍴
-          </Text>
-        </View>
-
-        <ActivityIndicator
-          size="small"
-          color="#087443"
-        />
-
-        <Text style={styles.loadingText}>
-          Loading meal plans...
-        </Text>
-      </View>
+      <LoadingView message="Loading meal plans..." />
     );
   }
 
   return (
     <View style={styles.screen}>
+      <ScreenHeader
+        title="Meal Plans"
+        subtitle="Manage available meal plans"
+        showBack
+        onBack={() => navigation.goBack()}
+        rightAction={
+          <TouchableOpacity
+            style={styles.headerAddButton}
+            onPress={() => navigation.navigate("CreateMealPlan")}
+            accessibilityRole="button"
+            accessibilityLabel="Create meal plan"
+          >
+            <Ionicons
+              name="add"
+              size={18}
+              color={COLORS.primary}
+            />
+
+            <Text style={styles.headerAddText}>
+              Add
+            </Text>
+          </TouchableOpacity>
+        }
+      />
+
       <ScrollView
         style={styles.container}
         contentContainerStyle={styles.content}
@@ -124,50 +146,19 @@ const MealPlansScreen = ({ navigation }) => {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={handleRefresh}
-            tintColor="#087443"
+            tintColor={COLORS.primary}
           />
         }
       >
-        {/* Green Header */}
-
-        <View style={styles.header}>
-          <View style={styles.headerTopRow}>
-            <View style={styles.headerTextContainer}>
-              <Text style={styles.headerTitle}>
-                Meal Plans
-              </Text>
-
-              <Text style={styles.headerSubtitle}>
-                Manage available meal plans
-              </Text>
-            </View>
-
-            <TouchableOpacity
-              style={styles.headerAddButton}
-              onPress={() =>
-                navigation.navigate(
-                  "CreateMealPlan"
-                )
-              }
-            >
-              <Text style={styles.headerAddIcon}>
-                +
-              </Text>
-
-              <Text style={styles.headerAddText}>
-                Add
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
         {/* Summary */}
 
         <View style={styles.summaryCard}>
           <View style={styles.summaryIcon}>
-            <Text style={styles.summaryIconText}>
-              ▣
-            </Text>
+            <Ionicons
+              name="albums-outline"
+              size={22}
+              color={COLORS.primary}
+            />
           </View>
 
           <View style={styles.summaryContent}>
@@ -197,9 +188,11 @@ const MealPlansScreen = ({ navigation }) => {
         {mealPlans.length === 0 ? (
           <View style={styles.emptyContainer}>
             <View style={styles.emptyIcon}>
-              <Text style={styles.emptyIconText}>
-                🍽
-              </Text>
+              <Ionicons
+                name="restaurant-outline"
+                size={30}
+                color={COLORS.primary}
+              />
             </View>
 
             <Text style={styles.emptyTitle}>
@@ -220,9 +213,12 @@ const MealPlansScreen = ({ navigation }) => {
                 )
               }
             >
-              <Text style={styles.emptyButtonIcon}>
-                +
-              </Text>
+              <Ionicons
+                name="add-outline"
+                size={19}
+                color={COLORS.onPrimary}
+                style={styles.emptyButtonIcon}
+              />
 
               <Text style={styles.emptyButtonText}>
                 Create Meal Plan
@@ -258,9 +254,11 @@ const MealPlansScreen = ({ navigation }) => {
 
                 <View style={styles.cardTop}>
                   <View style={styles.planIcon}>
-                    <Text style={styles.planIconText}>
-                      🍽
-                    </Text>
+                    <Ionicons
+                      name="fast-food-outline"
+                      size={20}
+                      color={COLORS.primary}
+                    />
                   </View>
 
                   <View style={styles.planTitleContainer}>
@@ -314,9 +312,11 @@ const MealPlansScreen = ({ navigation }) => {
                 <View style={styles.statsContainer}>
                   <View style={styles.statBox}>
                     <View style={styles.statIcon}>
-                      <Text style={styles.statIconText}>
-                        ◷
-                      </Text>
+                      <Ionicons
+                        name="ticket-outline"
+                        size={14}
+                        color={COLORS.primary}
+                      />
                     </View>
 
                     <View>
@@ -334,9 +334,11 @@ const MealPlansScreen = ({ navigation }) => {
 
                   <View style={styles.statBox}>
                     <View style={styles.statIcon}>
-                      <Text style={styles.statIconText}>
-                        ₣
-                      </Text>
+                      <Ionicons
+                        name="cash-outline"
+                        size={14}
+                        color={COLORS.primary}
+                      />
                     </View>
 
                     <View>
@@ -365,9 +367,11 @@ const MealPlansScreen = ({ navigation }) => {
                       )
                     }
                   >
-                    <Text style={styles.editIcon}>
-                      ✎
-                    </Text>
+                    <Ionicons
+                      name="create-outline"
+                      size={14}
+                      color={COLORS.primary}
+                    />
 
                     <Text style={styles.editButtonText}>
                       Edit
@@ -380,9 +384,11 @@ const MealPlansScreen = ({ navigation }) => {
                       handleDelete(mealPlan)
                     }
                   >
-                    <Text style={styles.deleteIcon}>
-                      ×
-                    </Text>
+                    <Ionicons
+                      name="trash-outline"
+                      size={14}
+                      color={COLORS.danger}
+                    />
 
                     <Text
                       style={styles.deleteButtonText}
@@ -408,9 +414,11 @@ const MealPlansScreen = ({ navigation }) => {
             )
           }
         >
-          <Text style={styles.floatingButtonText}>
-            +
-          </Text>
+          <Ionicons
+            name="add-outline"
+            size={28}
+            color={COLORS.onPrimary}
+          />
         </TouchableOpacity>
       )}
     </View>
@@ -420,7 +428,7 @@ const MealPlansScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: "#F4FAF7",
+    backgroundColor: COLORS.background,
   },
 
   container: {
@@ -431,122 +439,46 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
 
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#F4FAF7",
-  },
-
-  loadingIcon: {
-    width: 64,
-    height: 64,
-    borderRadius: 20,
-    backgroundColor: "#E2F4EA",
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 15,
-  },
-
-  loadingIconText: {
-    fontSize: 28,
-  },
-
-  loadingText: {
-    marginTop: 9,
-    color: "#789187",
-    fontSize: 13,
-  },
-
-  header: {
-    backgroundColor: "#087443",
-    paddingHorizontal: 18,
-    paddingTop: 20,
-    paddingBottom: 22,
-    borderBottomLeftRadius: 22,
-    borderBottomRightRadius: 22,
-  },
-
-  headerTopRow: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-
-  headerTextContainer: {
-    flex: 1,
-    paddingRight: 10,
-  },
-
-  headerTitle: {
-    color: "#FFFFFF",
-    fontSize: 23,
-    fontWeight: "800",
-  },
-
-  headerSubtitle: {
-    color: "#D7F2E3",
-    fontSize: 12,
-    marginTop: 4,
-  },
-
   headerAddButton: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
     minWidth: 74,
-    height: 40,
-    borderRadius: 10,
-    paddingHorizontal: 12,
+    height: 36,
+    borderRadius: RADIUS.md,
+    paddingHorizontal: SPACING.md,
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-  },
-
-  headerAddIcon: {
-    color: "#087443",
-    fontSize: 21,
-    fontWeight: "800",
-    marginRight: 5,
+    gap: SPACING.xs,
   },
 
   headerAddText: {
-    color: "#087443",
+    color: COLORS.primary,
     fontSize: 13,
     fontWeight: "800",
   },
 
   summaryCard: {
-    backgroundColor: "#FFFFFF",
-    marginHorizontal: 16,
-    marginTop: -8,
-    borderRadius: 16,
+    backgroundColor: COLORS.surface,
+    marginHorizontal: SPACING.lg,
+    marginTop: SPACING.lg,
+    borderRadius: RADIUS.lg,
     minHeight: 78,
-    padding: 13,
+    padding: SPACING.md,
     flexDirection: "row",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#E0EFE7",
-    shadowColor: "#075C37",
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
+    borderColor: COLORS.border,
+    ...SHADOWS.md,
   },
 
   summaryIcon: {
     width: 50,
     height: 50,
     borderRadius: 14,
-    backgroundColor: "#E5F5ED",
+    backgroundColor: COLORS.primaryLight,
     justifyContent: "center",
     alignItems: "center",
     marginRight: 12,
-  },
-
-  summaryIconText: {
-    color: "#087443",
-    fontSize: 22,
   },
 
   summaryContent: {
@@ -554,13 +486,13 @@ const styles = StyleSheet.create({
   },
 
   summaryNumber: {
-    color: "#10251C",
+    color: COLORS.text,
     fontSize: 21,
     fontWeight: "800",
   },
 
   summaryLabel: {
-    color: "#789187",
+    color: COLORS.textSecondary,
     fontSize: 11,
     marginTop: 2,
   },
@@ -568,7 +500,7 @@ const styles = StyleSheet.create({
   summaryStatus: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#EAF8F1",
+    backgroundColor: COLORS.primaryLight,
     borderRadius: 20,
     paddingHorizontal: 9,
     paddingVertical: 6,
@@ -578,12 +510,12 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: "#087443",
+    backgroundColor: COLORS.primary,
     marginRight: 5,
   },
 
   summaryStatusText: {
-    color: "#087443",
+    color: COLORS.primary,
     fontSize: 10,
     fontWeight: "800",
   },
@@ -598,48 +530,40 @@ const styles = StyleSheet.create({
   },
 
   sectionTitle: {
-    color: "#10251C",
-    fontSize: 17,
-    fontWeight: "800",
+    ...TYPOGRAPHY.h3,
+    color: COLORS.text,
   },
 
   sectionSubtitle: {
-    color: "#789187",
-    fontSize: 11,
-    marginTop: 3,
+    ...TYPOGRAPHY.caption,
+    color: COLORS.textSecondary,
+    marginTop: SPACING.xs,
   },
 
   countBadge: {
     minWidth: 30,
     height: 30,
-    borderRadius: 10,
-    backgroundColor: "#DFF2E8",
+    borderRadius: RADIUS.md,
+    backgroundColor: COLORS.primaryLight,
     justifyContent: "center",
     alignItems: "center",
   },
 
   countBadgeText: {
-    color: "#087443",
+    color: COLORS.primary,
     fontSize: 12,
     fontWeight: "800",
   },
 
   card: {
-    backgroundColor: "#FFFFFF",
-    marginHorizontal: 16,
-    marginBottom: 13,
-    borderRadius: 16,
-    padding: 14,
+    backgroundColor: COLORS.surface,
+    marginHorizontal: SPACING.lg,
+    marginBottom: SPACING.md,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.md,
     borderWidth: 1,
-    borderColor: "#E0EFE7",
-    shadowColor: "#075C37",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.06,
-    shadowRadius: 7,
-    elevation: 2,
+    borderColor: COLORS.border,
+    ...SHADOWS.md,
   },
 
   cardTop: {
@@ -648,50 +572,46 @@ const styles = StyleSheet.create({
   },
 
   planIcon: {
-    width: 45,
-    height: 45,
-    borderRadius: 13,
-    backgroundColor: "#E7F6EE",
+    width: 44,
+    height: 44,
+    borderRadius: RADIUS.md,
+    backgroundColor: COLORS.primaryLight,
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 10,
-  },
-
-  planIconText: {
-    fontSize: 20,
+    marginRight: SPACING.sm,
   },
 
   planTitleContainer: {
     flex: 1,
-    paddingRight: 7,
+    paddingRight: SPACING.sm,
   },
 
   planName: {
-    color: "#10251C",
+    color: COLORS.text,
     fontSize: 15,
     fontWeight: "800",
   },
 
   planDescription: {
-    color: "#82978E",
+    color: COLORS.textMuted,
     fontSize: 10,
-    marginTop: 3,
+    marginTop: SPACING.xs,
   },
 
   statusBadge: {
     flexDirection: "row",
     alignItems: "center",
-    borderRadius: 20,
-    paddingHorizontal: 8,
-    paddingVertical: 5,
+    borderRadius: 999,
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: SPACING.xs,
   },
 
   activeBadge: {
-    backgroundColor: "#DDF4E8",
+    backgroundColor: COLORS.successLight,
   },
 
   inactiveBadge: {
-    backgroundColor: "#EFF2F0",
+    backgroundColor: COLORS.surfaceAlt,
   },
 
   badgeDot: {
@@ -702,11 +622,11 @@ const styles = StyleSheet.create({
   },
 
   activeDot: {
-    backgroundColor: "#087443",
+    backgroundColor: COLORS.primary,
   },
 
   inactiveDot: {
-    backgroundColor: "#84928C",
+    backgroundColor: COLORS.textMuted,
   },
 
   statusText: {
@@ -715,22 +635,22 @@ const styles = StyleSheet.create({
   },
 
   activeText: {
-    color: "#087443",
+    color: COLORS.primary,
   },
 
   inactiveText: {
-    color: "#718079",
+    color: COLORS.textSecondary,
   },
 
   statsContainer: {
-    backgroundColor: "#F5FBF8",
-    borderRadius: 12,
-    marginTop: 13,
-    padding: 11,
+    backgroundColor: COLORS.background,
+    borderRadius: RADIUS.md,
+    marginTop: SPACING.md,
+    padding: SPACING.sm,
     flexDirection: "row",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#E5F1EB",
+    borderColor: COLORS.border,
   },
 
   statBox: {
@@ -742,169 +662,141 @@ const styles = StyleSheet.create({
   statIcon: {
     width: 31,
     height: 31,
-    borderRadius: 9,
-    backgroundColor: "#E2F4EA",
+    borderRadius: RADIUS.sm,
+    backgroundColor: COLORS.primaryLight,
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 7,
-  },
-
-  statIconText: {
-    color: "#087443",
-    fontSize: 13,
-    fontWeight: "800",
+    marginRight: SPACING.sm,
   },
 
   statLabel: {
-    color: "#7C9188",
+    color: COLORS.textMuted,
     fontSize: 9,
   },
 
   statValue: {
-    color: "#16382B",
+    color: COLORS.text,
     fontSize: 12,
     fontWeight: "800",
-    marginTop: 2,
+    marginTop: SPACING.xs,
   },
 
   statDivider: {
     width: 1,
     height: 32,
-    backgroundColor: "#DCEAE3",
-    marginHorizontal: 9,
+    backgroundColor: COLORS.border,
+    marginHorizontal: SPACING.sm,
   },
 
   actions: {
     flexDirection: "row",
-    marginTop: 11,
+    marginTop: SPACING.md,
   },
 
   editButton: {
     flex: 1,
-    height: 40,
-    borderRadius: 9,
+    minHeight: TOUCH_TARGET,
+    borderRadius: RADIUS.md,
     borderWidth: 1,
-    borderColor: "#087443",
-    backgroundColor: "#FFFFFF",
+    borderColor: COLORS.primary,
+    backgroundColor: COLORS.surface,
     justifyContent: "center",
     alignItems: "center",
     flexDirection: "row",
-    marginRight: 5,
-  },
-
-  editIcon: {
-    color: "#087443",
-    fontSize: 14,
-    fontWeight: "800",
-    marginRight: 5,
+    marginRight: SPACING.sm,
   },
 
   editButtonText: {
-    color: "#087443",
+    color: COLORS.primary,
     fontSize: 12,
-    fontWeight: "800",
+    fontWeight: "700",
   },
 
   deleteButton: {
     flex: 1,
-    height: 40,
-    borderRadius: 9,
+    minHeight: TOUCH_TARGET,
+    borderRadius: RADIUS.md,
     borderWidth: 1,
-    borderColor: "#E9CACA",
-    backgroundColor: "#FFF9F9",
+    borderColor: COLORS.dangerLight,
+    backgroundColor: COLORS.surface,
     justifyContent: "center",
     alignItems: "center",
     flexDirection: "row",
-    marginLeft: 5,
-  },
-
-  deleteIcon: {
-    color: "#C63B3B",
-    fontSize: 18,
-    fontWeight: "600",
-    marginRight: 5,
+    marginLeft: SPACING.sm,
   },
 
   deleteButtonText: {
-    color: "#C63B3B",
+    color: COLORS.danger,
     fontSize: 12,
-    fontWeight: "800",
+    fontWeight: "700",
   },
 
   emptyContainer: {
-    backgroundColor: "#FFFFFF",
-    marginHorizontal: 16,
-    marginTop: 22,
-    padding: 28,
-    borderRadius: 18,
+    backgroundColor: COLORS.surface,
+    marginHorizontal: SPACING.lg,
+    marginTop: SPACING.xl,
+    padding: SPACING.xxl,
+    borderRadius: RADIUS.lg,
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#E0EFE7",
+    borderColor: COLORS.border,
   },
 
   emptyIcon: {
     width: 65,
     height: 65,
-    borderRadius: 20,
-    backgroundColor: "#E5F5ED",
+    borderRadius: RADIUS.lg,
+    backgroundColor: COLORS.primaryLight,
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 14,
-  },
-
-  emptyIconText: {
-    fontSize: 30,
+    marginBottom: SPACING.md,
   },
 
   emptyTitle: {
-    color: "#10251C",
-    fontSize: 19,
-    fontWeight: "800",
+    ...TYPOGRAPHY.h2,
+    color: COLORS.text,
   },
 
   emptyText: {
-    marginTop: 8,
+    marginTop: SPACING.sm,
     textAlign: "center",
-    color: "#789187",
+    color: COLORS.textSecondary,
     fontSize: 12,
     lineHeight: 18,
   },
 
   emptyButton: {
-    height: 45,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-    backgroundColor: "#087443",
-    marginTop: 18,
+    minHeight: TOUCH_TARGET,
+    paddingHorizontal: SPACING.xl,
+    borderRadius: RADIUS.md,
+    backgroundColor: COLORS.primary,
+    marginTop: SPACING.lg,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
   },
 
   emptyButtonIcon: {
-    color: "#FFFFFF",
-    fontSize: 19,
-    fontWeight: "800",
-    marginRight: 7,
+    marginRight: SPACING.sm,
   },
 
   emptyButtonText: {
-    color: "#FFFFFF",
+    color: COLORS.onPrimary,
     fontSize: 12,
     fontWeight: "800",
   },
 
   floatingButton: {
     position: "absolute",
-    right: 18,
-    bottom: 22,
+    right: SPACING.lg,
+    bottom: SPACING.xl,
     width: 55,
     height: 55,
-    borderRadius: 18,
-    backgroundColor: "#087443",
+    borderRadius: RADIUS.lg,
+    backgroundColor: COLORS.primary,
     justifyContent: "center",
     alignItems: "center",
-    shadowColor: "#075C37",
+    shadowColor: COLORS.primaryDark,
     shadowOffset: {
       width: 0,
       height: 4,
@@ -912,13 +804,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.22,
     shadowRadius: 7,
     elevation: 6,
-  },
-
-  floatingButtonText: {
-    color: "#FFFFFF",
-    fontSize: 29,
-    fontWeight: "400",
-    lineHeight: 32,
   },
 });
 

@@ -8,8 +8,9 @@ import {
   Alert,
   StatusBar,
 } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Ionicons } from "@expo/vector-icons";
 import useAuthStore from '../../store/useAuthStore';
+import { COLORS, RADIUS, SHADOWS, SPACING, TYPOGRAPHY } from '../../theme/tokens';
 
 
 const AdminDashboardScreen = ({ navigation }) => {
@@ -33,7 +34,7 @@ const AdminDashboardScreen = ({ navigation }) => {
     <View style={styles.screen}>
       <StatusBar
         barStyle="light-content"
-        backgroundColor="#087A4B"
+        backgroundColor={COLORS.primary}
       />
 
       <ScrollView
@@ -101,9 +102,7 @@ const AdminDashboardScreen = ({ navigation }) => {
 
             <View style={styles.statCard}>
               <View style={styles.statIconContainer}>
-                <Text style={styles.statIcon}>
-                  ♙
-                </Text>
+                <Ionicons name="people-outline" size={20} color={COLORS.primary} />
               </View>
 
               <Text style={styles.statNumber}>
@@ -119,9 +118,7 @@ const AdminDashboardScreen = ({ navigation }) => {
 
             <View style={styles.statCard}>
               <View style={styles.statIconContainer}>
-                <Text style={styles.statIcon}>
-                  ▤
-                </Text>
+                <Ionicons name="card-outline" size={20} color={COLORS.primary} />
               </View>
 
               <Text style={styles.statNumber}>
@@ -137,9 +134,7 @@ const AdminDashboardScreen = ({ navigation }) => {
 
             <View style={styles.statCard}>
               <View style={styles.statIconContainer}>
-                <Text style={styles.statIcon}>
-                  ◷
-                </Text>
+                <Ionicons name="time-outline" size={20} color={COLORS.primary} />
               </View>
 
               <Text style={styles.statNumber}>
@@ -155,9 +150,7 @@ const AdminDashboardScreen = ({ navigation }) => {
 
             <View style={styles.statCard}>
               <View style={styles.statIconContainer}>
-                <Text style={styles.statIcon}>
-                  ♨
-                </Text>
+                <Ionicons name="restaurant-outline" size={20} color={COLORS.primary} />
               </View>
 
               <Text style={styles.statNumber}>
@@ -197,9 +190,7 @@ const AdminDashboardScreen = ({ navigation }) => {
               }
             >
               <View style={styles.menuIconContainer}>
-                <Text style={styles.menuIcon}>
-                  ▣
-                </Text>
+                <Ionicons name="calendar-outline" size={20} color={COLORS.primary} />
               </View>
 
               <View style={styles.menuTextContainer}>
@@ -212,9 +203,7 @@ const AdminDashboardScreen = ({ navigation }) => {
                 </Text>
               </View>
 
-              <Text style={styles.arrow}>
-                ›
-              </Text>
+              <Ionicons name="chevron-forward" size={16} color={COLORS.textMuted} />
             </TouchableOpacity>
 
             {/* Meal Plans */}
@@ -227,9 +216,7 @@ const AdminDashboardScreen = ({ navigation }) => {
               }
             >
               <View style={styles.menuIconContainer}>
-                <Text style={styles.menuIcon}>
-                  ♨
-                </Text>
+                <Ionicons name="restaurant-outline" size={20} color={COLORS.primary} />
               </View>
 
               <View style={styles.menuTextContainer}>
@@ -242,9 +229,7 @@ const AdminDashboardScreen = ({ navigation }) => {
                 </Text>
               </View>
 
-              <Text style={styles.arrow}>
-                ›
-              </Text>
+              <Ionicons name="chevron-forward" size={16} color={COLORS.textMuted} />
             </TouchableOpacity>
 
             {/* Subscriptions */}
@@ -257,9 +242,7 @@ const AdminDashboardScreen = ({ navigation }) => {
               }
             >
               <View style={styles.menuIconContainer}>
-                <Text style={styles.menuIcon}>
-                  ▤
-                </Text>
+                <Ionicons name="card-outline" size={20} color={COLORS.primary} />
               </View>
 
               <View style={styles.menuTextContainer}>
@@ -272,9 +255,7 @@ const AdminDashboardScreen = ({ navigation }) => {
                 </Text>
               </View>
 
-              <Text style={styles.arrow}>
-                ›
-              </Text>
+              <Ionicons name="chevron-forward" size={16} color={COLORS.textMuted} />
             </TouchableOpacity>
 
             {/* Payments */}
@@ -287,9 +268,7 @@ const AdminDashboardScreen = ({ navigation }) => {
               }
             >
               <View style={styles.menuIconContainer}>
-                <Text style={styles.menuIcon}>
-                  ◷
-                </Text>
+                <Ionicons name="time-outline" size={20} color={COLORS.primary} />
               </View>
 
               <View style={styles.menuTextContainer}>
@@ -302,9 +281,7 @@ const AdminDashboardScreen = ({ navigation }) => {
                 </Text>
               </View>
 
-              <Text style={styles.arrow}>
-                ›
-              </Text>
+              <Ionicons name="chevron-forward" size={16} color={COLORS.textMuted} />
             </TouchableOpacity>
 
             {/* Students */}
@@ -317,9 +294,7 @@ const AdminDashboardScreen = ({ navigation }) => {
               }
             >
               <View style={styles.menuIconContainer}>
-                <Text style={styles.menuIcon}>
-                  ♙
-                </Text>
+                <Ionicons name="people-outline" size={20} color={COLORS.primary} />
               </View>
 
               <View style={styles.menuTextContainer}>
@@ -332,9 +307,7 @@ const AdminDashboardScreen = ({ navigation }) => {
                 </Text>
               </View>
 
-              <Text style={styles.arrow}>
-                ›
-              </Text>
+              <Ionicons name="chevron-forward" size={16} color={COLORS.textMuted} />
             </TouchableOpacity>
 
             {/* Reports */}
@@ -347,9 +320,7 @@ const AdminDashboardScreen = ({ navigation }) => {
               }
             >
               <View style={styles.menuIconContainer}>
-                <Text style={styles.menuIcon}>
-                  ▥
-                </Text>
+                <Ionicons name="bar-chart-outline" size={20} color={COLORS.primary} />
               </View>
 
               <View style={styles.menuTextContainer}>
@@ -362,9 +333,7 @@ const AdminDashboardScreen = ({ navigation }) => {
                 </Text>
               </View>
 
-              <Text style={styles.arrow}>
-                ›
-              </Text>
+              <Ionicons name="chevron-forward" size={16} color={COLORS.textMuted} />
             </TouchableOpacity>
 
             {/* Meal Claims */}
@@ -377,9 +346,7 @@ const AdminDashboardScreen = ({ navigation }) => {
               }
             >
               <View style={styles.menuIconContainer}>
-                <Text style={styles.menuIcon}>
-                  ♨
-                </Text>
+                <Ionicons name="restaurant-outline" size={20} color={COLORS.primary} />
               </View>
 
               <View style={styles.menuTextContainer}>
@@ -392,9 +359,7 @@ const AdminDashboardScreen = ({ navigation }) => {
                 </Text>
               </View>
 
-              <Text style={styles.arrow}>
-                ›
-              </Text>
+              <Ionicons name="chevron-forward" size={16} color={COLORS.textMuted} />
             </TouchableOpacity>
 
           </View>
@@ -408,9 +373,8 @@ const AdminDashboardScreen = ({ navigation }) => {
             activeOpacity={0.75}
             onPress={handleLogout}
           >
-            <Text style={styles.logoutIcon}>
-              ↪
-            </Text>
+            <Ionicons name="log-out-outline" size={19} color={COLORS.danger} />
+            <View style={{ width: SPACING.sm }} />
 
             <Text style={styles.logoutText}>
               Logout
@@ -434,12 +398,12 @@ const styles = StyleSheet.create({
 
   screen: {
     flex: 1,
-    backgroundColor: "#087A4B",
+    backgroundColor: COLORS.primary,
   },
 
   container: {
     flex: 1,
-    backgroundColor: "#087A4B",
+    backgroundColor: COLORS.primary,
   },
 
   content: {
@@ -452,8 +416,8 @@ const styles = StyleSheet.create({
 
   topHeader: {
     height: 92,
-    backgroundColor: "#087A4B",
-    paddingHorizontal: 20,
+    backgroundColor: COLORS.primary,
+    paddingHorizontal: SPACING.xl,
     paddingTop: 18,
     paddingBottom: 14,
 
@@ -477,7 +441,7 @@ const styles = StyleSheet.create({
   menuLine: {
     width: 20,
     height: 2,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.onPrimary,
     marginVertical: 2.5,
     borderRadius: 2,
   },
@@ -487,13 +451,13 @@ const styles = StyleSheet.create({
   },
 
   brandName: {
-    color: "#FFFFFF",
+    color: COLORS.onPrimary,
     fontSize: 17,
-    fontWeight: "800",
+    fontWeight: "700",
   },
 
   brandSubtitle: {
-    color: "#D9F2E7",
+    color: COLORS.onPrimaryMuted,
     fontSize: 10,
     marginTop: 1,
   },
@@ -502,13 +466,13 @@ const styles = StyleSheet.create({
     width: 38,
     height: 38,
     borderRadius: 19,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.onPrimary,
     justifyContent: "center",
     alignItems: "center",
   },
 
   avatarText: {
-    color: "#087A4B",
+    color: COLORS.primary,
     fontSize: 16,
     fontWeight: "800",
   },
@@ -518,14 +482,14 @@ const styles = StyleSheet.create({
   ========================================================== */
 
   mainContent: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
 
-    borderTopLeftRadius: 22,
-    borderTopRightRadius: 22,
+    borderTopLeftRadius: RADIUS.xl,
+    borderTopRightRadius: RADIUS.xl,
 
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 30,
+    paddingHorizontal: SPACING.xl,
+    paddingTop: SPACING.xl,
+    paddingBottom: SPACING.xxl,
 
     minHeight: 750,
   },
@@ -535,19 +499,18 @@ const styles = StyleSheet.create({
   ========================================================== */
 
   welcomeContainer: {
-    marginBottom: 22,
+    marginBottom: SPACING.lg,
   },
 
   welcome: {
-    color: "#10231B",
-    fontSize: 22,
-    fontWeight: "800",
+    ...TYPOGRAPHY.h2,
+    color: COLORS.text,
   },
 
   subtitle: {
-    color: "#789087",
-    fontSize: 12,
-    marginTop: 4,
+    ...TYPOGRAPHY.bodySmall,
+    color: COLORS.textSecondary,
+    marginTop: 2,
   },
 
   /* =========================================================
@@ -555,9 +518,8 @@ const styles = StyleSheet.create({
   ========================================================== */
 
   sectionTitle: {
-    color: "#10231B",
-    fontSize: 16,
-    fontWeight: "800",
+    ...TYPOGRAPHY.h3,
+    color: COLORS.text,
   },
 
   managementHeader: {
@@ -566,9 +528,9 @@ const styles = StyleSheet.create({
   },
 
   sectionSubtitle: {
-    color: "#789087",
-    fontSize: 11,
-    marginTop: 4,
+    ...TYPOGRAPHY.bodySmall,
+    color: COLORS.textSecondary,
+    marginTop: 2,
   },
 
   /* =========================================================
@@ -579,33 +541,25 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
-    marginTop: 13,
-    marginBottom: 25,
+    marginTop: SPACING.md,
+    marginBottom: SPACING.xl,
   },
 
   statCard: {
     width: "48.2%",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
 
     borderWidth: 1,
-    borderColor: "#E3F0EA",
+    borderColor: COLORS.border,
 
-    borderRadius: 14,
+    borderRadius: RADIUS.md,
 
-    paddingHorizontal: 13,
-    paddingVertical: 13,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.md,
 
-    marginBottom: 10,
+    marginBottom: SPACING.sm,
 
-    shadowColor: "#087A4B",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.06,
-    shadowRadius: 5,
-
-    elevation: 2,
+    ...SHADOWS.sm,
   },
 
   statIconContainer: {
@@ -613,28 +567,22 @@ const styles = StyleSheet.create({
     height: 34,
     borderRadius: 10,
 
-    backgroundColor: "#E5F5EE",
+    backgroundColor: COLORS.primaryLight,
 
     justifyContent: "center",
     alignItems: "center",
 
-    marginBottom: 8,
-  },
-
-  statIcon: {
-    color: "#087A4B",
-    fontSize: 20,
-    fontWeight: "700",
+    marginBottom: SPACING.sm,
   },
 
   statNumber: {
-    color: "#087A4B",
+    color: COLORS.primary,
     fontSize: 21,
     fontWeight: "800",
   },
 
   statLabel: {
-    color: "#71847C",
+    color: COLORS.textSecondary,
     fontSize: 11,
     marginTop: 2,
   },
@@ -644,56 +592,42 @@ const styles = StyleSheet.create({
   ========================================================== */
 
   menuContainer: {
-    marginBottom: 20,
+    marginBottom: SPACING.lg,
   },
 
   menuItem: {
-    minHeight: 66,
+    minHeight: 60,
 
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
 
     borderWidth: 1,
-    borderColor: "#E4F0EB",
+    borderColor: COLORS.border,
 
-    borderRadius: 13,
+    borderRadius: RADIUS.md,
 
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
 
-    marginBottom: 9,
+    marginBottom: SPACING.sm,
 
     flexDirection: "row",
     alignItems: "center",
 
-    shadowColor: "#087A4B",
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.035,
-    shadowRadius: 4,
-
-    elevation: 1,
+    ...SHADOWS.sm,
   },
 
   menuIconContainer: {
-    width: 40,
-    height: 40,
+    width: 38,
+    height: 38,
 
-    borderRadius: 11,
+    borderRadius: 10,
 
-    backgroundColor: "#E7F5EF",
+    backgroundColor: COLORS.primaryLight,
 
     justifyContent: "center",
     alignItems: "center",
 
-    marginRight: 12,
-  },
-
-  menuIcon: {
-    color: "#087A4B",
-    fontSize: 20,
-    fontWeight: "700",
+    marginRight: SPACING.md,
   },
 
   menuTextContainer: {
@@ -701,23 +635,16 @@ const styles = StyleSheet.create({
   },
 
   menuTitle: {
-    color: "#153128",
+    color: COLORS.text,
     fontSize: 13,
-    fontWeight: "800",
+    fontWeight: "700",
   },
 
   menuDescription: {
-    color: "#81928B",
+    color: COLORS.textSecondary,
     fontSize: 10.5,
-    marginTop: 3,
+    marginTop: 2,
     lineHeight: 14,
-  },
-
-  arrow: {
-    color: "#087A4B",
-    fontSize: 25,
-    fontWeight: "300",
-    marginLeft: 7,
   },
 
   /* =========================================================
@@ -727,12 +654,12 @@ const styles = StyleSheet.create({
   logoutButton: {
     height: 48,
 
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
 
     borderWidth: 1,
-    borderColor: "#F3D7D7",
+    borderColor: COLORS.dangerLight,
 
-    borderRadius: 12,
+    borderRadius: RADIUS.md,
 
     flexDirection: "row",
     alignItems: "center",
@@ -741,15 +668,8 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
 
-  logoutIcon: {
-    color: "#D64545",
-    fontSize: 19,
-    fontWeight: "700",
-    marginRight: 7,
-  },
-
   logoutText: {
-    color: "#D64545",
+    color: COLORS.danger,
     fontSize: 13,
     fontWeight: "800",
   },
@@ -760,9 +680,9 @@ const styles = StyleSheet.create({
 
   footerText: {
     textAlign: "center",
-    color: "#A0AEA8",
+    color: COLORS.textMuted,
     fontSize: 9.5,
-    marginTop: 18,
+    marginTop: SPACING.lg,
   },
 });
 

@@ -11,17 +11,40 @@ import {
   ActivityIndicator,
 } from "react-native";
 
-import { createMealPlan } from "../../api/mealPlans.api";
+import { updateMealPlan } from "../../api/mealPlans.api";
+import { Ionicons } from "@expo/vector-icons";
+import { ScreenHeader } from "../../components";
+import {
+  COLORS,
+  RADIUS,
+  SHADOWS,
+  SPACING,
+  TOUCH_TARGET,
+  TYPOGRAPHY,
+} from "../../theme/tokens";
 
-const EditMealPlanScreen = ({ navigation }) => {
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [credits, setCredits] = useState("");
-  const [pricePerCredit, setPricePerCredit] = useState("");
-  const [isActive, setIsActive] = useState(true);
+const EditMealPlanScreen = ({ navigation, route }) => {
+  const plan = route?.params?.mealPlan || {};
+  const planId = plan?.id;
+  const [name, setName] = useState(plan?.name || "");
+  const [description, setDescription] = useState(plan?.description || "");
+  const [credits, setCredits] = useState(
+    plan?.credits != null ? String(plan.credits) : ""
+  );
+  const [pricePerCredit, setPricePerCredit] = useState(
+    plan?.pricePerCredit != null ? String(plan.pricePerCredit) : ""
+  );
+  const [isActive, setIsActive] = useState(plan?.isActive ?? true);
   const [loading, setLoading] = useState(false);
 
-  const handleCreate = async () => {
+  const handleSave = async () => {
+    if (!planId) {
+      Alert.alert(
+        "Error",
+        "No meal plan selected to edit."
+      );
+      return;
+    }
     if (!name.trim()) {
       Alert.alert(
         "Error",
@@ -60,11 +83,11 @@ const EditMealPlanScreen = ({ navigation }) => {
         isActive,
       };
 
-      await createMealPlan(mealPlanData);
+      await updateMealPlan(planId, mealPlanData);
 
       Alert.alert(
         "Success",
-        "Meal plan created successfully.",
+        "Meal plan updated successfully.",
         [
           {
             text: "OK",
@@ -78,7 +101,7 @@ const EditMealPlanScreen = ({ navigation }) => {
       Alert.alert(
         "Error",
         error.response?.data?.message ||
-          "Unable to create meal plan."
+          "Unable to update meal plan."
       );
     } finally {
       setLoading(false);
@@ -87,27 +110,12 @@ const EditMealPlanScreen = ({ navigation }) => {
 
   return (
     <View style={styles.screen}>
-      {/* Green Header */}
-
-      <View style={styles.topHeader}>
-        <TouchableOpacity
-          style={styles.headerBackButton}
-          onPress={() => navigation.goBack()}
-          disabled={loading}
-        >
-          <Text style={styles.headerBackText}>‹</Text>
-        </TouchableOpacity>
-
-        <View style={styles.headerTitleContainer}>
-          <Text style={styles.headerTitle}>
-            Create Meal Plan
-          </Text>
-
-          <Text style={styles.headerSubtitle}>
-            Add a new meal plan for students
-          </Text>
-        </View>
-      </View>
+      <ScreenHeader
+        title="Edit Meal Plan"
+        subtitle="Update this meal plan for students"
+        showBack
+        onBack={() => navigation.goBack()}
+      />
 
       <ScrollView
         style={styles.container}
@@ -120,9 +128,11 @@ const EditMealPlanScreen = ({ navigation }) => {
 
           <View style={styles.sectionHeader}>
             <View style={styles.sectionIcon}>
-              <Text style={styles.sectionIconText}>
-                +
-              </Text>
+              <Ionicons
+                name="create-outline"
+                size={22}
+                color={COLORS.primary}
+              />
             </View>
 
             <View>
@@ -145,15 +155,17 @@ const EditMealPlanScreen = ({ navigation }) => {
 
             <View style={styles.inputContainer}>
               <View style={styles.inputIcon}>
-                <Text style={styles.inputIconText}>
-                  ▣
-                </Text>
+                <Ionicons
+                  name="pricetag-outline"
+                  size={17}
+                  color={COLORS.primary}
+                />
               </View>
 
               <TextInput
                 style={styles.input}
                 placeholder="e.g. One Week Plan"
-                placeholderTextColor="#9BB5A8"
+                placeholderTextColor={COLORS.textMuted}
                 value={name}
                 onChangeText={setName}
               />
@@ -179,9 +191,11 @@ const EditMealPlanScreen = ({ navigation }) => {
                   styles.textAreaIcon,
                 ]}
               >
-                <Text style={styles.inputIconText}>
-                  ≡
-                </Text>
+                <Ionicons
+                  name="document-text-outline"
+                  size={17}
+                  color={COLORS.primary}
+                />
               </View>
 
               <TextInput
@@ -190,7 +204,7 @@ const EditMealPlanScreen = ({ navigation }) => {
                   styles.textArea,
                 ]}
                 placeholder="Describe this meal plan"
-                placeholderTextColor="#9BB5A8"
+                placeholderTextColor={COLORS.textMuted}
                 value={description}
                 onChangeText={setDescription}
                 multiline
@@ -208,15 +222,17 @@ const EditMealPlanScreen = ({ navigation }) => {
 
             <View style={styles.inputContainer}>
               <View style={styles.inputIcon}>
-                <Text style={styles.inputIconText}>
-                  ◷
-                </Text>
+                <Ionicons
+                  name="ticket-outline"
+                  size={17}
+                  color={COLORS.primary}
+                />
               </View>
 
               <TextInput
                 style={styles.input}
                 placeholder="e.g. 5"
-                placeholderTextColor="#9BB5A8"
+                placeholderTextColor={COLORS.textMuted}
                 value={credits}
                 onChangeText={setCredits}
                 keyboardType="numeric"
@@ -237,15 +253,17 @@ const EditMealPlanScreen = ({ navigation }) => {
 
             <View style={styles.inputContainer}>
               <View style={styles.inputIcon}>
-                <Text style={styles.inputIconText}>
-                  ₣
-                </Text>
+                <Ionicons
+                  name="cash-outline"
+                  size={17}
+                  color={COLORS.primary}
+                />
               </View>
 
               <TextInput
                 style={styles.input}
                 placeholder="e.g. 1000"
-                placeholderTextColor="#9BB5A8"
+                placeholderTextColor={COLORS.textMuted}
                 value={pricePerCredit}
                 onChangeText={setPricePerCredit}
                 keyboardType="decimal-pad"
@@ -261,9 +279,11 @@ const EditMealPlanScreen = ({ navigation }) => {
 
           <View style={styles.switchCard}>
             <View style={styles.switchIcon}>
-              <Text style={styles.switchIconText}>
-                ✓
-              </Text>
+              <Ionicons
+                name="checkmark-circle-outline"
+                size={20}
+                color={COLORS.primary}
+              />
             </View>
 
             <View style={styles.switchTextContainer}>
@@ -280,35 +300,38 @@ const EditMealPlanScreen = ({ navigation }) => {
               value={isActive}
               onValueChange={setIsActive}
               trackColor={{
-                false: "#D7E2DD",
-                true: "#9AD5B7",
+                false: COLORS.border,
+                true: COLORS.primaryLight,
               }}
               thumbColor={
-                isActive ? "#087443" : "#F4F7F5"
+                isActive ? COLORS.primary : COLORS.surface
               }
             />
           </View>
 
-          {/* Create */}
+          {/* Save */}
 
           <TouchableOpacity
             style={[
               styles.primaryButton,
               loading && styles.disabledButton,
             ]}
-            onPress={handleCreate}
+            onPress={handleSave}
             disabled={loading}
           >
             {loading ? (
-              <ActivityIndicator color="#FFFFFF" />
+              <ActivityIndicator color={COLORS.onPrimary} />
             ) : (
               <>
-                <Text style={styles.primaryButtonIcon}>
-                  +
-                </Text>
+                <Ionicons
+                  name="checkmark-outline"
+                  size={18}
+                  color={COLORS.onPrimary}
+                  style={styles.primaryButtonIcon}
+                />
 
                 <Text style={styles.primaryButtonText}>
-                  Create Meal Plan
+                  Save Changes
                 </Text>
               </>
             )}
@@ -334,48 +357,7 @@ const EditMealPlanScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: "#F4FAF7",
-  },
-
-  topHeader: {
-    backgroundColor: "#087443",
-    paddingHorizontal: 18,
-    paddingTop: 18,
-    paddingBottom: 20,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-
-  headerBackButton: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 10,
-  },
-
-  headerBackText: {
-    color: "#FFFFFF",
-    fontSize: 36,
-    fontWeight: "300",
-    lineHeight: 38,
-  },
-
-  headerTitleContainer: {
-    flex: 1,
-  },
-
-  headerTitle: {
-    color: "#FFFFFF",
-    fontSize: 19,
-    fontWeight: "800",
-  },
-
-  headerSubtitle: {
-    color: "#D7F2E3",
-    fontSize: 12,
-    marginTop: 3,
+    backgroundColor: COLORS.background,
   },
 
   container: {
@@ -383,104 +365,83 @@ const styles = StyleSheet.create({
   },
 
   content: {
-    padding: 16,
-    paddingBottom: 35,
+    padding: SPACING.lg,
+    paddingBottom: SPACING.xxl,
   },
 
   formCard: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 18,
-    padding: 17,
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.lg,
     borderWidth: 1,
-    borderColor: "#E0EFE7",
-    shadowColor: "#075C37",
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    shadowOpacity: 0.07,
-    shadowRadius: 8,
-    elevation: 2,
+    borderColor: COLORS.border,
+    ...SHADOWS.md,
   },
 
   sectionHeader: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 4,
+    marginBottom: SPACING.xs,
   },
 
   sectionIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 13,
-    backgroundColor: "#E5F5ED",
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: COLORS.primaryLight,
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 11,
-  },
-
-  sectionIconText: {
-    color: "#087443",
-    fontSize: 25,
-    fontWeight: "700",
+    marginRight: SPACING.sm,
   },
 
   sectionTitle: {
-    color: "#10251C",
+    color: COLORS.text,
     fontSize: 17,
-    fontWeight: "800",
+    fontWeight: "700",
   },
 
   sectionSubtitle: {
-    color: "#789187",
+    color: COLORS.textSecondary,
     fontSize: 12,
-    marginTop: 3,
+    marginTop: 2,
   },
 
   field: {
-    marginTop: 19,
+    marginTop: SPACING.lg,
   },
 
   label: {
-    color: "#345247",
-    fontSize: 12,
-    fontWeight: "700",
-    marginBottom: 7,
+    color: COLORS.text,
+    ...TYPOGRAPHY.label,
+    marginBottom: SPACING.sm,
   },
 
   inputContainer: {
-    minHeight: 50,
+    minHeight: 48,
     borderWidth: 1,
-    borderColor: "#DCEBE4",
-    borderRadius: 11,
-    backgroundColor: "#FBFDFC",
+    borderColor: COLORS.border,
+    borderRadius: RADIUS.md,
+    backgroundColor: COLORS.surface,
     flexDirection: "row",
     alignItems: "center",
   },
 
   inputIcon: {
-    width: 42,
-    height: 42,
-    marginLeft: 4,
-    borderRadius: 9,
-    backgroundColor: "#EAF7F0",
+    width: 38,
+    height: 38,
+    marginLeft: SPACING.xs,
+    borderRadius: RADIUS.sm,
+    backgroundColor: COLORS.primaryLight,
     justifyContent: "center",
     alignItems: "center",
   },
 
-  inputIconText: {
-    color: "#087443",
-    fontSize: 16,
-    fontWeight: "800",
-  },
-
   input: {
     flex: 1,
-    paddingHorizontal: 11,
-    paddingVertical: 12,
-    color: "#17382B",
-    fontSize: 14,
-    fontWeight: "500",
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: SPACING.md,
+    color: COLORS.text,
+    ...TYPOGRAPHY.body,
   },
 
   textAreaContainer: {
@@ -498,86 +459,70 @@ const styles = StyleSheet.create({
   },
 
   helperText: {
-    color: "#8AA096",
-    fontSize: 11,
-    marginTop: 5,
+    ...TYPOGRAPHY.caption,
+    color: COLORS.textMuted,
+    marginTop: SPACING.xs,
     marginLeft: 2,
   },
 
   switchCard: {
-    marginTop: 23,
-    padding: 13,
-    borderRadius: 13,
-    backgroundColor: "#EFF9F4",
+    marginTop: SPACING.xl,
+    padding: SPACING.md,
+    borderRadius: RADIUS.md,
+    backgroundColor: COLORS.primaryLight,
     borderWidth: 1,
-    borderColor: "#DDEFE6",
+    borderColor: COLORS.border,
     flexDirection: "row",
     alignItems: "center",
   },
 
   switchIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 11,
-    backgroundColor: "#DDF3E8",
+    width: 38,
+    height: 38,
+    borderRadius: 10,
+    backgroundColor: COLORS.surface,
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 10,
-  },
-
-  switchIconText: {
-    color: "#087443",
-    fontSize: 17,
-    fontWeight: "800",
+    marginRight: SPACING.sm,
   },
 
   switchTextContainer: {
     flex: 1,
-    paddingRight: 7,
+    paddingRight: SPACING.sm,
   },
 
   switchTitle: {
-    color: "#17382B",
+    color: COLORS.text,
     fontSize: 14,
-    fontWeight: "800",
+    fontWeight: "700",
   },
 
   switchDescription: {
-    color: "#789187",
-    fontSize: 11,
-    marginTop: 3,
+    ...TYPOGRAPHY.caption,
+    color: COLORS.textSecondary,
+    marginTop: 2,
     lineHeight: 16,
   },
 
   primaryButton: {
-    backgroundColor: "#087443",
-    minHeight: 51,
-    borderRadius: 11,
-    marginTop: 23,
+    backgroundColor: COLORS.primary,
+    minHeight: TOUCH_TARGET,
+    borderRadius: RADIUS.md,
+    marginTop: SPACING.xl,
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    shadowColor: "#087443",
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.18,
-    shadowRadius: 7,
-    elevation: 3,
+    ...SHADOWS.md,
   },
 
   primaryButtonIcon: {
-    color: "#FFFFFF",
-    fontSize: 19,
-    fontWeight: "800",
-    marginRight: 8,
+    marginRight: SPACING.sm,
   },
 
   primaryButtonText: {
-    color: "#FFFFFF",
+    color: COLORS.onPrimary,
     fontSize: 14,
-    fontWeight: "800",
+    fontWeight: "700",
   },
 
   disabledButton: {
@@ -585,20 +530,20 @@ const styles = StyleSheet.create({
   },
 
   secondaryButton: {
-    minHeight: 49,
-    borderWidth: 1.2,
-    borderColor: "#087443",
-    borderRadius: 11,
+    minHeight: TOUCH_TARGET,
+    borderWidth: 1,
+    borderColor: COLORS.primary,
+    borderRadius: RADIUS.md,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 9,
-    backgroundColor: "#FFFFFF",
+    marginTop: SPACING.sm,
+    backgroundColor: COLORS.surface,
   },
 
   secondaryButtonText: {
-    color: "#087443",
+    color: COLORS.primary,
     fontSize: 14,
-    fontWeight: "800",
+    fontWeight: "700",
   },
 });
 

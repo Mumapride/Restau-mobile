@@ -8,10 +8,19 @@ import {
   Alert,
   ActivityIndicator,
   ScrollView,
-  StatusBar,
 } from "react-native";
 
 import { createSemester } from "../../api/semester.api";
+import { Ionicons } from "@expo/vector-icons";
+import { ScreenHeader } from "../../components";
+import {
+  COLORS,
+  RADIUS,
+  SHADOWS,
+  SPACING,
+  TOUCH_TARGET,
+  TYPOGRAPHY,
+} from "../../theme/tokens";
 
 const CreateSemesterScreen = ({ navigation }) => {
   const [name, setName] = useState("");
@@ -76,31 +85,12 @@ const CreateSemesterScreen = ({ navigation }) => {
 
   return (
     <View style={styles.screen}>
-      <StatusBar
-        barStyle="light-content"
-        backgroundColor="#087F4E"
+      <ScreenHeader
+        title="Create Semester"
+        subtitle="Academic semester management"
+        showBack
+        onBack={() => navigation.goBack()}
       />
-
-      {/* Green Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-          disabled={loading}
-        >
-          <Text style={styles.backIcon}>‹</Text>
-        </TouchableOpacity>
-
-        <View style={styles.headerTextContainer}>
-          <Text style={styles.headerTitle}>
-            Create Semester
-          </Text>
-
-          <Text style={styles.headerSubtitle}>
-            Academic semester management
-          </Text>
-        </View>
-      </View>
 
       <ScrollView
         style={styles.container}
@@ -108,17 +98,6 @@ const CreateSemesterScreen = ({ navigation }) => {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        {/* Page Introduction */}
-        <View style={styles.intro}>
-          <Text style={styles.pageTitle}>
-            Create Semester
-          </Text>
-
-          <Text style={styles.pageSubtitle}>
-            Add a new academic semester
-          </Text>
-        </View>
-
         {/* Form Card */}
         <View style={styles.formCard}>
           <Text style={styles.formTitle}>
@@ -133,7 +112,11 @@ const CreateSemesterScreen = ({ navigation }) => {
           <View style={styles.field}>
             <View style={styles.labelRow}>
               <View style={styles.iconBox}>
-                <Text style={styles.iconText}>▣</Text>
+                <Ionicons
+                  name="text-outline"
+                  size={18}
+                  color={COLORS.primary}
+                />
               </View>
 
               <Text style={styles.label}>
@@ -144,7 +127,7 @@ const CreateSemesterScreen = ({ navigation }) => {
             <TextInput
               style={styles.input}
               placeholder="e.g. 2026/2027 First Semester"
-              placeholderTextColor="#9AAFA5"
+              placeholderTextColor={COLORS.textMuted}
               value={name}
               onChangeText={setName}
               editable={!loading}
@@ -155,7 +138,11 @@ const CreateSemesterScreen = ({ navigation }) => {
           <View style={styles.field}>
             <View style={styles.labelRow}>
               <View style={styles.iconBox}>
-                <Text style={styles.iconText}>◷</Text>
+                <Ionicons
+                  name="calendar-outline"
+                  size={18}
+                  color={COLORS.primary}
+                />
               </View>
 
               <Text style={styles.label}>
@@ -166,7 +153,7 @@ const CreateSemesterScreen = ({ navigation }) => {
             <TextInput
               style={styles.input}
               placeholder="YYYY-MM-DD"
-              placeholderTextColor="#9AAFA5"
+              placeholderTextColor={COLORS.textMuted}
               value={startDate}
               onChangeText={setStartDate}
               keyboardType="numbers-and-punctuation"
@@ -182,7 +169,11 @@ const CreateSemesterScreen = ({ navigation }) => {
           <View style={styles.field}>
             <View style={styles.labelRow}>
               <View style={styles.iconBox}>
-                <Text style={styles.iconText}>◷</Text>
+                <Ionicons
+                  name="calendar-outline"
+                  size={18}
+                  color={COLORS.primary}
+                />
               </View>
 
               <Text style={styles.label}>
@@ -193,7 +184,7 @@ const CreateSemesterScreen = ({ navigation }) => {
             <TextInput
               style={styles.input}
               placeholder="YYYY-MM-DD"
-              placeholderTextColor="#9AAFA5"
+              placeholderTextColor={COLORS.textMuted}
               value={endDate}
               onChangeText={setEndDate}
               keyboardType="numbers-and-punctuation"
@@ -216,10 +207,15 @@ const CreateSemesterScreen = ({ navigation }) => {
             activeOpacity={0.85}
           >
             {loading ? (
-              <ActivityIndicator color="#FFFFFF" />
+              <ActivityIndicator color={COLORS.onPrimary} />
             ) : (
               <>
-                <Text style={styles.plusIcon}>+</Text>
+                <Ionicons
+                  name="add"
+                  size={18}
+                  color={COLORS.onPrimary}
+                  style={styles.plusIcon}
+                />
 
                 <Text style={styles.primaryButtonText}>
                   Create Semester
@@ -248,53 +244,12 @@ const CreateSemesterScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: "#F4F8F6",
+    backgroundColor: COLORS.background,
   },
 
   /* =========================
-     HEADER
+     HEADER (rendered by ScreenHeader)
   ========================= */
-
-  header: {
-    backgroundColor: "#087F4E",
-    paddingHorizontal: 18,
-    paddingTop: 14,
-    paddingBottom: 18,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 8,
-  },
-
-  backIcon: {
-    color: "#FFFFFF",
-    fontSize: 34,
-    fontWeight: "300",
-    lineHeight: 36,
-  },
-
-  headerTextContainer: {
-    flex: 1,
-  },
-
-  headerTitle: {
-    color: "#FFFFFF",
-    fontSize: 18,
-    fontWeight: "700",
-  },
-
-  headerSubtitle: {
-    color: "#D8F0E5",
-    fontSize: 11,
-    marginTop: 2,
-  },
 
   /* =========================
      CONTENT
@@ -305,26 +260,9 @@ const styles = StyleSheet.create({
   },
 
   content: {
-    paddingHorizontal: 16,
-    paddingTop: 18,
-    paddingBottom: 40,
-  },
-
-  intro: {
-    marginBottom: 15,
-    paddingHorizontal: 2,
-  },
-
-  pageTitle: {
-    fontSize: 22,
-    fontWeight: "700",
-    color: "#102E24",
-  },
-
-  pageSubtitle: {
-    fontSize: 13,
-    color: "#668177",
-    marginTop: 4,
+    paddingHorizontal: SPACING.lg,
+    paddingTop: SPACING.lg,
+    paddingBottom: SPACING.xxl,
   },
 
   /* =========================
@@ -332,32 +270,24 @@ const styles = StyleSheet.create({
   ========================= */
 
   formCard: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 18,
-    padding: 18,
-
-    shadowColor: "#164D38",
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    shadowOpacity: 0.07,
-    shadowRadius: 8,
-
-    elevation: 3,
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.lg,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    ...SHADOWS.md,
   },
 
   formTitle: {
-    color: "#102E24",
-    fontSize: 18,
-    fontWeight: "700",
+    ...TYPOGRAPHY.h3,
+    color: COLORS.text,
   },
 
   formDescription: {
-    color: "#789088",
-    fontSize: 12,
-    marginTop: 4,
-    marginBottom: 7,
+    ...TYPOGRAPHY.bodySmall,
+    color: COLORS.textSecondary,
+    marginTop: SPACING.xs,
+    marginBottom: SPACING.sm,
   },
 
   /* =========================
@@ -365,53 +295,45 @@ const styles = StyleSheet.create({
   ========================= */
 
   field: {
-    marginTop: 18,
+    marginTop: SPACING.lg,
   },
 
   labelRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 8,
+    marginBottom: SPACING.sm,
   },
 
   iconBox: {
     width: 34,
     height: 34,
-    borderRadius: 10,
-    backgroundColor: "#E5F4ED",
+    borderRadius: RADIUS.md,
+    backgroundColor: COLORS.primaryLight,
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 10,
-  },
-
-  iconText: {
-    color: "#087F4E",
-    fontSize: 17,
-    fontWeight: "700",
+    marginRight: SPACING.sm,
   },
 
   label: {
-    color: "#24483B",
-    fontSize: 13,
-    fontWeight: "700",
+    ...TYPOGRAPHY.label,
+    color: COLORS.text,
   },
 
   input: {
-    height: 48,
+    minHeight: TOUCH_TARGET,
     borderWidth: 1,
-    borderColor: "#D8E9E1",
-    backgroundColor: "#FBFDFC",
-    borderRadius: 11,
-    paddingHorizontal: 14,
-    color: "#16372B",
+    borderColor: COLORS.border,
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.md,
+    paddingHorizontal: SPACING.md,
+    color: COLORS.text,
     fontSize: 14,
   },
 
   hint: {
-    color: "#91A59D",
+    color: COLORS.textMuted,
     fontSize: 11,
-    marginTop: 5,
-    marginLeft: 2,
+    marginTop: SPACING.xs,
   },
 
   /* =========================
@@ -419,36 +341,25 @@ const styles = StyleSheet.create({
   ========================= */
 
   primaryButton: {
-    height: 50,
-    backgroundColor: "#087F4E",
-    borderRadius: 11,
-    marginTop: 27,
+    minHeight: TOUCH_TARGET,
+    paddingHorizontal: SPACING.lg,
+    backgroundColor: COLORS.primary,
+    borderRadius: RADIUS.md,
+    marginTop: SPACING.xl,
 
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
 
-    shadowColor: "#087F4E",
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    shadowOpacity: 0.18,
-    shadowRadius: 5,
-
-    elevation: 3,
+    ...SHADOWS.md,
   },
 
   plusIcon: {
-    color: "#FFFFFF",
-    fontSize: 21,
-    fontWeight: "400",
-    marginRight: 7,
-    lineHeight: 22,
+    marginRight: SPACING.sm,
   },
 
   primaryButtonText: {
-    color: "#FFFFFF",
+    color: COLORS.onPrimary,
     fontSize: 14,
     fontWeight: "700",
   },
@@ -458,20 +369,21 @@ const styles = StyleSheet.create({
   },
 
   cancelButton: {
-    height: 48,
+    minHeight: TOUCH_TARGET,
+    paddingHorizontal: SPACING.lg,
     borderWidth: 1,
-    borderColor: "#087F4E",
-    borderRadius: 11,
-    marginTop: 10,
+    borderColor: COLORS.primary,
+    borderRadius: RADIUS.md,
+    marginTop: SPACING.sm,
 
     alignItems: "center",
     justifyContent: "center",
 
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.surface,
   },
 
   cancelText: {
-    color: "#087F4E",
+    color: COLORS.primary,
     fontSize: 14,
     fontWeight: "700",
   },

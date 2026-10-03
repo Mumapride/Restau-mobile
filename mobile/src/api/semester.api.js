@@ -1,9 +1,9 @@
 import axios from "axios";
-
-const BASE_URL = "http://192.168.1.188:5000/api";
+import { BASE_URL } from "./auth.api";
 
 const api = axios.create({
   baseURL: BASE_URL,
+  timeout: 15000,
 });
 
 // Get the currently active semester

@@ -18,6 +18,11 @@ import SubscriptionsScreen from "../screens/admin/SubscriptionsScreen";
 import SubscriptionDetailsScreen from "../screens/admin/SubscriptionDetailsScreen";
 
 import MealClaimsScreen from "../screens/admin/MealClaimsScreen";
+import ReportsScreen from "../screens/admin/ReportsScreen";
+import PaymentsScreen from "../screens/admin/PaymentsScreen";
+import StudentsScreen from "../screens/admin/StudentsScreen";
+import { COLORS } from "../theme/tokens";
+
 const Stack = createNativeStackNavigator();
 
 export default function AdminNavigator() {
@@ -25,6 +30,7 @@ export default function AdminNavigator() {
     <Stack.Navigator
       screenOptions={{
         headerShown: false,
+        contentStyle: { backgroundColor: COLORS.background },
       }}
     >
       {/* Dashboard */}
@@ -79,6 +85,21 @@ export default function AdminNavigator() {
   name="MealClaims"
   component={MealClaimsScreen}
 />
+
+      <Stack.Screen
+        name="Payments"
+        component={PaymentsScreen}
+      />
+
+      <Stack.Screen
+        name="Students"
+        component={StudentsScreen}
+      />
+
+      <Stack.Screen
+        name="Reports"
+        component={ReportsScreen}
+      />
     </Stack.Navigator>
 
     

@@ -1,12 +1,11 @@
 import axios from "axios";
-
-const BASE_URL = "http://192.168.1.188:5000/api";
+import { BASE_URL } from "./auth.api";
 
 const api = axios.create({
   baseURL: BASE_URL,
 });
 
-// Get all subscriptions
+// Get all subscriptionss
 export const getSubscriptions = async () => {
   const response = await api.get("/subscriptions");
   return response.data;
