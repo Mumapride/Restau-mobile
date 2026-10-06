@@ -5,7 +5,6 @@ const api = axios.create({
   baseURL: BASE_URL,
   timeout: 15000,
 });
-
 // Get all active meal plans
 export const getMealPlans = async () => {
   const response = await api.get("/meal-plans");
