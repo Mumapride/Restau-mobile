@@ -1,0 +1,30 @@
+{
+  "name": "restau-admin-web",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Professional admin web application for Restau (meal-credit and QR meal-claim system)",
+  "author": "Restau Team",
+  "license": "UNLICENSED",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint src --max-warnings 0"
+  },
+  "dependencies": {
+    "axios": "^1.7.9",
+    "lucide-react": "^0.454.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-router-dom": "^6.26.0",
+    "recharts": "^2.12.7"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.22",
+    "postcss": "^8.4.42",
+    "tailwindcss": "^3.4.17",
+    "vite": "^5.4.11"
+  }
+}

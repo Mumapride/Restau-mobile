@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Environment files (contains the API base URL)
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+
+# OS / editor files
+.DS_Store
+*.swp
+.idea/
+.vscode/
