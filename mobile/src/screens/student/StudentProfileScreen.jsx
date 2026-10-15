@@ -138,6 +138,21 @@ export default function StudentProfileScreen({ navigation }) {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState('');
 
+  const handleLogout = useCallback(() => {
+    Alert.alert(
+      'Log Out',
+      'Are you sure you want to log out of your student account?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Log Out',
+          style: 'destructive',
+          onPress: clearAuth,
+        },
+      ],
+    );
+  }, [clearAuth]);
+
   const fetchProfile = useCallback(
     async (isRefresh = false) => {
       if (isRefresh) {
@@ -154,16 +169,28 @@ export default function StudentProfileScreen({ navigation }) {
         });
         setProfile(response.data);
       } catch (err) {
+        const status = err.response?.status;
+        const apiMessage = err.response?.data?.message || '';
+
+        // Auto-logout if unauthorized or token error message is returned
+        if (
+          status === 401 ||
+          apiMessage.toLowerCase().includes('token invalid') ||
+          apiMessage.toLowerCase().includes('token expired')
+        ) {
+          clearAuth();
+          return;
+        }
+
         setError(
-          err.response?.data?.message ||
-            'Could not load your student profile. Pull down to try again.',
+          apiMessage || 'Could not load your student profile. Pull down to try again.',
         );
       } finally {
         setLoading(false);
         setRefreshing(false);
       }
     },
-    [token],
+    [token, clearAuth],
   );
 
   useEffect(() => {
@@ -173,21 +200,6 @@ export default function StudentProfileScreen({ navigation }) {
   const onRefresh = useCallback(() => {
     fetchProfile(true);
   }, [fetchProfile]);
-
-  const handleLogout = () => {
-    Alert.alert(
-      'Log Out',
-      'Are you sure you want to log out of your student account?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Log Out',
-          style: 'destructive',
-          onPress: clearAuth,
-        },
-      ],
-    );
-  };
 
   const firstName = profile?.firstName || user?.firstName || 'Student';
   const lastName = profile?.lastName || user?.lastName || '';
@@ -239,12 +251,28 @@ export default function StudentProfileScreen({ navigation }) {
               </View>
               <Text style={styles.stateTitle}>Could Not Load Profile</Text>
               <Text style={styles.stateText}>{error}</Text>
-              <AppButton
-                title="Try Again"
-                onPress={() => fetchProfile(false)}
-                variant="secondary"
-                style={{ alignSelf: 'stretch' }}
-              />
+
+              <View style={{ gap: 10, alignSelf: 'stretch', width: '100%' }}>
+                <AppButton
+                  title="Try Again"
+                  onPress={() => fetchProfile(false)}
+                  variant="secondary"
+                  style={{ alignSelf: 'stretch' }}
+                />
+
+                <Pressable
+                  onPress={handleLogout}
+                  accessibilityRole="button"
+                  accessibilityLabel="Log out of student account"
+                  style={({ pressed }) => [
+                    styles.logoutButton,
+                    pressed && styles.logoutButtonPressed,
+                  ]}
+                >
+                  <Ionicons name="log-out-outline" size={19} color="#DC2626" />
+                  <Text style={styles.logoutText}>Log Out</Text>
+                </Pressable>
+              </View>
             </View>
           ) : (
             <>
