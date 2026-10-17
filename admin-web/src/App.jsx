@@ -1,6 +1,7 @@
 ﻿import React from "react";
 import { Routes, Route } from "react-router-dom";
 import Dashboard from "./pages/Dashboard.jsx";
+import Home from "./pages/Home.jsx";
 import MealPlans from "./pages/MealPlans.jsx";
 import Semesters from "./pages/Semesters.jsx";
 import Students from "./pages/Students.jsx";
@@ -25,6 +26,7 @@ const AdminPage = ({ title, breadcrumb, children }) => (
 export default function App() {
   return (
     <Routes>
+      <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
 
       <Route
