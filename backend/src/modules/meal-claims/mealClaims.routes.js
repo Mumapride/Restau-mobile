@@ -4,6 +4,8 @@ const {
   getMealClaims,
   getTodaysMealClaims,
   getMealClaimsByStudent,
+  scanQR,
+  getMyClaims,
 } = require("./mealClaims.controller");
 
 const {
@@ -11,7 +13,11 @@ const {
   requireRole,
 } = require("../../middleware/auth.middleware");
 
+
 const router = express.Router();
+
+router.post('/scan', protect, requireRole('SCANNER'), scanQR);
+router.get('/my-claims', protect, requireRole('STUDENT'), getMyClaims);
 
 router.get(
   "/",

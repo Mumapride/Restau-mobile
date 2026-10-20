@@ -59,29 +59,64 @@ const registerStudent = async (firstName, lastName, matricule, email, password) 
   };
 };
 const loginStudent = async (matricule, password) => {
-  // Step 1: Find the student by matricule
+  // First check if this is a scanner account
+  const scanner = await prisma.scanner.findUnique({
+    where: { matricule: matricule.toUpperCase() },
+    include: { user: true }
+  });
+
+  if (scanner) {
+    // This is a scanner account — login as scanner
+    if (!scanner.user.isActive) {
+      throw new Error('Account is deactivated');
+    }
+
+    const passwordMatch = await bcrypt.compare(password, scanner.user.password);
+    if (!passwordMatch) {
+      throw new Error('Invalid matricule or password');
+    }
+
+    const token = jwt.sign(
+      {
+        id: scanner.user.id,
+        scannerId: scanner.id,
+        role: scanner.user.role
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    return {
+      token,
+      user: {
+        id: scanner.user.id,
+        firstName: scanner.user.firstName,
+        lastName: scanner.user.lastName,
+        matricule: scanner.matricule,
+        role: scanner.user.role
+      }
+    };
+  }
+
+  // Otherwise check student table
   const student = await prisma.student.findUnique({
     where: { matricule: matricule.toUpperCase() },
     include: { user: true }
   });
 
-  // Step 2: If no student found, throw error
   if (!student) {
     throw new Error('Invalid matricule or password');
   }
 
-  // Step 3: Check if account is active
   if (!student.user.isActive) {
     throw new Error('Account is deactivated, contact admin');
   }
 
-  // Step 4: Check if password matches
   const passwordMatch = await bcrypt.compare(password, student.user.password);
   if (!passwordMatch) {
     throw new Error('Invalid matricule or password');
   }
 
-  // Step 5: Create and return JWT token
   const token = jwt.sign(
     {
       id: student.user.id,
@@ -150,5 +185,50 @@ const loginAdmin = async (email, password) => {
     }
   };
 };
+const loginScanner = async (matricule, password) => {
+  // Step 1: Find scanner by matricule
+  const scanner = await prisma.scanner.findUnique({
+    where: { matricule: matricule.toUpperCase() },
+    include: { user: true }
+  });
 
-module.exports = { registerStudent, loginStudent, loginAdmin };
+  // Step 2: If not found throw error
+  if (!scanner) {
+    throw new Error('Invalid matricule or password');
+  }
+
+  // Step 3: Check account is active
+  if (!scanner.user.isActive) {
+    throw new Error('Account is deactivated');
+  }
+
+  // Step 4: Check password
+  const passwordMatch = await bcrypt.compare(password, scanner.user.password);
+  if (!passwordMatch) {
+    throw new Error('Invalid matricule or password');
+  }
+
+  // Step 5: Create and return JWT token
+  const token = jwt.sign(
+    {
+      id: scanner.user.id,
+      scannerId: scanner.id,
+      role: scanner.user.role
+    },
+    process.env.JWT_SECRET,
+    { expiresIn: '7d' }
+  );
+
+  return {
+    token,
+    user: {
+      id: scanner.user.id,
+      firstName: scanner.user.firstName,
+      lastName: scanner.user.lastName,
+      matricule: scanner.matricule,
+      role: scanner.user.role
+    }
+  };
+};
+
+module.exports = { registerStudent, loginStudent, loginAdmin, loginScanner };

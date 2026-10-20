@@ -18,11 +18,13 @@ model User {
 
   student   Student?
   admin     Admin?
+  scanner   Scanner?
 }
 
 enum Role {
   STUDENT
   ADMIN
+  SCANNER
 }
 
 model Student {
@@ -41,6 +43,12 @@ model Admin {
   email  String @unique
   userId Int    @unique
   user   User   @relation(fields: [userId], references: [id])
+}
+model Scanner {
+  id        Int    @id @default(autoincrement())
+  matricule String @unique
+  userId    Int    @unique
+  user      User   @relation(fields: [userId], references: [id])
 }
 model Semester {
   id            Int            @id @default(autoincrement())

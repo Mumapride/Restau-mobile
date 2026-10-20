@@ -1,5 +1,5 @@
 const mealClaimsService = require("./mealClaims.service");
-
+const { processScan, getStudentClaims } = require("./mealClaims.service");
 // Get all meal claims
 const getMealClaims = async (req, res) => {
   try {
@@ -41,9 +41,32 @@ const getMealClaimsByStudent = async (req, res) => {
     });
   }
 };
+const scanQR = async (req, res) => {
+  try {
+    const { token } = req.body;
+    if (!token) {
+      return res.status(400).json({ message: 'Token is required' });
+    }
+    const result = await processScan(token);
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+const getMyClaims = async (req, res) => {
+  try {
+    const result = await getStudentClaims(req.user.studentId);
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
 
 module.exports = {
   getMealClaims,
   getTodaysMealClaims,
   getMealClaimsByStudent,
+  scanQR,
+  getMyClaims,
 };

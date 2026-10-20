@@ -1,4 +1,4 @@
-const { registerStudent, loginStudent, loginAdmin } = require('./auth.service');
+const { registerStudent, loginStudent, loginAdmin, loginScanner } = require('./auth.service');
 
 const studentRegister = async (req, res) => {
   try {
@@ -55,5 +55,20 @@ const adminLogin = async (req, res) => {
     res.status(401).json({ message: error.message });
   }
 };
+const scannerLogin = async (req, res) => {
+  try {
+    const { matricule, password } = req.body;
 
-module.exports = { studentRegister, studentLogin, adminLogin };
+    if (!matricule || !password) {
+      return res.status(400).json({ message: 'Matricule and password are required' });
+    }
+
+    const result = await loginScanner(matricule, password);
+    res.status(200).json(result);
+
+  } catch (error) {
+    res.status(401).json({ message: error.message });
+  }
+};
+
+module.exports = { studentRegister, studentLogin, adminLogin, scannerLogin };

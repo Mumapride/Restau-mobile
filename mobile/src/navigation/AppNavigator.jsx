@@ -8,6 +8,7 @@ import LoginScreen from '../screens/auth/LoginScreen';
 import RegisterScreen from '../screens/auth/RegisterScreen';
 import StudentNavigator from './StudentNavigator';
 import AdminNavigator from './AdminNavigator';
+import ScannerNavigator from './ScannerNavigator';
 
 const Stack = createNativeStackNavigator();
 
@@ -33,6 +34,8 @@ export default function AppNavigator() {
           </>
         ) : user?.role === 'ADMIN' ? (
           <Stack.Screen name="Admin" component={AdminNavigator} />
+        ) : user?.role === 'SCANNER' ? (
+          <Stack.Screen name="Scanner" component={ScannerNavigator} />
         ) : (
           <Stack.Screen name="Student" component={StudentNavigator} />
         )}
