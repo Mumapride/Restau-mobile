@@ -11,10 +11,11 @@
  */
 
 export const COLORS = {
-  // Brand — derived around the existing dominant green.
-  primary: '#1B5E3A',
-  primaryDark: '#123F27',
-  primaryLight: '#E7F2EB',
+  // Brand — existing dominant Restau green (#087A55), as used by the
+  // Student Dashboard and Login screens. Single source of truth.
+  primary: '#087A55',
+  primaryDark: '#054D33',
+  primaryLight: '#E8F8EE',
 
   // Text on primary backgrounds (for headers / buttons).
   onPrimary: '#FFFFFF',

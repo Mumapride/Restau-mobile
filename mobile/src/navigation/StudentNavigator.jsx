@@ -3,6 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import StudentDashboardScreen from '../screens/student/StudentDashboardScreen';
+import AnnouncementsScreen from '../screens/student/AnnouncementsScreen';
 import MealPlansScreen from '../screens/student/MealPlansScreen';
 import MyQRCodeScreen from '../screens/student/MyQRCodeScreen';
 import MealHistoryScreen from '../screens/student/MealHistoryScreen';
@@ -43,6 +44,7 @@ export default function StudentNavigator() {
       }}
     >
       <Stack.Screen name="StudentTabs" component={StudentTabs} />
+      <Stack.Screen name="Announcements" component={AnnouncementsScreen} />
       <Stack.Screen name="Payment" component={PaymentScreen} />
     </Stack.Navigator>
   );

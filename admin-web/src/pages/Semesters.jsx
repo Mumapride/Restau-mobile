@@ -1,5 +1,5 @@
-﻿import React, { useEffect, useState } from "react";
-import { CalendarDays, CalendarCheck, CalendarX, Hourglass } from "lucide-react";
+﻿import React, { useEffect, useState, useRef } from "react";
+import { CalendarDays, CalendarCheck, CalendarX, Hourglass, Plus } from "lucide-react";
 import {
   getActiveSemester,
   createSemester,
@@ -8,7 +8,6 @@ import {
 } from "../api/semesters.js";
 import Modal from "../components/Modal.jsx";
 import ConfirmDialog from "../components/ConfirmDialog.jsx";
-import Button from "../components/Button.jsx";
 import PageHeader from "../components/PageHeader.jsx";
 import Input from "../components/Input.jsx";
 import LoadingState from "../components/LoadingState.jsx";
@@ -16,6 +15,21 @@ import EmptyState from "../components/EmptyState.jsx";
 import StatusBadge from "../components/StatusBadge.jsx";
 import { formatDate, toDateInputValue } from "../lib/format.js";
 import { getErrorMessage } from "../lib/error.js";
+
+const BTN =
+  "inline-flex shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600 disabled:cursor-not-allowed disabled:opacity-50";
+const BTN_MD = `${BTN} h-10 px-4 text-sm`;
+const BTN_PRIMARY = "bg-primary text-white hover:bg-primary-dark";
+const BTN_OUTLINE = "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50";
+const BTN_DANGER = "border border-red-200 bg-white text-red-600 hover:bg-red-50";
+const LABEL = "block text-sm font-medium text-slate-700";
+
+const Spinner = () => (
+  <span
+    className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/40 border-t-white motion-reduce:animate-none"
+    aria-hidden="true"
+  />
+);
 
 const DAY_MS = 86400000;
 
@@ -49,12 +63,8 @@ const InfoTile = ({ icon: Icon, label, value }) => (
 
 const SemesterForm = ({ initial, onSave, onCancel }) => {
   const [name, setName] = useState(initial?.name || "");
-  const [startDate, setStartDate] = useState(
-    initial?.startDate ? toDateInputValue(initial.startDate) : ""
-  );
-  const [endDate, setEndDate] = useState(
-    initial?.endDate ? toDateInputValue(initial.endDate) : ""
-  );
+  const [startDate, setStartDate] = useState(initial?.startDate ? toDateInputValue(initial.startDate) : "");
+  const [endDate, setEndDate] = useState(initial?.endDate ? toDateInputValue(initial.endDate) : "");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
@@ -104,7 +114,7 @@ const SemesterForm = ({ initial, onSave, onCancel }) => {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-1.5">
-        <label htmlFor="semester-name" className="block text-sm font-medium text-slate-700">Name</label>
+        <label htmlFor="semester-name" className={LABEL}>Name</label>
         <Input
           id="semester-name"
           value={name}
@@ -115,7 +125,7 @@ const SemesterForm = ({ initial, onSave, onCancel }) => {
       </div>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div className="space-y-1.5">
-          <label htmlFor="semester-start-date" className="block text-sm font-medium text-slate-700">Start date</label>
+          <label htmlFor="semester-start-date" className={LABEL}>Start date</label>
           <Input
             id="semester-start-date"
             type="date"
@@ -125,7 +135,7 @@ const SemesterForm = ({ initial, onSave, onCancel }) => {
           />
         </div>
         <div className="space-y-1.5">
-          <label htmlFor="semester-end-date" className="block text-sm font-medium text-slate-700">End date</label>
+          <label htmlFor="semester-end-date" className={LABEL}>End date</label>
           <Input
             id="semester-end-date"
             type="date"
@@ -142,13 +152,14 @@ const SemesterForm = ({ initial, onSave, onCancel }) => {
           <p className="text-sm font-medium text-red-700">{error}</p>
         </div>
       )}
-      <div className="flex justify-end gap-3 border-t border-slate-100 pt-4">
-        <Button variant="secondary" onClick={onCancel} disabled={saving}>
+      <div className="flex flex-wrap justify-end gap-3 border-t border-slate-100 pt-4">
+        <button type="button" onClick={onCancel} disabled={saving} className={`${BTN_MD} ${BTN_OUTLINE}`}>
           Cancel
-        </Button>
-        <Button type="submit" loading={saving} disabled={saving}>
+        </button>
+        <button type="submit" disabled={saving} className={`${BTN_MD} ${BTN_PRIMARY}`}>
+          {saving && <Spinner />}
           {initial?.id ? "Save changes" : "Create semester"}
-        </Button>
+        </button>
       </div>
     </form>
   );
@@ -166,7 +177,7 @@ const Semesters = () => {
   const [success, setSuccess] = useState("");
 
   // Guards against overlapping / out-of-order load responses.
-  const requestId = React.useRef(0);
+  const requestId = useRef(0);
 
   const load = async () => {
     const id = ++requestId.current;
@@ -219,10 +230,15 @@ const Semesters = () => {
     }
   };
 
+  const openCreate = () => {
+    setEditing(false);
+    setModalOpen(true);
+  };
+
   if (loading) {
     return (
-      <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6">
-        <LoadingState message="Loading semester..." />
+      <div className="mx-auto w-full max-w-7xl">
+        <LoadingState message="Loading semester…" />
       </div>
     );
   }
@@ -230,26 +246,27 @@ const Semesters = () => {
   const progress = semester ? getProgress(semester) : null;
 
   return (
-    <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6">
+    <div className="mx-auto w-full max-w-7xl space-y-4">
       <PageHeader
         title="Semesters"
-        subtitle="Create and manage the active academic semester"
+        subtitle="Create and manage the active academic semester."
         action={
-          <Button onClick={() => { setEditing(false); setModalOpen(true); }}>
-            + New semester
-          </Button>
+          <button type="button" onClick={openCreate} className={`${BTN_MD} ${BTN_PRIMARY}`}>
+            <Plus className="h-4 w-4" aria-hidden="true" />
+            New semester
+          </button>
         }
       />
 
       {error && (
-        <div className="mt-4 flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-2.5">
+        <div className="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-2.5">
           <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-red-500" />
           <p className="text-sm font-medium text-red-700">{error}</p>
         </div>
       )}
       {success && (
         <div
-          className="mt-4 flex items-start gap-3 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-2.5"
+          className="flex items-start gap-3 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-2.5"
           role="status"
           aria-live="polite"
         >
@@ -259,20 +276,21 @@ const Semesters = () => {
       )}
 
       {!semester ? (
-        <div className="mt-5 rounded-xl border border-dashed border-slate-200 bg-white/60 py-8">
+        <div className="rounded-xl border border-dashed border-slate-200 bg-white/60 py-8">
           <EmptyState
             icon="info"
             title="No active semester"
             message="Create a semester to enable meal-plan enrollment and meal claims."
             action={
-              <Button onClick={() => { setEditing(false); setModalOpen(true); }}>
+              <button type="button" onClick={openCreate} className={`${BTN_MD} ${BTN_PRIMARY}`}>
+                <Plus className="h-4 w-4" aria-hidden="true" />
                 Create semester
-              </Button>
+              </button>
             }
           />
         </div>
       ) : (
-        <div className="mt-5 rounded-xl border border-slate-200 bg-white shadow-sm">
+        <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
           {/* Header */}
           <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3.5">
@@ -281,29 +299,35 @@ const Semesters = () => {
               </div>
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2.5">
-                  <h2 className="truncate text-lg font-semibold tracking-tight text-slate-900">
-                    {semester.name}
-                  </h2>
+                  <h2 className="truncate text-lg font-semibold tracking-tight text-slate-900">{semester.name}</h2>
                   <StatusBadge status={semester.isActive ? "ACTIVE" : "INACTIVE"} />
                 </div>
-                <p className="mt-0.5 text-sm text-slate-500">
-                  {formatDate(semester.startDate)} - {formatDate(semester.endDate)}
+                <p className="mt-0.5 text-sm text-slate-500 tabular-nums">
+                  {formatDate(semester.startDate)} – {formatDate(semester.endDate)}
                 </p>
               </div>
             </div>
             <div className="flex gap-2">
-              <Button
-                variant="secondary"
-                onClick={() => { setEditing(true); setModalOpen(true); }}
+              <button
+                type="button"
+                onClick={() => {
+                  setEditing(true);
+                  setModalOpen(true);
+                }}
+                className={`${BTN_MD} ${BTN_OUTLINE}`}
               >
                 Edit
-              </Button>
-              <Button
-                variant="danger"
-                onClick={() => { setCloseTarget(semester); setConfirmingClose(true); }}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setCloseTarget(semester);
+                  setConfirmingClose(true);
+                }}
+                className={`${BTN_MD} ${BTN_DANGER}`}
               >
                 Close semester
-              </Button>
+              </button>
             </div>
           </div>
 
@@ -312,11 +336,7 @@ const Semesters = () => {
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
               <InfoTile icon={CalendarCheck} label="Start date" value={formatDate(semester.startDate)} />
               <InfoTile icon={CalendarX} label="End date" value={formatDate(semester.endDate)} />
-              <InfoTile
-                icon={Hourglass}
-                label="Duration"
-                value={progress ? `${progress.totalDays} days` : "-"}
-              />
+              <InfoTile icon={Hourglass} label="Duration" value={progress ? `${progress.totalDays} days` : "—"} />
             </div>
 
             {progress && (
@@ -333,10 +353,7 @@ const Semesters = () => {
                   aria-valuemax={100}
                   aria-label="Semester progress"
                 >
-                  <div
-                    className="h-full rounded-full bg-emerald-600 transition-all"
-                    style={{ width: `${progress.pct}%` }}
-                  />
+                  <div className="h-full rounded-full bg-emerald-600 transition-all" style={{ width: `${progress.pct}%` }} />
                 </div>
               </div>
             )}
@@ -347,12 +364,18 @@ const Semesters = () => {
       <Modal
         open={modalOpen}
         title={editing ? "Edit semester" : "Create semester"}
-        onClose={() => { setModalOpen(false); setError(""); }}
+        onClose={() => {
+          setModalOpen(false);
+          setError("");
+        }}
       >
         <SemesterForm
           initial={editing ? semester : null}
           onSave={handleSaved}
-          onCancel={() => { setModalOpen(false); setError(""); }}
+          onCancel={() => {
+            setModalOpen(false);
+            setError("");
+          }}
         />
       </Modal>
 
@@ -362,7 +385,10 @@ const Semesters = () => {
         message="Closing this semester prevents new meal-plan enrollments for it. Existing data remains intact."
         confirmLabel="Close semester"
         onConfirm={handleClose}
-        onCancel={() => { setConfirmingClose(false); setCloseTarget(null); }}
+        onCancel={() => {
+          setConfirmingClose(false);
+          setCloseTarget(null);
+        }}
         confirmVariant="danger"
         disabled={closing}
       />

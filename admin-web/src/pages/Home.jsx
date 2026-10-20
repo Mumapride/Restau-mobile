@@ -65,38 +65,37 @@ const FEATURES = [
   },
 ];
 
+const EYEBROW = "text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700";
+const BTN_PRIMARY =
+  "inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-emerald-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600";
+const BTN_OUTLINE =
+  "inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600";
+
 const Wordmark = ({ className = "" }) => (
   <span className={`font-extrabold tracking-tight ${className}`}>
-    <span className="text-text">RESTAU</span>
-    <span className="text-primary">Admin</span>
+    <span className="text-slate-900">RESTAU</span>
+    <span className="text-emerald-600">Admin</span>
   </span>
 );
 
 const StatusPill = ({ status }) => {
   const styles =
-    status === "Paid"
-      ? "bg-primary-light text-primary-dark"
-      : "bg-amber-50 text-amber-700";
+    status === "Paid" ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700";
   return (
-    <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${styles}`}>
-      {status}
-    </span>
+    <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${styles}`}>{status}</span>
   );
 };
 
-
 /** Decorative, fully static preview of the admin dashboard. Makes no API calls. */
 const DashboardPreview = () => (
-  <div className="rounded-2xl border border-border bg-white shadow-lg" aria-hidden="true">
-    {/* Preview window chrome */}
-    <div className="flex items-center gap-2 border-b border-border px-4 py-3">
+  <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg" aria-hidden="true">
+    {/* Window chrome */}
+    <div className="flex items-center gap-2 border-b border-slate-100 bg-slate-50/70 px-4 py-3">
       <span className="h-2.5 w-2.5 rounded-full bg-red-400" />
       <span className="h-2.5 w-2.5 rounded-full bg-amber-400" />
       <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
-      <span className="ml-2 truncate text-xs font-medium text-text-muted">
-        RESTAU Admin — Overview
-      </span>
-      <span className="ml-auto rounded-full bg-surfaceAlt px-2 py-0.5 text-[10px] font-semibold text-text-secondary">
+      <span className="ml-2 truncate text-xs font-medium text-slate-500">RESTAU Admin — Overview</span>
+      <span className="ml-auto rounded-full border border-slate-200 bg-white px-2 py-0.5 text-[10px] font-semibold text-slate-500">
         Sample data
       </span>
     </div>
@@ -105,14 +104,14 @@ const DashboardPreview = () => (
       {/* Stat tiles */}
       <div className="grid grid-cols-2 gap-3">
         {SAMPLE_STATS.map(({ icon: Icon, label, value }) => (
-          <div key={label} className="rounded-xl border border-border bg-surface p-3">
+          <div key={label} className="rounded-xl border border-slate-100 bg-slate-50/70 p-3">
             <div className="flex items-center gap-2">
-              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary-light text-primary">
+              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700">
                 <Icon className="h-3.5 w-3.5" strokeWidth={2} />
               </span>
-              <p className="truncate text-[11px] font-medium text-text-muted">{label}</p>
+              <p className="truncate text-[11px] font-medium text-slate-500">{label}</p>
             </div>
-            <p className="mt-2 truncate text-base font-bold tracking-tight text-text tabular-nums">
+            <p className="mt-2 truncate text-base font-semibold tracking-tight text-slate-900 tabular-nums">
               {value}
             </p>
           </div>
@@ -120,42 +119,36 @@ const DashboardPreview = () => (
       </div>
 
       {/* Meal plans */}
-      <div className="rounded-xl border border-border bg-surface p-3">
-        <p className="text-[11px] font-semibold uppercase tracking-wide text-text-muted">
-          Meal plans
-        </p>
-        <ul className="mt-2 space-y-2">
+      <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-3">
+        <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Meal plans</p>
+        <ul className="mt-2 divide-y divide-slate-100">
           {SAMPLE_PLANS.map((plan) => (
-            <li key={plan.name} className="flex items-center justify-between gap-2">
+            <li key={plan.name} className="flex items-center justify-between gap-2 py-2 first:pt-0 last:pb-0">
               <div className="min-w-0">
-                <p className="truncate text-xs font-semibold text-text">{plan.name}</p>
-                <p className="truncate text-[11px] text-text-muted">{plan.detail}</p>
+                <p className="truncate text-xs font-semibold text-slate-900">{plan.name}</p>
+                <p className="truncate text-[11px] text-slate-500">{plan.detail}</p>
               </div>
-              <span className="shrink-0 text-xs font-semibold text-primary-dark tabular-nums">
-                {plan.price}
-              </span>
+              <span className="shrink-0 text-xs font-semibold text-emerald-700 tabular-nums">{plan.price}</span>
             </li>
           ))}
         </ul>
       </div>
 
-      {/* Payment summaries */}
-      <div className="rounded-xl border border-border bg-surface p-3">
-        <p className="text-[11px] font-semibold uppercase tracking-wide text-text-muted">
-          Recent payments
-        </p>
-        <ul className="mt-2 space-y-2">
+      {/* Recent payments */}
+      <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-3">
+        <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Recent payments</p>
+        <ul className="mt-2 divide-y divide-slate-100">
           {SAMPLE_PAYMENTS.map((payment) => (
             <li
               key={payment.student}
-              className="flex items-center justify-between gap-2 text-xs"
+              className="flex items-center justify-between gap-2 py-2 text-xs first:pt-0 last:pb-0"
             >
               <div className="min-w-0">
-                <p className="truncate font-semibold text-text">{payment.student}</p>
-                <p className="truncate text-[11px] text-text-muted">{payment.plan}</p>
+                <p className="truncate font-semibold text-slate-900">{payment.student}</p>
+                <p className="truncate text-[11px] text-slate-500">{payment.plan}</p>
               </div>
               <div className="flex shrink-0 items-center gap-2">
-                <span className="font-semibold text-text tabular-nums">{payment.amount}</span>
+                <span className="font-semibold text-slate-900 tabular-nums">{payment.amount}</span>
                 <StatusPill status={payment.status} />
               </div>
             </li>
@@ -179,21 +172,24 @@ const Home = () => {
   }, []);
 
   return (
-    <div id="top" className="min-h-screen bg-background text-text">
-      {/* ── Header ─────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-40 border-b border-border bg-white/90 backdrop-blur">
+    <div id="top" className="min-h-screen bg-slate-50 text-slate-900">
+      {/* ── Header ───────────────────────────────────────────── */}
+      <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-          <a href="#top" className="flex items-center gap-2.5">
-            <img src={LOGO} alt="RESTAU logo" className="h-8 w-8 object-contain" />
-            <Wordmark className="text-lg" />
-          </a>
+          <div className="flex items-center gap-4">
+  <img src={LOGO} alt="RESTAU logo" className="h-14 w-14 object-contain" />
+  <div>
+    <Wordmark className="text-lg" />
+    <p className="text-xs text-slate-500">Your campus meals, made simple</p>
+  </div>
+</div>
 
           <nav className="hidden items-center gap-1 md:flex" aria-label="Main">
             {NAV_LINKS.map((link) => (
               <a
                 key={link.label}
                 href={link.href}
-                className="rounded-lg px-3 py-2 text-sm font-semibold text-text-secondary transition-colors hover:bg-surfaceAlt hover:text-text"
+                className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
               >
                 {link.label}
               </a>
@@ -201,49 +197,36 @@ const Home = () => {
           </nav>
 
           <div className="flex items-center gap-2">
-            {authed ? (
-              <Link
-                to="/dashboard"
-                className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-dark"
-              >
-                Go to Dashboard
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            ) : (
-              <Link
-                to="/login"
-                className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-dark"
-              >
-                Admin Login
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            )}
+            <Link
+              to={authed ? "/dashboard" : "/login"}
+              className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-emerald-700"
+            >
+              {authed ? "Go to Dashboard" : "Admin Login"}
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </Link>
 
             <button
               type="button"
-              className="rounded-lg p-2 text-text-secondary hover:bg-surfaceAlt md:hidden"
+              className="rounded-lg p-2 text-slate-600 transition hover:bg-slate-100 md:hidden"
               onClick={() => setMenuOpen((open) => !open)}
               aria-label={menuOpen ? "Close menu" : "Open menu"}
               aria-expanded={menuOpen}
             >
-              {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              {menuOpen ? <X className="h-5 w-5" aria-hidden="true" /> : <Menu className="h-5 w-5" aria-hidden="true" />}
             </button>
           </div>
         </div>
 
         {/* Mobile menu */}
         {menuOpen && (
-          <nav
-            className="border-t border-border bg-white px-4 py-3 md:hidden"
-            aria-label="Mobile"
-          >
+          <nav className="border-t border-slate-200 bg-white px-4 py-3 md:hidden" aria-label="Mobile">
             <div className="flex flex-col gap-1">
               {NAV_LINKS.map((link) => (
                 <a
                   key={link.label}
                   href={link.href}
                   onClick={() => setMenuOpen(false)}
-                  className="rounded-lg px-3 py-2 text-sm font-semibold text-text-secondary transition-colors hover:bg-surfaceAlt hover:text-text"
+                  className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
                 >
                   {link.label}
                 </a>
@@ -254,70 +237,59 @@ const Home = () => {
       </header>
 
       <main>
-        {/* ── Hero ─────────────────────────────────────────────── */}
+        {/* ── Hero ─────────────────────────────────────────── */}
         <section className="mx-auto max-w-6xl px-4 pb-16 pt-12 sm:px-6 md:pt-20">
-          <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-14">
+          <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
-                University Meal Management
-              </p>
-              <h1 className="mt-4 text-3xl font-extrabold leading-tight tracking-tight text-text sm:text-4xl lg:text-[2.75rem]">
-                Smarter Meal Management. Simpler Campus Dining.
+              <p className={EYEBROW}>University Meal Management</p>
+              <h1 className="mt-4 text-3xl font-extrabold leading-tight tracking-tight text-slate-900 sm:text-4xl lg:text-[2.75rem]">
+                Smarter Meal Management.{" "}
+                <span className="text-emerald-600">Simpler Campus Dining.</span>
               </h1>
-              <p className="mt-5 max-w-xl text-base leading-relaxed text-text-secondary">
-                RESTAU Management System helps university administrators manage meal plans, weekly
-                menus, student subscriptions and mobile-money payments — so your cafeteria
-                team spends less time on paperwork and more time serving students.
+              <p className="mt-5 max-w-xl text-base leading-relaxed text-slate-600">
+                RESTAU Management System helps university administrators manage meal plans, weekly menus,
+                student subscriptions and mobile-money payments, so your cafeteria team spends less time on
+                paperwork and more time serving students.
               </p>
 
               <div className="mt-8 flex flex-wrap items-center gap-3">
-                <Link
-                  to="/dashboard"
-                  className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-dark"
-                >
+                <Link to="/dashboard" className={BTN_PRIMARY}>
                   Go to Dashboard
-                  <ArrowRight className="h-4 w-4" />
+                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </Link>
-                <a
-                  href="#features"
-                  className="inline-flex items-center gap-2 rounded-lg border border-border bg-white px-5 py-3 text-sm font-semibold text-text transition-colors hover:bg-surfaceAlt"
-                >
+                <a href="#features" className={BTN_OUTLINE}>
                   Explore Features
                 </a>
               </div>
 
-              <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2">
-                {["Meal plans & credits", "Weekly menus", "Payments & reports"].map(
-                  (item) => (
-                    <li key={item} className="flex items-center gap-2 text-sm text-text-secondary">
-                      <CheckCircle2 className="h-4 w-4 shrink-0 text-primary" />
-                      {item}
-                    </li>
-                  ),
-                )}
+              <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-3">
+                {["Meal plans & credits", "Weekly menus", "Payments & reports"].map((item) => (
+                  <li key={item} className="flex items-center gap-2 text-sm font-medium text-slate-600">
+                    <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" aria-hidden="true" />
+                    {item}
+                  </li>
+                ))}
               </ul>
             </div>
 
-            <div className="lg:pl-4">
+            <div>
               <DashboardPreview />
-              <p className="mt-3 text-center text-xs text-text-muted">
-                Illustrative preview — sample figures, not live data.
+              <p className="mt-3 text-center text-xs text-slate-400">
+                Illustrative preview. Sample figures, not live data.
               </p>
             </div>
           </div>
         </section>
 
-        {/* ── Features ─────────────────────────────────────────── */}
-        <section id="features" className="border-t border-border bg-white py-16 md:py-20">
+        {/* ── Features ─────────────────────────────────────── */}
+        <section id="features" className="border-t border-slate-200 bg-white py-16 md:py-20">
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
             <div className="mx-auto max-w-2xl text-center">
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
-                Features
-              </p>
-              <h2 className="mt-3 text-2xl font-extrabold tracking-tight text-text sm:text-3xl">
+              <p className={EYEBROW}>Features</p>
+              <h2 className="mt-3 text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
                 Everything your cafeteria needs
               </h2>
-              <p className="mt-3 text-base text-text-secondary">
+              <p className="mt-3 text-base text-slate-600">
                 A focused toolset for managing campus dining from one console.
               </p>
             </div>
@@ -326,34 +298,32 @@ const Home = () => {
               {FEATURES.map(({ icon: Icon, title, text }) => (
                 <div
                   key={title}
-                  className="rounded-2xl border border-border bg-surface p-5 shadow-sm transition-shadow hover:shadow-md"
+                  className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
                 >
-                  <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary-light text-primary">
-                    <Icon className="h-5 w-5" strokeWidth={2} />
+                  <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700">
+                    <Icon className="h-5 w-5" strokeWidth={2} aria-hidden="true" />
                   </span>
-                  <h3 className="mt-4 text-base font-bold text-text">{title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-text-secondary">{text}</p>
+                  <h3 className="mt-4 text-base font-semibold text-slate-900">{title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-600">{text}</p>
                 </div>
               ))}
             </div>
           </div>
         </section>
-        {/* ── About ────────────────────────────────────────────── */}
+
+        {/* ── About ────────────────────────────────────────── */}
         <section id="about" className="mx-auto max-w-6xl px-4 py-16 sm:px-6 md:py-20">
-          <div className="grid items-center gap-10 lg:grid-cols-2">
+          <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
-                About
-              </p>
-              <h2 className="mt-3 text-2xl font-extrabold tracking-tight text-text sm:text-3xl">
+              <p className={EYEBROW}>About</p>
+              <h2 className="mt-3 text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
                 Built for university cafeteria operations
               </h2>
-              <p className="mt-4 text-base leading-relaxed text-text-secondary">
-                RESTAU Management System simplifies university cafeteria operations by bringing meal
-                plans, student subscriptions, weekly menus and payments into a single,
-                easy-to-use platform. Administrators get a clear overview of daily claims
-                and revenue, while students enjoy a faster, fairer dining experience on
-                campus.
+              <p className="mt-4 text-base leading-relaxed text-slate-600">
+                RESTAU Management System simplifies university cafeteria operations by bringing meal plans,
+                student subscriptions, weekly menus and payments into a single, easy-to-use platform.
+                Administrators get a clear overview of daily claims and revenue, while students enjoy a
+                faster, fairer dining experience on campus.
               </p>
               <div className="mt-6 grid gap-3 sm:grid-cols-2">
                 {[
@@ -362,40 +332,33 @@ const Home = () => {
                   "Clear daily claims and revenue views",
                   "Student-first meal credits",
                 ].map((item) => (
-                  <div
-                    key={item}
-                    className="flex items-start gap-2 text-sm text-text-secondary"
-                  >
-                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                  <div key={item} className="flex items-start gap-2.5 text-sm text-slate-600">
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" aria-hidden="true" />
                     <span>{item}</span>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="rounded-2xl border border-border bg-white p-6 shadow-sm sm:p-8">
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
               <div className="flex items-center gap-3">
-                <img
-                  src={LOGO}
-                  alt=""
-                  className="h-10 w-10 object-contain"
-                  aria-hidden="true"
-                />
+                <span className="flex h-11 w-11 items-center justify-center rounded-xl border border-emerald-100 bg-emerald-50">
+                  <img src={LOGO} alt="" className="h-7 w-7 object-contain" aria-hidden="true" />
+                </span>
                 <div>
                   <Wordmark className="text-lg" />
-                  <p className="text-xs text-text-muted">Your Campus Meals, Made Simple</p>
+                  <p className="text-xs text-slate-500">Your campus meals, made simple</p>
                 </div>
               </div>
-              <p className="mt-5 text-sm leading-relaxed text-text-secondary">
-                From planning the weekly menu to reconciling payments at the end of the
-                day, RESTAU Management System keeps administrators, cafeteria staff and students in
-                sync — with role-based access so only authorised administrators can manage
-                sensitive data.
+              <p className="mt-5 text-sm leading-relaxed text-slate-600">
+                From planning the weekly menu to reconciling payments at the end of the day, RESTAU Management
+                System keeps administrators, cafeteria staff and students in sync, with role-based access so
+                only authorised administrators can manage sensitive data.
               </p>
-              <div className="mt-6 flex items-center gap-3 rounded-xl bg-primary-light px-4 py-3">
-                <CreditCard className="h-5 w-5 shrink-0 text-primary-dark" />
-                <p className="text-sm font-semibold text-primary-dark">
-                  Meal plans, subscriptions and payments — together at last.
+              <div className="mt-6 flex items-center gap-3 rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3">
+                <CreditCard className="h-5 w-5 shrink-0 text-emerald-700" aria-hidden="true" />
+                <p className="text-sm font-semibold text-emerald-800">
+                  Meal plans, subscriptions and payments, together at last.
                 </p>
               </div>
             </div>
@@ -404,45 +367,31 @@ const Home = () => {
       </main>
 
       {/* ── Footer ───────────────────────────────────────────── */}
-      <footer className="border-t border-border bg-white">
+      <footer className="border-t border-slate-200 bg-white">
         <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
           <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
-            <div className="flex items-center gap-3">
-              <img
-                src={LOGO}
-                alt="RESTAU MOBILE logo"
-                className="h-9 w-9 object-contain"
-              />
-              <div>
-                <Wordmark className="text-base" />
-                <p className="mt-0.5 max-w-sm text-sm text-text-secondary">
-                  University meal management platform for meal plans, student
-                  subscriptions, weekly menus and payments.
-                </p>
-              </div>
-            </div>
-            <nav className="flex items-center gap-4" aria-label="Footer">
-              <a
-                href="#features"
-                className="text-sm font-semibold text-text-secondary hover:text-text"
-              >
+            <div className="flex items-center gap-4">
+  <img src={LOGO} alt="RESTAU logo" className="h-12 w-12 object-contain" />
+  <div>
+    <Wordmark className="text-base" />
+    <p className="mt-0.5 max-w-sm text-sm text-slate-600">
+      University meal management platform for meal plans, student subscriptions, weekly menus and payments.
+    </p>
+  </div>
+</div>
+            <nav className="flex items-center gap-5" aria-label="Footer">
+              <a href="#features" className="text-sm font-semibold text-slate-600 hover:text-slate-900">
                 Features
               </a>
-              <a
-                href="#about"
-                className="text-sm font-semibold text-text-secondary hover:text-text"
-              >
+              <a href="#about" className="text-sm font-semibold text-slate-600 hover:text-slate-900">
                 About
               </a>
-              <Link
-                to="/login"
-                className="text-sm font-semibold text-primary hover:text-primary-dark"
-              >
+              <Link to="/login" className="text-sm font-semibold text-emerald-700 hover:text-emerald-800">
                 Admin Login
               </Link>
             </nav>
           </div>
-          <p className="mt-8 border-t border-border pt-6 text-xs text-text-muted">
+          <p className="mt-8 border-t border-slate-100 pt-6 text-xs text-slate-400">
             © {new Date().getFullYear()} RESTAU MOBILE. All rights reserved.
           </p>
         </div>
@@ -452,5 +401,3 @@ const Home = () => {
 };
 
 export default Home;
-
-

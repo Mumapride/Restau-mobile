@@ -1,11 +1,7 @@
 ﻿import React, { useEffect, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
-import {
-  PieChart, Pie, Cell, Tooltip, ResponsiveContainer,
-} from "recharts";
-import {
-  User, CreditCard, Banknote, Receipt, Users, Clock, ArrowUpRight,
-} from "lucide-react";
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
+import { User, CreditCard, Banknote, Receipt, Users, Clock, ArrowUpRight } from "lucide-react";
 import { getReportsSummary, getDailyReport } from "../api/reports.js";
 import EmptyState from "../components/EmptyState.jsx";
 import { formatCurrency, formatDate, formatDateTime } from "../lib/format.js";
@@ -13,7 +9,7 @@ import { getErrorMessage } from "../lib/error.js";
 
 const PIE_COLORS = ["#059669", "#047857", "#10B981", "#F59E0B", "#64748B", "#475569"];
 
-// Full class names so Tailwind can detect them
+// Full class names so Tailwind can detect them.
 const TONES = {
   primary: "bg-emerald-50 text-emerald-700",
   success: "bg-teal-50 text-teal-700",
@@ -22,15 +18,15 @@ const TONES = {
 };
 
 const Card = ({ className = "", children }) => (
-  <div className={`rounded-xl border border-slate-200 bg-white shadow-sm ${className}`}>
-    {children}
-  </div>
+  <div className={`rounded-xl border border-slate-200 bg-white shadow-sm ${className}`}>{children}</div>
 );
 
 const StatCard = ({ label, value, subtitle, icon: Icon, accent = "primary", loading }) => (
   <Card className="h-full p-4">
     <div className="flex items-center gap-3.5">
-      <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${TONES[accent] || TONES.primary}`}>
+      <div
+        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${TONES[accent] || TONES.primary}`}
+      >
         <Icon className="h-[18px] w-[18px]" strokeWidth={2} aria-hidden="true" />
       </div>
       <div className="min-w-0 flex-1">
@@ -38,7 +34,9 @@ const StatCard = ({ label, value, subtitle, icon: Icon, accent = "primary", load
         {loading ? (
           <div className="mt-1.5 h-6 w-20 animate-pulse rounded bg-slate-100" />
         ) : (
-          <p className="truncate text-xl font-semibold leading-tight tracking-tight text-slate-900 tabular-nums">{value}</p>
+          <p className="truncate text-xl font-semibold leading-tight tracking-tight text-slate-900 tabular-nums">
+            {value}
+          </p>
         )}
         {subtitle && <p className="mt-0.5 truncate text-[11px] text-slate-400">{subtitle}</p>}
       </div>
@@ -52,7 +50,9 @@ const DoughnutChart = ({ data, loading }) => {
       <div className="flex h-[200px] items-center gap-8">
         <div className="mx-auto h-40 w-40 animate-pulse rounded-full bg-slate-100" />
         <div className="hidden flex-1 space-y-3 md:block">
-          {[0, 1, 2, 3].map((i) => <div key={i} className="h-3.5 w-full animate-pulse rounded bg-slate-100" />)}
+          {[0, 1, 2, 3].map((i) => (
+            <div key={i} className="h-3.5 w-full animate-pulse rounded bg-slate-100" />
+          ))}
         </div>
       </div>
     );
@@ -74,17 +74,28 @@ const DoughnutChart = ({ data, loading }) => {
           <PieChart>
             <Pie
               data={data}
-              cx="50%" cy="50%"
-              innerRadius={58} outerRadius={86}
-              paddingAngle={3} cornerRadius={5}
-              dataKey="value" nameKey="name"
+              cx="50%"
+              cy="50%"
+              innerRadius={58}
+              outerRadius={86}
+              paddingAngle={3}
+              cornerRadius={5}
+              dataKey="value"
+              nameKey="name"
               stroke="none"
             >
-              {data.map((_, i) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} stroke="none" />)}
+              {data.map((_, i) => (
+                <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} stroke="none" />
+              ))}
             </Pie>
             <Tooltip
               formatter={(v) => [`${v} meals`, ""]}
-              contentStyle={{ borderRadius: 10, border: "1px solid #E2E8F0", boxShadow: "0 8px 24px rgba(15,23,42,0.08)", fontSize: 12 }}
+              contentStyle={{
+                borderRadius: 10,
+                border: "1px solid #E2E8F0",
+                boxShadow: "0 8px 24px rgba(15,23,42,0.08)",
+                fontSize: 12,
+              }}
               cursor={{ stroke: "#E1E8E4", strokeDasharray: "3 3", strokeWidth: 1 }}
             />
           </PieChart>
@@ -98,11 +109,12 @@ const DoughnutChart = ({ data, loading }) => {
       <ul className="w-full flex-1 space-y-2.5">
         {data.slice(0, 6).map((d, i) => {
           const pct = total ? Math.round((d.value / total) * 100) : 0;
+          const color = PIE_COLORS[i % PIE_COLORS.length];
           return (
             <li key={d.name}>
               <div className="flex items-center justify-between gap-3 text-[13px]">
                 <span className="flex min-w-0 items-center gap-2">
-                  <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: PIE_COLORS[i % PIE_COLORS.length] }} />
+                  <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: color }} />
                   <span className="truncate font-medium text-slate-700">{d.name}</span>
                 </span>
                 <span className="shrink-0 text-slate-500 tabular-nums">
@@ -110,7 +122,7 @@ const DoughnutChart = ({ data, loading }) => {
                 </span>
               </div>
               <div className="mt-1 h-1 w-full overflow-hidden rounded-full bg-slate-100">
-                <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: PIE_COLORS[i % PIE_COLORS.length] }} />
+                <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: color }} />
               </div>
             </li>
           );
@@ -126,7 +138,9 @@ const RecentClaimsTable = ({ claims, loading }) => {
       <Card className="overflow-hidden">
         <div className="h-10 w-full animate-pulse bg-slate-100" />
         <div className="space-y-3 p-4">
-          {[0, 1, 2, 3].map((i) => <div key={i} className="h-4 w-full animate-pulse rounded bg-slate-100" />)}
+          {[0, 1, 2, 3].map((i) => (
+            <div key={i} className="h-4 w-full animate-pulse rounded bg-slate-100" />
+          ))}
         </div>
       </Card>
     );
@@ -159,10 +173,13 @@ const RecentClaimsTable = ({ claims, loading }) => {
                   <td className="px-4 py-2.5">
                     <div className="flex items-center gap-3">
                       <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-[11px] font-semibold text-emerald-700">
-                        {first.charAt(0)}{last.charAt(0)}
+                        {first.charAt(0)}
+                        {last.charAt(0)}
                       </div>
                       <div className="min-w-0">
-                        <p className="truncate font-medium text-slate-900">{first} {last}</p>
+                        <p className="truncate font-medium text-slate-900">
+                          {first} {last}
+                        </p>
                         <p className="text-[11px] text-slate-400">{c.student?.matricule || ""}</p>
                       </div>
                     </div>
@@ -186,11 +203,15 @@ const RecentClaimsTable = ({ claims, loading }) => {
 
 const GlanceRow = ({ icon: Icon, value, label, accent }) => (
   <div className="flex items-center gap-3 rounded-lg border border-slate-100 bg-slate-50/70 px-3 py-2.5">
-    <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${TONES[accent] || TONES.primary}`}>
+    <div
+      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${TONES[accent] || TONES.primary}`}
+    >
       <Icon className="h-[18px] w-[18px]" strokeWidth={2} />
     </div>
     <div className="min-w-0">
-      <p className="truncate text-lg font-semibold leading-tight tracking-tight text-slate-900 tabular-nums">{value}</p>
+      <p className="truncate text-lg font-semibold leading-tight tracking-tight text-slate-900 tabular-nums">
+        {value}
+      </p>
       <p className="text-[11px] font-medium text-slate-500">{label}</p>
     </div>
   </div>
@@ -207,7 +228,10 @@ const Reports = () => {
     const load = async () => {
       try {
         const [s, d] = await Promise.all([getReportsSummary(), getDailyReport()]);
-        if (!cancelled) { setSummary(s); setDaily(d); }
+        if (!cancelled) {
+          setSummary(s);
+          setDaily(d);
+        }
       } catch (err) {
         if (!cancelled) setError(getErrorMessage(err));
       } finally {
@@ -215,56 +239,65 @@ const Reports = () => {
       }
     };
     load();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const mealItemData = useMemo(() => {
     if (!daily?.mealsByMenuItem) return [];
-    return Object.entries(daily.mealsByMenuItem).map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
+    return Object.entries(daily.mealsByMenuItem)
+      .map(([name, value]) => ({ name, value }))
+      .sort((a, b) => b.value - a.value);
   }, [daily]);
 
   const stats = [
     { label: "Registered students", value: summary?.totalStudents ?? "—", subtitle: "Total registered", icon: User, accent: "primary" },
     { label: "Subscriptions", value: summary?.totalSubscriptions ?? "—", subtitle: "Total records", icon: CreditCard, accent: "success" },
-    { label: "Verified revenue", value: summary ? formatCurrency(summary.totalRevenue) : "—", subtitle: "Simulated payments (FCFA)", icon: Banknote, accent: "warning" },
+    {
+      label: "Verified revenue",
+      value: summary ? formatCurrency(summary.totalRevenue) : "—",
+      subtitle: "Simulated payments (FCFA)",
+      icon: Banknote,
+      accent: "warning",
+    },
     { label: "Meal claims", value: summary?.totalMealsClaimed ?? "—", subtitle: "All time", icon: Receipt, accent: "error" },
   ];
 
   return (
-    <div className="mx-auto w-full max-w-7xl">
-      {/* Page header */}
+    <div className="mx-auto w-full max-w-7xl space-y-4">
+      {/* Header */}
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="text-xl font-semibold tracking-tight text-slate-900">Reports</h1>
-          <p className="mt-0.5 text-sm text-slate-500">
-            Summary and trends for cafeteria operations.
-          </p>
+          <p className="mt-0.5 text-sm text-slate-500">Summary and trends for cafeteria operations.</p>
         </div>
         <div className="inline-flex items-center gap-2 self-start rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600 sm:self-auto">
-          <Clock className="h-3.5 w-3.5 text-emerald-600" />
+          <Clock className="h-3.5 w-3.5 text-emerald-600" aria-hidden="true" />
           {daily?.date ? formatDate(daily.date, "") : "Loading…"}
         </div>
       </div>
 
-      {/* Error banner */}
       {error && (
-        <div className="mt-4 flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-2.5">
+        <div className="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-2.5">
           <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-red-500" />
           <p className="text-sm font-medium text-red-700">{error}</p>
         </div>
       )}
 
       {/* KPI cards */}
-      <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {stats.map((s) => <StatCard key={s.label} {...s} loading={loading} />)}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {stats.map((s) => (
+          <StatCard key={s.label} {...s} loading={loading} />
+        ))}
       </div>
-      <p className="mt-2 text-xs text-slate-400">
-        Verified revenue totals payment records the backend marks VERIFIED when a
-        subscription is created (a simulated flow) — not confirmed real-money income.
+      <p className="text-xs text-slate-400">
+        Verified revenue totals payment records the backend marks VERIFIED when a subscription is created (a simulated
+        flow), not confirmed real-money income.
       </p>
 
       {/* Chart + glance */}
-      <div className="mt-5 grid grid-cols-1 gap-4 xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
         <Card className="p-5 xl:col-span-2">
           <div className="flex items-start justify-between gap-4">
             <div>
@@ -282,21 +315,24 @@ const Reports = () => {
 
         <Card className="p-5">
           <h2 className="text-sm font-semibold text-slate-900">Today at a glance</h2>
-          <p className="mt-0.5 text-xs text-slate-500">
-            {daily?.date ? formatDate(daily.date, "") : "Loading…"}
-          </p>
+          <p className="mt-0.5 text-xs text-slate-500">{daily?.date ? formatDate(daily.date, "") : "Loading…"}</p>
           <div className="mt-5 space-y-2.5">
             <GlanceRow icon={Users} value={daily?.studentsServed ?? "—"} label="Students served" accent="primary" />
             <GlanceRow icon={Receipt} value={daily?.totalMealsClaimed ?? "—"} label="Meals claimed" accent="success" />
             {summary && (
-              <GlanceRow icon={Banknote} value={formatCurrency(summary.totalCreditsPurchased)} label="Credits purchased" accent="warning" />
+              <GlanceRow
+                icon={Banknote}
+                value={formatCurrency(summary.totalCreditsPurchased)}
+                label="Credits purchased"
+                accent="warning"
+              />
             )}
           </div>
         </Card>
       </div>
 
       {/* Recent claims */}
-      <div className="mt-6">
+      <div className="pt-2">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-4">
           <div>
             <h2 className="text-sm font-semibold text-slate-900">Recent meal claims</h2>
@@ -308,7 +344,7 @@ const Reports = () => {
             </span>
             <Link
               to="/meal-claims"
-              className="inline-flex items-center gap-1 text-sm font-medium text-primary transition-colors hover:text-primary-dark"
+              className="inline-flex items-center gap-1 text-sm font-medium text-emerald-700 transition-colors hover:text-emerald-800"
             >
               View all
               <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
