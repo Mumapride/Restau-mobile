@@ -1,3 +1,8 @@
+/**
+ * CreateMealPlanScreen — presentation-only redesign.
+ * Validation, createMealPlan() call, alerts and navigation are unchanged.
+ */
+
 import React, { useState } from "react";
 import {
   View,
@@ -9,6 +14,8 @@ import {
   Alert,
   Switch,
   ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 
 import { createMealPlan } from "../../api/mealPlans.api";
@@ -22,6 +29,62 @@ import {
   TOUCH_TARGET,
   TYPOGRAPHY,
 } from "../../theme/tokens";
+
+// Palette from the approved admin design
+const HERO      = "#075E45";
+const PRIMARY   = "#0B7A55";
+const TILE      = "#E6F6EE";
+const TILE_TEXT = "#075E45";
+const SOFT      = "#F1F5F9";
+const BORDER    = "#E2E8F0";
+const TEXT_SEC  = "#475569";
+const TEXT_MUT  = "#64748B";
+
+const FIELD_HEIGHT = Math.max(TOUCH_TARGET, 52);
+
+// ---------------------------------------------------------------------------
+// Small presentational helpers
+// ---------------------------------------------------------------------------
+
+const Field = ({ label, hint, children }) => (
+  <View style={styles.field}>
+    <Text style={styles.label}>{label}</Text>
+    {children}
+    {hint ? <Text style={styles.helperText}>{hint}</Text> : null}
+  </View>
+);
+
+const FormInput = ({ icon, multiline, ...inputProps }) => {
+  const [focused, setFocused] = useState(false);
+  return (
+    <View
+      style={[
+        styles.inputWrap,
+        multiline && styles.inputWrapMulti,
+        focused && styles.inputWrapFocused,
+      ]}
+    >
+      <Ionicons
+        name={icon}
+        size={19}
+        color={focused ? PRIMARY : COLORS.textMuted}
+        style={multiline ? styles.iconTop : null}
+      />
+      <TextInput
+        {...inputProps}
+        multiline={multiline}
+        style={[styles.input, multiline && styles.inputMulti]}
+        placeholderTextColor={COLORS.textMuted}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+      />
+    </View>
+  );
+};
+
+// ---------------------------------------------------------------------------
+// Screen
+// ---------------------------------------------------------------------------
 
 const CreateMealPlanScreen = ({ navigation }) => {
   const [name, setName] = useState("");
@@ -95,6 +158,19 @@ const CreateMealPlanScreen = ({ navigation }) => {
     }
   };
 
+  // Display-only: total price of the plan once credits and price are valid.
+  const creditsNum = Number(credits);
+  const priceNum = Number(pricePerCredit);
+  const total =
+    credits !== "" &&
+    pricePerCredit !== "" &&
+    Number.isFinite(creditsNum) &&
+    Number.isFinite(priceNum) &&
+    creditsNum > 0 &&
+    priceNum >= 0
+      ? creditsNum * priceNum
+      : null;
+
   return (
     <View style={styles.screen}>
       <ScreenHeader
@@ -104,239 +180,169 @@ const CreateMealPlanScreen = ({ navigation }) => {
         onBack={() => navigation.goBack()}
       />
 
-      <ScrollView
-        style={styles.container}
-        contentContainerStyle={styles.content}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        <View style={styles.formCard}>
-          {/* Section Header */}
-
-          <View style={styles.sectionHeader}>
-            <View style={styles.sectionIcon}>
-              <Ionicons
-                name="add-outline"
-                size={22}
-                color={COLORS.primary}
-              />
-            </View>
-
-            <View>
-              <Text style={styles.sectionTitle}>
-                Plan Information
-              </Text>
-
-              <Text style={styles.sectionSubtitle}>
-                Add the details for this meal plan
-              </Text>
+        <ScrollView
+          style={styles.flex}
+          contentContainerStyle={styles.content}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Hero preview: live credits + total */}
+          <View style={styles.hero}>
+            <View style={styles.heroCircle} />
+            <View style={styles.heroRow}>
+              <View style={styles.heroTile}>
+                <Text style={styles.heroTileNumber}>
+                  {credits && Number(credits) > 0 ? credits : "–"}
+                </Text>
+                <Text style={styles.heroTileWord}>credits</Text>
+              </View>
+              <View style={styles.heroText}>
+                <Text style={styles.heroTitle} numberOfLines={1}>
+                  {name.trim() || "New meal plan"}
+                </Text>
+                <Text style={styles.heroSubtitle}>
+                  {total !== null
+                    ? `${total.toLocaleString()} FCFA total`
+                    : "Enter credits and price to see the total"}
+                </Text>
+              </View>
             </View>
           </View>
 
-          {/* Plan Name */}
-
-          <View style={styles.field}>
-            <Text style={styles.label}>
-              Plan Name
-            </Text>
-
-            <View style={styles.inputContainer}>
-              <View style={styles.inputIcon}>
-                <Ionicons
-                  name="pricetag-outline"
-                  size={17}
-                  color={COLORS.primary}
-                />
+          <View style={styles.formCard}>
+            {/* Card header */}
+            <View style={styles.cardHeader}>
+              <View style={styles.cardIcon}>
+                <Ionicons name="restaurant-outline" size={22} color={PRIMARY} />
               </View>
+              <View style={styles.cardHeaderText}>
+                <Text style={styles.sectionTitle}>Plan Information</Text>
+                <Text style={styles.sectionSubtitle}>
+                  Add the details for this meal plan
+                </Text>
+              </View>
+            </View>
 
-              <TextInput
-                style={styles.input}
+            <View style={styles.divider} />
+
+            <Field label="Plan name">
+              <FormInput
+                icon="pricetag-outline"
                 placeholder="e.g. One Week Plan"
-                placeholderTextColor={COLORS.textMuted}
                 value={name}
                 onChangeText={setName}
+                editable={!loading}
+                accessibilityLabel="Plan name"
               />
-            </View>
-          </View>
+            </Field>
 
-          {/* Description */}
-
-          <View style={styles.field}>
-            <Text style={styles.label}>
-              Description
-            </Text>
-
-            <View
-              style={[
-                styles.inputContainer,
-                styles.textAreaContainer,
-              ]}
-            >
-              <View
-                style={[
-                  styles.inputIcon,
-                  styles.textAreaIcon,
-                ]}
-              >
-                <Ionicons
-                  name="document-text-outline"
-                  size={17}
-                  color={COLORS.primary}
-                />
-              </View>
-
-              <TextInput
-                style={[
-                  styles.input,
-                  styles.textArea,
-                ]}
+            <Field label="Description">
+              <FormInput
+                icon="document-text-outline"
                 placeholder="Describe this meal plan"
-                placeholderTextColor={COLORS.textMuted}
                 value={description}
                 onChangeText={setDescription}
                 multiline
                 numberOfLines={4}
+                editable={!loading}
+                accessibilityLabel="Description"
               />
-            </View>
-          </View>
+            </Field>
 
-          {/* Credits */}
-
-          <View style={styles.field}>
-            <Text style={styles.label}>
-              Meal Credits
-            </Text>
-
-            <View style={styles.inputContainer}>
-              <View style={styles.inputIcon}>
-                <Ionicons
-                  name="ticket-outline"
-                  size={17}
-                  color={COLORS.primary}
-                />
-              </View>
-
-              <TextInput
-                style={styles.input}
+            <Field label="Meal credits" hint="Number of meals included in this plan">
+              <FormInput
+                icon="ticket-outline"
                 placeholder="e.g. 5"
-                placeholderTextColor={COLORS.textMuted}
                 value={credits}
                 onChangeText={setCredits}
                 keyboardType="numeric"
+                editable={!loading}
+                accessibilityLabel="Meal credits"
               />
-            </View>
+            </Field>
 
-            <Text style={styles.helperText}>
-              Number of meals included in this plan
-            </Text>
-          </View>
-
-          {/* Price */}
-
-          <View style={styles.field}>
-            <Text style={styles.label}>
-              Price Per Credit
-            </Text>
-
-            <View style={styles.inputContainer}>
-              <View style={styles.inputIcon}>
-                <Ionicons
-                  name="cash-outline"
-                  size={17}
-                  color={COLORS.primary}
-                />
-              </View>
-
-              <TextInput
-                style={styles.input}
+            <Field label="Price per credit" hint="Amount charged for each meal credit">
+              <FormInput
+                icon="cash-outline"
                 placeholder="e.g. 1000"
-                placeholderTextColor={COLORS.textMuted}
                 value={pricePerCredit}
                 onChangeText={setPricePerCredit}
                 keyboardType="decimal-pad"
+                editable={!loading}
+                accessibilityLabel="Price per credit"
               />
-            </View>
+            </Field>
 
-            <Text style={styles.helperText}>
-              Amount charged for each meal credit
-            </Text>
-          </View>
-
-          {/* Active Plan */}
-
-          <View style={styles.switchCard}>
-            <View style={styles.switchIcon}>
-              <Ionicons
-                name="checkmark-circle-outline"
-                size={20}
-                color={COLORS.primary}
-              />
-            </View>
-
-            <View style={styles.switchTextContainer}>
-              <Text style={styles.switchTitle}>
-                Active Plan
-              </Text>
-
-              <Text style={styles.switchDescription}>
-                Make this plan available to students
-              </Text>
-            </View>
-
-            <Switch
-              value={isActive}
-              onValueChange={setIsActive}
-              trackColor={{
-                false: COLORS.border,
-                true: COLORS.primaryLight,
-              }}
-              thumbColor={
-                isActive ? COLORS.primary : COLORS.surface
-              }
-            />
-          </View>
-
-          {/* Create */}
-
-          <TouchableOpacity
-            style={[
-              styles.primaryButton,
-              loading && styles.disabledButton,
-            ]}
-            onPress={handleCreate}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color={COLORS.onPrimary} />
-            ) : (
-              <>
+            {/* Active plan */}
+            <View style={styles.switchCard}>
+              <View style={styles.switchIcon}>
                 <Ionicons
-                  name="add-outline"
-                  size={18}
-                  color={COLORS.onPrimary}
-                  style={styles.primaryButtonIcon}
+                  name="checkmark-circle-outline"
+                  size={20}
+                  color={PRIMARY}
                 />
+              </View>
 
-                <Text style={styles.primaryButtonText}>
-                  Create Meal Plan
+              <View style={styles.switchTextContainer}>
+                <Text style={styles.switchTitle}>Active plan</Text>
+                <Text style={styles.switchDescription}>
+                  Make this plan available to students
                 </Text>
-              </>
-            )}
-          </TouchableOpacity>
+              </View>
 
-          {/* Cancel */}
+              <Switch
+                value={isActive}
+                onValueChange={setIsActive}
+                disabled={loading}
+                trackColor={{
+                  false: COLORS.border,
+                  true: TILE,
+                }}
+                thumbColor={isActive ? PRIMARY : COLORS.surface}
+              />
+            </View>
 
-          <TouchableOpacity
-            style={styles.secondaryButton}
-            onPress={() => navigation.goBack()}
-            disabled={loading}
-          >
-            <Text style={styles.secondaryButtonText}>
-              Cancel
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
+            {/* Buttons */}
+            <TouchableOpacity
+              style={[styles.primaryButton, loading && styles.disabledButton]}
+              onPress={handleCreate}
+              disabled={loading}
+              activeOpacity={0.85}
+              accessibilityRole="button"
+              accessibilityLabel="Create meal plan"
+            >
+              {loading ? (
+                <ActivityIndicator color={COLORS.onPrimary} />
+              ) : (
+                <>
+                  <Ionicons
+                    name="add"
+                    size={20}
+                    color={COLORS.onPrimary}
+                    style={styles.buttonIcon}
+                  />
+                  <Text style={styles.primaryButtonText}>Create Meal Plan</Text>
+                </>
+              )}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.secondaryButton}
+              onPress={() => navigation.goBack()}
+              disabled={loading}
+              activeOpacity={0.8}
+              accessibilityRole="button"
+              accessibilityLabel="Cancel"
+            >
+              <Text style={styles.secondaryButtonText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </View>
   );
 };
@@ -344,192 +350,237 @@ const CreateMealPlanScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: "#F4F6F5",
   },
-
-  container: {
+  flex: {
     flex: 1,
   },
-
   content: {
-    padding: SPACING.lg,
+    paddingHorizontal: SPACING.lg,
+    paddingTop: SPACING.lg,
     paddingBottom: SPACING.xxl,
   },
 
+  /* ---------- Hero preview ---------- */
+  hero: {
+    backgroundColor: HERO,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.lg,
+    overflow: "hidden",
+    ...SHADOWS.sm,
+  },
+  heroCircle: {
+    position: "absolute",
+    right: -50,
+    top: -60,
+    width: 180,
+    height: 180,
+    borderRadius: 90,
+    backgroundColor: "rgba(255,255,255,0.06)",
+  },
+  heroRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  heroTile: {
+    width: 64,
+    height: 64,
+    borderRadius: 14,
+    backgroundColor: "rgba(255,255,255,0.14)",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: SPACING.md,
+  },
+  heroTileNumber: {
+    color: COLORS.onPrimary,
+    fontSize: 20,
+    fontWeight: "800",
+    lineHeight: 22,
+  },
+  heroTileWord: {
+    color: "#BFE8D4",
+    fontSize: 12,
+    marginTop: 2,
+  },
+  heroText: {
+    flex: 1,
+  },
+  heroTitle: {
+    color: COLORS.onPrimary,
+    fontSize: 17,
+    fontWeight: "700",
+  },
+  heroSubtitle: {
+    color: "#BFE8D4",
+    fontSize: 13,
+    marginTop: 3,
+  },
+
+  /* ---------- Card ---------- */
   formCard: {
+    marginTop: SPACING.md,
     backgroundColor: COLORS.surface,
     borderRadius: RADIUS.lg,
     padding: SPACING.lg,
     borderWidth: 1,
-    borderColor: COLORS.border,
-    ...SHADOWS.md,
+    borderColor: BORDER,
+    ...SHADOWS.sm,
   },
-
-  sectionHeader: {
+  cardHeader: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 4,
   },
-
-  sectionIcon: {
-    width: 40,
-    height: 40,
+  cardIcon: {
+    width: 44,
+    height: 44,
     borderRadius: 12,
-    backgroundColor: COLORS.primaryLight,
+    backgroundColor: TILE,
     justifyContent: "center",
     alignItems: "center",
-    marginRight: SPACING.sm,
+    marginRight: SPACING.md,
   },
-
+  cardHeaderText: {
+    flex: 1,
+  },
   sectionTitle: {
+    ...TYPOGRAPHY.h3,
     color: COLORS.text,
-    fontSize: 17,
-    fontWeight: "700",
   },
-
   sectionSubtitle: {
-    color: COLORS.textSecondary,
-    fontSize: 12,
+    ...TYPOGRAPHY.bodySmall,
+    color: TEXT_SEC,
     marginTop: 2,
   },
-
-  field: {
+  divider: {
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: BORDER,
     marginTop: SPACING.lg,
   },
 
-  label: {
-    color: COLORS.text,
-    ...TYPOGRAPHY.label,
-    marginBottom: SPACING.sm,
+  /* ---------- Fields ---------- */
+  field: {
+    marginTop: SPACING.lg,
   },
-
-  inputContainer: {
-    minHeight: 48,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    borderRadius: RADIUS.md,
-    backgroundColor: COLORS.surface,
+  label: {
+    ...TYPOGRAPHY.label,
+    color: COLORS.text,
+    marginBottom: 8,
+  },
+  inputWrap: {
+    minHeight: FIELD_HEIGHT,
     flexDirection: "row",
     alignItems: "center",
+    paddingHorizontal: 14,
+    backgroundColor: SOFT,
+    borderWidth: 1,
+    borderColor: BORDER,
+    borderRadius: RADIUS.md,
   },
-
-  inputIcon: {
-    width: 38,
-    height: 38,
-    marginLeft: SPACING.xs,
-    borderRadius: RADIUS.sm,
-    backgroundColor: COLORS.primaryLight,
-    justifyContent: "center",
-    alignItems: "center",
+  inputWrapMulti: {
+    alignItems: "flex-start",
+    minHeight: 112,
+    paddingTop: 14,
   },
-
+  inputWrapFocused: {
+    borderColor: PRIMARY,
+    backgroundColor: COLORS.surface,
+  },
+  iconTop: {
+    marginTop: 1,
+  },
   input: {
     flex: 1,
-    paddingHorizontal: SPACING.sm,
-    paddingVertical: SPACING.md,
+    marginLeft: 12,
+    paddingVertical: 0,
+    height: FIELD_HEIGHT - 2,
     color: COLORS.text,
-    ...TYPOGRAPHY.body,
+    fontSize: 15,
   },
-
-  textAreaContainer: {
-    alignItems: "flex-start",
-    minHeight: 108,
-  },
-
-  textAreaIcon: {
-    marginTop: 4,
-  },
-
-  textArea: {
-    minHeight: 100,
+  inputMulti: {
+    height: undefined,
+    minHeight: 84,
     textAlignVertical: "top",
+    paddingTop: 0,
   },
-
   helperText: {
-    ...TYPOGRAPHY.caption,
-    color: COLORS.textMuted,
-    marginTop: SPACING.xs,
+    color: TEXT_MUT,
+    fontSize: 12,
+    marginTop: 6,
     marginLeft: 2,
   },
 
+  /* ---------- Active switch ---------- */
   switchCard: {
-    marginTop: SPACING.xl,
-    padding: SPACING.md,
+    marginTop: SPACING.lg,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
     borderRadius: RADIUS.md,
-    backgroundColor: COLORS.primaryLight,
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: BORDER,
     flexDirection: "row",
     alignItems: "center",
   },
-
   switchIcon: {
-    width: 38,
-    height: 38,
-    borderRadius: 10,
-    backgroundColor: COLORS.surface,
+    width: 40,
+    height: 40,
+    borderRadius: 11,
+    backgroundColor: TILE,
     justifyContent: "center",
     alignItems: "center",
-    marginRight: SPACING.sm,
+    marginRight: SPACING.md,
   },
-
   switchTextContainer: {
     flex: 1,
     paddingRight: SPACING.sm,
   },
-
   switchTitle: {
     color: COLORS.text,
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: "700",
   },
-
   switchDescription: {
-    ...TYPOGRAPHY.caption,
-    color: COLORS.textSecondary,
+    color: TEXT_SEC,
+    fontSize: 12,
     marginTop: 2,
-    lineHeight: 16,
+    lineHeight: 17,
   },
 
+  /* ---------- Buttons ---------- */
   primaryButton: {
-    backgroundColor: COLORS.primary,
-    minHeight: TOUCH_TARGET,
+    backgroundColor: PRIMARY,
+    minHeight: FIELD_HEIGHT,
     borderRadius: RADIUS.md,
     marginTop: SPACING.xl,
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    ...SHADOWS.md,
+    ...SHADOWS.sm,
   },
-
-  primaryButtonIcon: {
+  buttonIcon: {
     marginRight: SPACING.sm,
   },
-
   primaryButtonText: {
     color: COLORS.onPrimary,
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: "700",
   },
-
   disabledButton: {
     opacity: 0.6,
   },
-
   secondaryButton: {
-    minHeight: TOUCH_TARGET,
+    minHeight: FIELD_HEIGHT,
     borderWidth: 1,
-    borderColor: COLORS.primary,
+    borderColor: BORDER,
     borderRadius: RADIUS.md,
     justifyContent: "center",
     alignItems: "center",
     marginTop: SPACING.sm,
     backgroundColor: COLORS.surface,
   },
-
   secondaryButtonText: {
-    color: COLORS.primary,
-    fontSize: 14,
+    color: TEXT_SEC,
+    fontSize: 15,
     fontWeight: "700",
   },
 });

@@ -37,8 +37,19 @@ app.use(
   require("./modules/meal-claims/mealClaims.routes")
 );
 
+// Reports (ADMIN)
+app.use(
+  "/api/reports",
+  require("./modules/reports/reports.routes")
+);
+
 // Developer C routes (student screens)
 app.use('/api/menu-schedule', require('./modules/menu-schedule/menuSchedule.routes'));
-app.use('/api/meal-claims', require('./modules/meal-claims/mealClaims.routes'));
+
+// Announcements (ADMIN management + STUDENT feed)
+app.use(
+  "/api/announcements",
+  require("./modules/announcements/announcements.routes")
+);
 
 module.exports = app;

@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import useAuthStore from '../store/useAuthStore';
 import { COLORS } from '../theme/tokens';
 
+import LandingScreen from '../screens/auth/LandingScreen';
 import LoginScreen from '../screens/auth/LoginScreen';
 import RegisterScreen from '../screens/auth/RegisterScreen';
 import StudentNavigator from './StudentNavigator';
@@ -29,6 +30,8 @@ export default function AppNavigator() {
       >
         {!token ? (
           <>
+            {/* Landing is the first screen unauthenticated users see */}
+            <Stack.Screen name="Landing" component={LandingScreen} />
             <Stack.Screen name="Login" component={LoginScreen} />
             <Stack.Screen name="Register" component={RegisterScreen} />
           </>

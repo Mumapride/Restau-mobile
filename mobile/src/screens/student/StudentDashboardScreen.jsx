@@ -6,12 +6,10 @@ import React, {
   useState,
 } from 'react';
 import {
-  AccessibilityInfo,
-  Alert,
   Animated,
   AppState,
   Easing,
-  ImageBackground,
+  Image,
   Pressable,
   Platform,
   RefreshControl,
@@ -22,39 +20,43 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import axios from 'axios';
 
 import useAuthStore from '../../store/useAuthStore';
 import { BASE_URL } from '../../api/auth.api';
-import Avatar from '../../components/Avatar';
-import StudentTopBar from '../../components/StudentTopBar';
-import { COLORS } from '../../theme/tokens';
+import { getAnnouncements } from '../../api/announcements.api';
 
-const DAY_LABELS = {
-  MONDAY: 'Mon',
-  TUESDAY: 'Tue',
-  WEDNESDAY: 'Wed',
-  THURSDAY: 'Thu',
-  FRIDAY: 'Fri',
-  SATURDAY: 'Sat',
-  SUNDAY: 'Sun',
-};
-const SERVICE_DAYS = ['TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY'];
+// Real brand asset (mobile/assets/brand/restau-logo.png).
+// eslint-disable-next-line import/no-unresolved
+const RESTAU_LOGO = require('../../../assets/brand/restau-logo.png');
+
+/* -------------------------------------------------------------------------- */
+/* Tokens (values from the measured reference)                                */
+/* -------------------------------------------------------------------------- */
+
+const GREEN = '#087A55';
+const NAVY = '#0B1026';
+const MUTED = '#747D96';
+const PALE_GREEN = '#E8F8EE';
+const WHITE = '#FFFFFF';
+const BORDER = '#E6EAF0';
+const DIVIDER = '#EEF2F6';
+const PAGE_BG = '#FBFCFD';
+
 const H_MARGIN = 16;
 const MAX_CONTENT_WIDTH = 680;
-const PANEL_PADDING = 12;
+const RADIUS = 14;
 
-const DASHBOARD_PRIMARY = '#16A36A';
-const DASHBOARD_DARK_GREEN = '#15803D';
-const DASHBOARD_LIGHT_GREEN = '#DCFCE7';
-const DASHBOARD_BACKGROUND = '#F8FAFC';
-const DASHBOARD_TEXT = '#0F172A';
-const DASHBOARD_TEXT_SECONDARY = '#64748B';
-const DASHBOARD_BORDER = '#E2E8F0';
-const DASHBOARD_MUTED = '#94A3B8';
-const INFO_BLUE = '#2563EB';
+const DAY_NAMES = {
+  MONDAY: 'Monday',
+  TUESDAY: 'Tuesday',
+  WEDNESDAY: 'Wednesday',
+  THURSDAY: 'Thursday',
+  FRIDAY: 'Friday',
+  SATURDAY: 'Saturday',
+  SUNDAY: 'Sunday',
+};
 
 // Web-only affordance; native keeps default press behavior.
 const WEB_CURSOR_STYLE = Platform.select({
@@ -62,77 +64,43 @@ const WEB_CURSOR_STYLE = Platform.select({
   default: {},
 });
 
-// Presentation-only fallback: the backend menu contract currently has no image field.
-const PRESENTATION_MEAL_IMAGE =
-  'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=85';
-
-// Isolated static UI content. There is currently no announcements endpoint.
-const STATIC_ANNOUNCEMENT_PREVIEW = {
-  title: 'Keep your meal pass ready',
-  message:
-    'Scan your QR code at the cafeteria entrance to collect your meal.',
-};
-
 const QUICK_ACTIONS = [
   {
     id: 'qr',
     label: 'My QR Code',
-    description: 'Show to scan',
-    icon: 'qr-code',
+    icon: 'qr-code-outline',
     route: 'My QR Code',
-    tint: '#15803D',
-    bg: '#DCFCE7',
+    primary: true,
   },
   {
     id: 'plans',
     label: 'Meal Plans',
-    description: 'View menu',
-    icon: 'restaurant',
+    icon: 'restaurant-outline',
     route: 'Meal Plans',
-    tint: '#EA8A0A',
-    bg: '#FFF1D6',
-  },
-  {
-    id: 'credit',
-    label: 'Buy Credit',
-    description: '1-day, 4-day plans',
-    icon: 'card',
-    route: 'Meal Plans',
-    tint: '#2563EB',
-    bg: '#DBEAFE',
   },
   {
     id: 'history',
     label: 'History',
-    description: 'View meals',
-    icon: 'document-text',
+    icon: 'document-text-outline',
     route: 'History',
-    tint: '#7C3AED',
-    bg: '#EDE9FE',
+  },
+  {
+    id: 'profile',
+    label: 'Profile',
+    icon: 'person-outline',
+    route: 'Profile',
   },
 ];
 
-// Subtle food icons drifting upward inside the green hero (Ionicons only, no emoji).
-const FOOD_DRIFT_ICONS = [
-  { name: 'restaurant-outline', size: 16, left: '5%', top: '10%', duration: 11000, delay: 0, drift: 8, rise: 34 },
-  { name: 'cafe-outline', size: 14, left: '19%', top: '40%', duration: 13000, delay: 1800, drift: -7, rise: 38 },
-  { name: 'fast-food-outline', size: 18, left: '33%', top: '18%', duration: 12000, delay: 900, drift: 9, rise: 30 },
-  { name: 'nutrition-outline', size: 15, left: '47%', top: '48%', duration: 14000, delay: 3000, drift: -8, rise: 40 },
-  { name: 'pizza-outline', size: 16, left: '60%', top: '12%', duration: 12500, delay: 2200, drift: 7, rise: 32 },
-  { name: 'fish-outline', size: 15, left: '71%', top: '44%', duration: 15000, delay: 600, drift: -6, rise: 42 },
-  { name: 'egg-outline', size: 14, left: '82%', top: '24%', duration: 13500, delay: 4000, drift: 6, rise: 30 },
-  { name: 'ice-cream-outline', size: 16, left: '90%', top: '52%', duration: 16000, delay: 2600, drift: -5, rise: 36 },
-];
+/* -------------------------------------------------------------------------- */
+/* Helpers                                                                    */
+/* -------------------------------------------------------------------------- */
 
 function getGreeting() {
   const hour = new Date().getHours();
   if (hour < 12) return 'Good morning';
   if (hour < 17) return 'Good afternoon';
   return 'Good evening';
-}
-
-function getInitials(firstName, lastName) {
-  return `${firstName?.charAt(0) || ''}${lastName?.charAt(0) || ''}`;
 }
 
 function formatAcademicYear(value) {
@@ -167,6 +135,27 @@ function getTodayKey() {
     .toUpperCase();
 }
 
+const SERVICE_DAY_INDEX = { TUESDAY: 2, WEDNESDAY: 3, THURSDAY: 4, FRIDAY: 5 };
+
+/** Date of a service day in the current Monday-start week, in local time. */
+function getServiceDayDate(dayOfWeek) {
+  const target = SERVICE_DAY_INDEX[dayOfWeek];
+  if (target == null) return null;
+  const d = new Date();
+  d.setHours(12, 0, 0, 0); // local noon, avoids timezone off-by-one
+  const today = d.getDay(); // Sun=0, Mon=1, ..., Sat=6
+  const daysToMonday = today === 0 ? 6 : today - 1;
+  d.setDate(d.getDate() - daysToMonday); // Monday of current week
+  d.setDate(d.getDate() + (target - 1)); // target weekday of current week
+  return d;
+}
+
+/** Short local date label, e.g. "Oct 13". */
+function formatMenuDate(date) {
+  if (!date) return '';
+  return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+}
+
 function pluralize(count, singular, plural) {
   return Number(count) === 1 ? singular : plural;
 }
@@ -179,6 +168,7 @@ function daysUntil(value) {
 }
 
 function findNextServiceDay(menu, todayKey) {
+  const SERVICE_DAYS = ['TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY'];
   if (!menu || menu.length === 0) return null;
   const todayIndex = SERVICE_DAYS.indexOf(todayKey);
   if (todayIndex === -1) return menu[0];
@@ -203,7 +193,7 @@ function useFadeIn(enabled) {
     }
     Animated.timing(progress, {
       toValue: 1,
-      duration: 260,
+      duration: 240,
       easing: Easing.out(Easing.cubic),
       useNativeDriver: true,
     }).start();
@@ -211,96 +201,16 @@ function useFadeIn(enabled) {
   return { opacity: progress };
 }
 
-function FoodDriftIcon({ config }) {
-  const progress = useRef(new Animated.Value(0)).current;
+/* -------------------------------------------------------------------------- */
+/* Building blocks                                                            */
+/* -------------------------------------------------------------------------- */
 
-  useEffect(() => {
-    const animation = Animated.sequence([
-      Animated.delay(config.delay),
-      Animated.loop(
-        Animated.timing(progress, {
-          toValue: 1,
-          duration: config.duration,
-          easing: Easing.linear,
-          useNativeDriver: true,
-        }),
-      ),
-    ]);
-    animation.start();
-    return () => animation.stop();
-  }, [config, progress]);
-
-  const translateY = progress.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, -config.rise],
-  });
-  const translateX = progress.interpolate({
-    inputRange: [0, 0.5, 1],
-    outputRange: [0, config.drift, 0],
-  });
-  const opacity = progress.interpolate({
-    inputRange: [0, 0.2, 0.8, 1],
-    outputRange: [0, 0.16, 0.16, 0],
-  });
-
-  return (
-    <Animated.View
-      style={[
-        styles.foodIcon,
-        {
-          left: config.left,
-          top: config.top,
-          opacity,
-          transform: [{ translateX }, { translateY }],
-        },
-      ]}
-    >
-      <Ionicons name={config.name} size={config.size} color="#FFFFFF" />
-    </Animated.View>
-  );
-}
-
-function FoodBackdrop() {
-  const [reduceMotion, setReduceMotion] = useState(false);
-
-  useEffect(() => {
-    let mounted = true;
-    AccessibilityInfo.isReduceMotionEnabled()
-      .then((enabled) => {
-        if (mounted) setReduceMotion(Boolean(enabled));
-      })
-      .catch(() => {});
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  if (reduceMotion) return null;
-
-  return (
-    <View pointerEvents="none" style={styles.foodLayer}>
-      {FOOD_DRIFT_ICONS.map((config) => (
-        <FoodDriftIcon key={config.name} config={config} />
-      ))}
-    </View>
-  );
-}
-
-function SectionHeading({
-  icon,
-  iconColor = DASHBOARD_PRIMARY,
-  title,
-  actionLabel,
-  onAction,
-}) {
+function SectionHeading({ title, actionLabel, onAction }) {
   return (
     <View style={styles.sectionHeading}>
-      <View style={styles.sectionTitleRow}>
-        <Ionicons name={icon} size={20} color={iconColor} />
-        <Text style={styles.sectionTitle} numberOfLines={1}>
-          {title}
-        </Text>
-      </View>
+      <Text style={styles.sectionTitle} numberOfLines={1}>
+        {title}
+      </Text>
       {actionLabel && onAction ? (
         <Pressable
           onPress={onAction}
@@ -313,18 +223,14 @@ function SectionHeading({
           ]}
         >
           <Text style={styles.sectionActionText}>{actionLabel}</Text>
-          <Ionicons
-            name="chevron-forward"
-            size={14}
-            color={DASHBOARD_TEXT_SECONDARY}
-          />
+          <Ionicons name="chevron-forward" size={15} color={GREEN} />
         </Pressable>
       ) : null}
     </View>
   );
 }
 
-function UsageBar({ ratio, color = DASHBOARD_PRIMARY, style }) {
+function UsageBar({ ratio, color = GREEN, style }) {
   const [trackWidth, setTrackWidth] = useState(0);
   const width = useRef(new Animated.Value(0)).current;
   const safeRatio = Math.max(0, Math.min(Number(ratio) || 0, 1));
@@ -354,123 +260,163 @@ function QuickActionTile({ action, onPress }) {
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={`${action.label}. ${action.description}`}
+      accessibilityLabel={action.label}
       style={({ pressed }) => [
         styles.quickAction,
         pressed && styles.quickActionPressed,
       ]}
     >
-      <View style={[styles.quickActionIcon, { backgroundColor: action.bg }]}>
-        <Ionicons name={action.icon} size={24} color={action.tint} />
+      <View
+        style={[
+          styles.quickActionCircle,
+          action.primary
+            ? styles.quickActionCirclePrimary
+            : styles.quickActionCircleLight,
+        ]}
+      >
+        <Ionicons
+          name={action.icon}
+          size={22}
+          color={action.primary ? WHITE : GREEN}
+        />
       </View>
-      <Text style={styles.quickActionLabel} numberOfLines={1}>
+      <Text
+        style={styles.quickActionLabel}
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        minimumFontScale={0.85}
+      >
         {action.label}
-      </Text>
-      <Text style={styles.quickActionDescription} numberOfLines={2}>
-        {action.description}
       </Text>
     </Pressable>
   );
 }
 
-function MealCard({ item, isToday, width, horizontal }) {
-  const dayLabel = DAY_LABELS[item.day] || item.day || 'Menu';
-
-  const image = (
-    <ImageBackground
-      source={{ uri: PRESENTATION_MEAL_IMAGE }}
-      style={[styles.mealImage, horizontal && styles.mealImageRow]}
-      imageStyle={styles.mealImageRadius}
-      resizeMode="cover"
-    >
-      <View
-        style={[
-          styles.mealBadge,
-          isToday ? styles.mealBadgeToday : styles.mealBadgeSchedule,
-        ]}
-      >
-        <Text
-          style={[
-            styles.mealBadgeText,
-            !isToday && styles.mealBadgeTextSchedule,
-          ]}
-        >
-          {isToday ? 'Today' : dayLabel}
-        </Text>
-      </View>
-    </ImageBackground>
-  );
-
-  const body = (
-    <>
-      <Text
-        style={[styles.mealName, horizontal && styles.mealNameRow]}
-        numberOfLines={2}
-      >
-        {item.mealName}
-      </Text>
-      {item.description ? (
-        <Text style={styles.mealDescription} numberOfLines={1}>
-          {item.description}
-        </Text>
-      ) : null}
-      <View style={styles.mealTimeRow}>
-        <Ionicons
-          name="time-outline"
-          size={13}
-          color={DASHBOARD_TEXT_SECONDARY}
-        />
-        <Text style={styles.mealTimeText} numberOfLines={1}>
-          Serving time to be announced
-        </Text>
-      </View>
-    </>
-  );
-
-  if (horizontal) {
-    return (
-      <View style={styles.mealRowCard}>
-        {image}
-        <View style={styles.mealRowBody}>{body}</View>
-      </View>
-    );
-  }
-
+// Cloche (serving dome) drawn with Views, since Ionicons has no cloche glyph.
+function Cloche() {
   return (
-    <View style={{ width }}>
-      {image}
-      {body}
+    <View style={styles.cloche}>
+      <View style={styles.clocheKnob} />
+      <View style={styles.clocheDome} />
+      <View style={styles.clocheBase} />
     </View>
   );
 }
 
-function AccountRow({ icon, label, value, onPress, accessibilityLabel, isLast }) {
+// Menu row: information only. Today gets a badge; other rows show a chevron.
+function MenuRow({ item, isToday }) {
+  const dayName = DAY_NAMES[item.day] || item.day || 'Menu';
   return (
-    <Pressable
-      onPress={onPress}
-      accessibilityRole="button"
-      accessibilityLabel={accessibilityLabel}
-      style={({ pressed }) => [
-        styles.accountItem,
-        !isLast && styles.accountItemDivider,
-        pressed && styles.accountItemPressed,
-      ]}
-    >
-      <View style={styles.accountIconBox}>
-        <Ionicons name={icon} size={18} color={DASHBOARD_DARK_GREEN} />
+    <View style={styles.menuRow}>
+      <View style={styles.menuImage}>
+        <Cloche />
       </View>
-      <View style={styles.accountCopy}>
-        <Text style={styles.accountLabel}>{label}</Text>
-        <Text style={styles.accountValue} numberOfLines={1}>
-          {value}
+      <View style={styles.menuRowBody}>
+        <Text style={styles.menuName} numberOfLines={2}>
+          {item.mealName}
+        </Text>
+        <Text style={styles.menuDay} numberOfLines={1}>
+          {dayName}
+          {item.date ? ' · ' + formatMenuDate(item.date) : ''}
         </Text>
       </View>
-      <Ionicons name="chevron-forward" size={16} color={DASHBOARD_MUTED} />
-    </Pressable>
+      {isToday ? (
+        <View style={styles.todayTag}>
+          <Text style={styles.todayTagText}>Today</Text>
+        </View>
+      ) : (
+        <Ionicons name="chevron-forward" size={16} color={MUTED} />
+      )}
+    </View>
   );
 }
 
-function DashboardLoader() {
+function InfoRow({ icon, label, value, isLast }) {
+  return (
+    <View style={[styles.infoRow, !isLast && styles.infoRowDivider]}>
+      <View style={styles.infoIconBox}>
+        <Ionicons name={icon} size={18} color={GREEN} />
+      </View>
+      <View style={styles.infoCopy}>
+        <Text style={styles.infoLabel}>{label}</Text>
+        <Text style={styles.infoValue} numberOfLines={1}>
+          {value}
+        </Text>
+      </View>
+    </View>
+  );
+}
+
+function DashboardHeader({
+  insetTop,
+  onBellPress,
+  onProfilePress,
+  fullName,
+  matricule,
+  firstName,
+  greeting,
+}) {
+  return (
+    <View style={[styles.header, { paddingTop: insetTop + 10 }]}>
+      {/* ── Top row: logo left + icons right ─── */}
+      <View style={styles.headerTopRow}>
+        <Image
+          source={RESTAU_LOGO}
+          style={styles.headerLogo}
+          resizeMode="contain"
+          accessibilityLabel="Restau"
+        />
+
+        <View style={styles.headerRight}>
+          {onBellPress ? (
+            <Pressable
+              onPress={onBellPress}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              accessibilityRole="button"
+              accessibilityLabel="Notifications"
+              style={({ pressed }) => [
+                styles.bellButton,
+                pressed && styles.pressedSoft,
+              ]}
+            >
+              <Ionicons name="notifications-outline" size={22} color={NAVY} />
+            </Pressable>
+          ) : (
+            <View style={styles.bellButton}>
+              <Ionicons name="notifications-outline" size={22} color={NAVY} />
+            </View>
+          )}
+
+          <Pressable
+            onPress={onProfilePress}
+            accessibilityRole="button"
+            accessibilityLabel={`Open ${fullName || 'student'} profile`}
+            accessibilityHint={`Matricule ${matricule}`}
+            style={({ pressed }) => [
+              styles.avatarButton,
+              pressed && styles.pressedSoft,
+            ]}
+          >
+            <Ionicons name="person-outline" size={20} color={GREEN} />
+          </Pressable>
+        </View>
+      </View>
+
+      {/* ── Greeting block — stacked below logo, same left edge ── */}
+      <View style={styles.headerGreeting}>
+        <Text style={styles.headerGreetingLabel}>{greeting},</Text>
+        <Text style={styles.headerGreetingName} numberOfLines={1}>
+          {firstName} 👋
+        </Text>
+        <Text style={styles.headerGreetingSubtitle}>
+          Ready for a great meal today?
+        </Text>
+      </View>
+    </View>
+  );
+}
+
+function DashboardLoader({ insetTop }) {
   const shimmer = useRef(new Animated.Value(0.45)).current;
   useEffect(() => {
     const loop = Animated.loop(
@@ -492,23 +438,23 @@ function DashboardLoader() {
     loop.start();
     return () => loop.stop();
   }, [shimmer]);
+
   return (
     <View style={styles.screen}>
-      <LinearGradient
-        colors={[COLORS.primary, DASHBOARD_PRIMARY]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={[styles.hero, styles.loaderHero]}
-      >
-        <View style={styles.heroInner}>
-          <Text style={styles.loaderTitle}>Loading your meal account…</Text>
-          <Text style={styles.loaderSubtitle}>
-            Fetching your plan, credits and this week’s menu
-          </Text>
-        </View>
-      </LinearGradient>
+      <View style={[styles.loaderHeader, { paddingTop: insetTop + 10 }]}>
+        <Image
+          source={RESTAU_LOGO}
+          style={styles.headerLogo}
+          resizeMode="contain"
+          accessibilityLabel="Restau"
+        />
+      </View>
       <View style={styles.loaderBody}>
-        {[104, 86, 140, 104].map((height, index) => (
+        <Text style={styles.loaderTitle}>Loading your meal account…</Text>
+        <Text style={styles.loaderSubtitle}>
+          Fetching your plan, credits and this week’s menu
+        </Text>
+        {[104, 72, 68, 68].map((height, index) => (
           <Animated.View
             key={`skeleton-${index}`}
             style={[styles.loaderBlock, { height, opacity: shimmer }]}
@@ -518,6 +464,10 @@ function DashboardLoader() {
     </View>
   );
 }
+
+/* -------------------------------------------------------------------------- */
+/* Screen                                                                     */
+/* -------------------------------------------------------------------------- */
 
 export default function StudentDashboardScreen({ navigation }) {
   const { token, user } = useAuthStore();
@@ -529,7 +479,8 @@ export default function StudentDashboardScreen({ navigation }) {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState('');
   const [lastUpdated, setLastUpdated] = useState(null);
-  const [showFullMenu, setShowFullMenu] = useState(false);
+  const [announcements, setAnnouncements] = useState([]);
+  const [announcementsError, setAnnouncementsError] = useState('');
 
   const contentFade = useFadeIn(!loading);
 
@@ -549,6 +500,21 @@ export default function StudentDashboardScreen({ navigation }) {
     setMenu(Array.isArray(response.data) ? response.data : []);
   }, [token]);
 
+  const fetchAnnouncements = useCallback(async () => {
+    try {
+      const data = await getAnnouncements(3);
+      setAnnouncements(Array.isArray(data) ? data : []);
+      setAnnouncementsError('');
+    } catch (err) {
+      console.error('DASHBOARD ANNOUNCEMENTS REQUEST FAILED:', err);
+      setAnnouncements([]);
+      setAnnouncementsError(
+        err.response?.data?.message ||
+          'Announcements temporarily unavailable.',
+      );
+    }
+  }, []);
+
   const loadDashboard = useCallback(
     async (isRefresh = false) => {
       if (isRefresh) {
@@ -558,10 +524,12 @@ export default function StudentDashboardScreen({ navigation }) {
       }
       setError('');
 
-      const [profileResult, menuResult] = await Promise.allSettled([
-        fetchProfile(),
-        fetchMenu(),
-      ]);
+      const [profileResult, menuResult, announcementsResult] =
+        await Promise.allSettled([
+          fetchProfile(),
+          fetchMenu(),
+          fetchAnnouncements(),
+        ]);
 
       if (profileResult.status === 'rejected') {
         setError(
@@ -579,14 +547,22 @@ export default function StudentDashboardScreen({ navigation }) {
         );
         setMenu([]);
         setError(
-          'Today’s menu is temporarily unavailable. Pull down to try again.',
+          'The weekly menu is temporarily unavailable. Pull down to try again.',
+        );
+      }
+
+      // Announcements failure must not break the dashboard (handled in fetchAnnouncements)
+      if (announcementsResult.status === 'rejected') {
+        console.error(
+          'STUDENT DASHBOARD ANNOUNCEMENTS REQUEST FAILED:',
+          announcementsResult.reason,
         );
       }
 
       setLoading(false);
       setRefreshing(false);
     },
-    [fetchMenu, fetchProfile],
+    [fetchMenu, fetchProfile, fetchAnnouncements],
   );
 
   useEffect(() => {
@@ -612,56 +588,46 @@ export default function StudentDashboardScreen({ navigation }) {
   const mealPlanName = mealPlan?.name || 'No active plan';
   const planCredits = Number(mealPlan?.credits) || 0;
   const creditsUsed = hasPlan ? Math.max(planCredits - credits, 0) : 0;
+  const creditsUsedRatio = planCredits > 0 ? creditsUsed / planCredits : 0;
   const semesterEndDate = profile?.semesterEndDate || null;
   const daysLeft = daysUntil(semesterEndDate);
   const hasQRCode = Boolean(profile?.hasQRCode);
   const todayKey = getTodayKey();
-  const todaysMeal = useMemo(
-    () => menu.find((item) => item.day === todayKey) || null,
-    [menu, todayKey],
-  );
   const nextService = useMemo(
     () => findNextServiceDay(menu, todayKey),
     [menu, todayKey],
   );
-  const visibleMeals = useMemo(() => {
-    if (showFullMenu) return menu;
-    if (todaysMeal) return [todaysMeal];
-    return nextService ? [nextService] : [];
-  }, [menu, nextService, showFullMenu, todaysMeal]);
   const isSemesterActive = daysLeft === null || daysLeft > 0;
   const semesterProgress =
     daysLeft === null
       ? 0.08
       : Math.max(0.08, Math.min(0.94, 1 - Math.max(daysLeft, 0) / 180));
-  const isNarrow = width < 340;
-  const contentWidth = Math.min(width, MAX_CONTENT_WIDTH) - H_MARGIN * 2;
-  const panelInnerWidth = contentWidth - PANEL_PADDING * 2 - 2;
-  const menuCardWidth = Math.max(
-    116,
-    Math.min(156, (panelInnerWidth - 16) / 2.5),
-  );
-  const singleMeal = visibleMeals.length === 1;
+  const isNarrow = width < 360;
   const greeting = getGreeting();
   const academicYear = formatAcademicYear(semesterEndDate);
 
+  // Only show a bell action if the app already has a notifications route.
+  const hasNotificationsRoute = Boolean(
+    navigation?.getState?.()?.routeNames?.includes('Notifications'),
+  );
+
   if (loading) {
-    return (
-      <View style={styles.screen}>
-        <StudentTopBar navigation={navigation} />
-        <DashboardLoader />
-      </View>
-    );
+    return <DashboardLoader insetTop={insets.top} />;
   }
 
   return (
     <View style={styles.screen}>
-      <StudentTopBar navigation={navigation} />
+      {/* Static background shapes (behind the scrolling content) */}
+      <View pointerEvents="none" style={StyleSheet.absoluteFill}>
+        <View style={styles.decorTop} />
+        <View style={styles.decorMiddle} />
+      </View>
+
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={[
           styles.content,
-          { paddingBottom: Math.max(insets.bottom, 16) + 84 },
+          { paddingBottom: Math.max(insets.bottom, 0) + 24 },
         ]}
         showsVerticalScrollIndicator={false}
         overScrollMode="never"
@@ -669,124 +635,35 @@ export default function StudentDashboardScreen({ navigation }) {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={() => loadDashboard(true)}
-            colors={[DASHBOARD_PRIMARY]}
-            tintColor={DASHBOARD_PRIMARY}
-            progressBackgroundColor="#FFFFFF"
+            colors={[GREEN]}
+            tintColor={GREEN}
+            progressBackgroundColor={WHITE}
           />
         }
       >
         <Animated.View style={contentFade}>
-          {/* Hero: greeting + profile */}
-          <LinearGradient
-            colors={[COLORS.primary, DASHBOARD_PRIMARY]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.hero}
-          >
-            <FoodBackdrop />
-            <View style={styles.heroInner}>
-              <View style={styles.heroTopRow}>
-                <View style={styles.heroCopy}>
-                  <Text style={styles.heroGreeting}>{greeting},</Text>
-                  <Text
-                    style={styles.heroName}
-                    numberOfLines={1}
-                    adjustsFontSizeToFit
-                    minimumFontScale={0.72}
-                  >
-                    {firstName}! 👋
-                  </Text>
-                  <Text style={styles.heroSubtitle}>
-                    Here’s your cafeteria overview
-                  </Text>
-                </View>
-                <Pressable
-                  onPress={() => navigation.navigate('Profile')}
-                  accessibilityRole="button"
-                  accessibilityLabel={`Open ${fullName || 'student'} profile`}
-                  accessibilityHint={`Matricule ${matricule}`}
-                  style={({ pressed }) => [
-                    styles.avatarButton,
-                    pressed && styles.avatarButtonPressed,
-                  ]}
-                >
-                  <Avatar
-                    initials={getInitials(firstName, lastName)}
-                    size={42}
-                    style={styles.avatar}
-                    textStyle={styles.avatarText}
-                  />
-                </Pressable>
-              </View>
-            </View>
-          </LinearGradient>
-
-          {/* Credits (overlaps hero) */}
-          <View style={styles.overlapWrap}>
-            <View
-              style={[styles.creditsCard, isNarrow && styles.creditsCardNarrow]}
-              accessible
-              accessibilityLabel={`${credits} meal credits available`}
-              accessibilityHint={
-                hasPlan
-                  ? `${creditsUsed} of ${planCredits} plan credits used`
-                  : 'No active meal plan'
+          <View style={styles.shell}>
+            {/* Header */}
+            <DashboardHeader
+              insetTop={insets.top}
+              fullName={fullName}
+              matricule={matricule}
+              firstName={firstName}
+              greeting={greeting}
+              onProfilePress={() => navigation.navigate('Profile')}
+              onBellPress={
+                hasNotificationsRoute
+                  ? () => navigation.navigate('Notifications')
+                  : undefined
               }
-            >
-              <View pointerEvents="none" style={styles.creditArt}>
-                <Ionicons
-                  name="card"
-                  size={72}
-                  color="rgba(22,163,106,0.10)"
-                />
-              </View>
-              <View style={styles.creditCopy}>
-                <Text style={styles.creditLabel}>Available Credits</Text>
-                <View style={styles.creditValueRow}>
-                  <Text style={styles.creditNumber}>{credits}</Text>
-                  <Text style={styles.creditUnit}>Meal Credits</Text>
-                </View>
-                <View style={styles.creditReadyRow}>
-                  <Ionicons
-                    name="restaurant"
-                    size={14}
-                    color={credits > 0 ? DASHBOARD_PRIMARY : DASHBOARD_MUTED}
-                  />
-                  <Text style={styles.creditReadyText} numberOfLines={1}>
-                    {credits > 0
-                      ? 'Ready for your meals'
-                      : 'Choose a plan to get started'}
-                  </Text>
-                  {lastUpdated ? (
-                    <Text style={styles.creditUpdated} numberOfLines={1}>
-                      · {formatSyncTime(lastUpdated)}
-                    </Text>
-                  ) : null}
-                </View>
-              </View>
-              <Pressable
-                onPress={() => navigation.navigate('Meal Plans')}
-                hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
-                accessibilityRole="button"
-                accessibilityLabel="Buy Credit. Open meal plans."
-                style={({ pressed }) => [
-                  styles.buyCreditButton,
-                  isNarrow && styles.buyCreditButtonNarrow,
-                  pressed && styles.buyCreditButtonPressed,
-                ]}
-              >
-                <Ionicons name="cart" size={17} color="#FFFFFF" />
-                <Text style={styles.buyCreditText}>Buy Credit</Text>
-              </Pressable>
-            </View>
-          </View>
+            />
 
-          {error ? (
-            <View style={[styles.shellSection, styles.noticeWrap]}>
+            {/* Error notice */}
+            {error ? (
               <View style={styles.notice}>
                 <Ionicons
                   name="alert-circle-outline"
-                  size={20}
+                  size={19}
                   color="#DC2626"
                 />
                 <Text style={styles.noticeText}>{error}</Text>
@@ -802,11 +679,57 @@ export default function StudentDashboardScreen({ navigation }) {
                   <Text style={styles.noticeRetryText}>Retry</Text>
                 </Pressable>
               </View>
-            </View>
-          ) : null}
+            ) : null}
 
-          {/* Quick actions */}
-          <View style={[styles.shellSection, styles.quickSection]}>
+            {/* Available credit */}
+            <View
+              style={styles.creditCard}
+              accessible
+              accessibilityLabel={`${credits} meal ${pluralize(
+                credits,
+                'credit',
+                'credits',
+              )} available`}
+              accessibilityHint={
+                hasPlan
+                  ? `${creditsUsed} of ${planCredits} plan credits used`
+                  : 'No active meal plan'
+              }
+            >
+              <View pointerEvents="none" style={styles.creditWaveA} />
+              <View pointerEvents="none" style={styles.creditWaveB} />
+              <View
+                style={[styles.creditRow, isNarrow && styles.creditRowNarrow]}
+              >
+                <View style={styles.creditCopy}>
+                  <Text style={styles.creditLabel}>Available credit</Text>
+                  <View style={styles.creditValueRow}>
+                    <Text style={styles.creditNumber}>{credits}</Text>
+                    <Text style={styles.creditUnit}>
+                      {pluralize(credits, 'credit', 'credits')}
+                    </Text>
+                  </View>
+                </View>
+                <Pressable
+                  onPress={() => navigation.navigate('Meal Plans')}
+                  hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
+                  accessibilityRole="button"
+                  accessibilityLabel="Buy credit. Open meal plans."
+                  style={({ pressed }) => [
+                    styles.buyButton,
+                    isNarrow && styles.buyButtonNarrow,
+                    pressed && styles.buyButtonPressed,
+                  ]}
+                >
+                  <View style={styles.buyPlus}>
+                    <Ionicons name="add" size={14} color={WHITE} />
+                  </View>
+                  <Text style={styles.buyText}>Buy credit</Text>
+                </Pressable>
+              </View>
+            </View>
+
+            {/* Quick actions */}
             <View style={styles.quickRow}>
               {QUICK_ACTIONS.map((action) => (
                 <QuickActionTile
@@ -816,64 +739,41 @@ export default function StudentDashboardScreen({ navigation }) {
                 />
               ))}
             </View>
-          </View>
 
-          {/* Today's menu */}
-          <View style={[styles.shellSection, styles.menuSection]}>
-            <View style={styles.panel}>
+            {/* Weekly menu */}
+            <View style={styles.section}>
               <SectionHeading
-                icon="restaurant"
-                title={showFullMenu ? 'Weekly Menu' : 'Today’s Menu'}
-                actionLabel={showFullMenu ? 'Show Today' : 'View Full Menu'}
-                onAction={
-                  menu.length > 1
-                    ? () => setShowFullMenu((current) => !current)
-                    : undefined
-                }
+                title="Weekly Menu"
+                actionLabel="See all"
+                onAction={() => navigation.navigate('Meal Plans')}
               />
-              {visibleMeals.length > 0 ? (
-                singleMeal ? (
-                  <MealCard
-                    item={visibleMeals[0]}
-                    isToday={visibleMeals[0].day === todayKey}
-                    horizontal
-                  />
-                ) : (
-                  <ScrollView
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    overScrollMode="never"
-                    contentContainerStyle={styles.menuScroller}
-                  >
-                    {visibleMeals.map((item, index) => (
-                      <MealCard
-                        key={`${item.day}-${item.mealName}-${index}`}
-                        item={item}
-                        isToday={item.day === todayKey}
-                        width={menuCardWidth}
-                      />
-                    ))}
-                  </ScrollView>
-                )
+              {menu.length > 0 ? (
+                <View style={styles.menuList}>
+                  {menu.map((item, index) => (
+                    <MenuRow
+                      key={`${item.day}-${item.mealName}-${index}`}
+                      item={{ ...item, date: getServiceDayDate(item.day) }}
+                      isToday={item.day === todayKey}
+                    />
+                  ))}
+                </View>
               ) : (
-                <View style={styles.menuEmpty}>
-                  <View style={styles.menuEmptyIcon}>
+                <View style={styles.emptyCard}>
+                  <View style={styles.emptyIcon}>
                     <Ionicons
                       name="restaurant-outline"
-                      size={20}
-                      color={DASHBOARD_DARK_GREEN}
+                      size={19}
+                      color={GREEN}
                     />
                   </View>
-                  <View style={styles.menuEmptyCopy}>
-                    <Text style={styles.menuEmptyTitle}>
-                      {menu.length === 0
-                        ? 'Menu not published yet'
-                        : 'No meal service today'}
+                  <View style={styles.emptyCopy}>
+                    <Text style={styles.emptyTitle}>
+                      {error ? 'Menu unavailable' : 'Menu not published yet'}
                     </Text>
-                    <Text style={styles.menuEmptyText}>
+                    <Text style={styles.emptyText}>
                       {nextService
                         ? `Next: ${
-                            DAY_LABELS[nextService.day] || nextService.day
+                            DAY_NAMES[nextService.day] || nextService.day
                           } — ${nextService.mealName}`
                         : 'The cafeteria schedule will appear here once published.'}
                     </Text>
@@ -881,125 +781,178 @@ export default function StudentDashboardScreen({ navigation }) {
                 </View>
               )}
             </View>
-          </View>
 
-          {/* Semester */}
-          <View style={[styles.shellSection, styles.section]}>
-            <View style={styles.semesterCard}>
-              <View style={styles.semesterIconCircle}>
-                <Ionicons name="school" size={22} color="#FFFFFF" />
-              </View>
-              <View style={styles.semesterMain}>
-                <View style={styles.semesterTopRow}>
-                  <View style={styles.semesterHeadingCopy}>
-                    <Text style={styles.semesterLabel}>Current Semester</Text>
-                    <Text style={styles.semesterYear} numberOfLines={1}>
-                      {academicYear}
-                    </Text>
-                  </View>
-                  <View
-                    style={[
-                      styles.activePill,
-                      !isSemesterActive && styles.expiredPill,
-                    ]}
-                  >
-                    <View
-                      style={[
-                        styles.activePillDot,
-                        !isSemesterActive && styles.expiredPillDot,
-                      ]}
-                    />
-                    <Text
-                      style={[
-                        styles.activePillText,
-                        !isSemesterActive && styles.expiredPillText,
-                      ]}
-                    >
-                      {isSemesterActive ? 'Active' : 'Ended'}
-                    </Text>
-                  </View>
-                </View>
-                <UsageBar
-                  ratio={semesterProgress}
-                  color={isSemesterActive ? DASHBOARD_DARK_GREEN : DASHBOARD_MUTED}
-                  style={styles.semesterProgress}
-                />
-                <View style={styles.semesterFooter}>
-                  <Text style={styles.semesterRemaining} numberOfLines={1}>
-                    {daysLeft === null
-                      ? 'Semester end date unavailable'
-                      : daysLeft > 0
-                      ? `${daysLeft} ${pluralize(
-                          daysLeft,
-                          'day',
-                          'days',
-                        )} remaining`
-                      : 'Semester access has ended'}
-                  </Text>
-                  <Text style={styles.semesterEndDate} numberOfLines={1}>
-                    {semesterEndDate
-                      ? `Ends ${formatLongDate(semesterEndDate)}`
-                      : 'No end date'}
-                  </Text>
-                </View>
-              </View>
-            </View>
-          </View>
-
-          {/* Announcements */}
-          <View style={[styles.shellSection, styles.section]}>
-            <View style={styles.panel}>
+            {/* Announcements */}
+            <View style={styles.section}>
               <SectionHeading
-                icon="megaphone"
-                iconColor={INFO_BLUE}
                 title="Announcements"
                 actionLabel="See All"
-                onAction={() =>
-                  Alert.alert(
-                    'Announcements',
-                    'Announcements are not connected to a backend service yet.',
-                  )
-                }
+                onAction={() => navigation.navigate('Announcements')}
               />
-              <View style={styles.announcementCard}>
-                <Ionicons
-                  name="information-circle"
-                  size={28}
-                  color={INFO_BLUE}
-                />
-                <View style={styles.announcementCopy}>
-                  <Text style={styles.announcementTitle} numberOfLines={1}>
-                    {STATIC_ANNOUNCEMENT_PREVIEW.title}
-                  </Text>
-                  <Text style={styles.announcementMessage} numberOfLines={2}>
-                    {STATIC_ANNOUNCEMENT_PREVIEW.message}
-                  </Text>
+              {announcementsError ? (
+                <View style={styles.emptyCard}>
+                  <View style={styles.emptyIcon}>
+                    <Ionicons
+                      name="alert-circle-outline"
+                      size={19}
+                      color="#DC2626"
+                    />
+                  </View>
+                  <View style={styles.emptyCopy}>
+                    <Text style={styles.emptyTitle}>
+                      Announcements unavailable
+                    </Text>
+                    <Text style={styles.emptyText}>
+                      {announcementsError}
+                    </Text>
+                  </View>
                 </View>
-                <Text style={styles.previewBadgeText}>Preview</Text>
-              </View>
+              ) : announcements.length === 0 ? (
+                <View style={styles.emptyCard}>
+                  <View style={styles.emptyIcon}>
+                    <Ionicons
+                      name="document-text-outline"
+                      size={19}
+                      color={GREEN}
+                    />
+                  </View>
+                  <View style={styles.emptyCopy}>
+                    <Text style={styles.emptyTitle}>
+                      No new announcements
+                    </Text>
+                    <Text style={styles.emptyText}>
+                      Updates from the cafeteria will appear here.
+                    </Text>
+                  </View>
+                </View>
+              ) : (
+                <View style={styles.announcementsList}>
+                  {announcements.map((item) => (
+                    <Pressable
+                      key={item.id}
+                      accessible
+                      accessibilityRole="button"
+                      accessibilityLabel={item.title || 'Announcement'}
+                      onPress={() =>
+                        navigation.navigate('Announcements')
+                      }
+                      hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                      style={styles.announcementRow}
+                    >
+                      <View style={styles.announcementRowBody}>
+                        <Text style={styles.announcementTitle}
+                          numberOfLines={2}
+                        >
+                          {item.title || '(Untitled announcement)'}
+                        </Text>
+                        <Text style={styles.announcementDate}>
+                          {new Date(
+                            item.updatedAt || item.createdAt,
+                          ).toLocaleDateString(undefined, {
+                            day: 'numeric',
+                            month: 'short',
+                          })}
+                        </Text>
+                        <Text style={styles.announcementPreview}
+                          numberOfLines={2}
+                        >
+                          {item.body || '—'}
+                        </Text>
+                      </View>
+                    </Pressable>
+                  ))}
+                </View>
+              )}
             </View>
-          </View>
 
-          {/* Account list */}
-          <View style={[styles.shellSection, styles.section]}>
-            <View style={styles.card}>
-              <AccountRow
-                icon="qr-code-outline"
-                label="Meal Pass"
-                value={hasQRCode ? 'Ready to scan' : 'Not generated'}
-                onPress={() => navigation.navigate('My QR Code')}
-                accessibilityLabel={`Meal pass ${
-                  hasQRCode ? 'ready to scan' : 'not generated'
-                }`}
-              />
-              <AccountRow
-                icon="card-outline"
-                label="Current Plan"
-                value={mealPlanName}
-                onPress={() => navigation.navigate('Meal Plans')}
-                accessibilityLabel={`Current plan ${mealPlanName}`}
-                isLast
-              />
+            {/* Account overview (existing dashboard data) */}
+            <View style={styles.section}>
+              <SectionHeading title="Account Overview" />
+              <View style={styles.overviewCard}>
+                <InfoRow
+                  icon="card-outline"
+                  label="Current plan"
+                  value={mealPlanName}
+                />
+                {hasPlan ? (
+                  <View style={styles.usageBlock}>
+                    <View style={styles.usageHeader}>
+                      <Text style={styles.infoLabel}>Plan credits used</Text>
+                      <Text style={styles.usageValue}>
+                        {creditsUsed} / {planCredits}
+                      </Text>
+                    </View>
+                    <UsageBar ratio={creditsUsedRatio} />
+                  </View>
+                ) : null}
+                <InfoRow
+                  icon="qr-code-outline"
+                  label="Meal pass"
+                  value={hasQRCode ? 'Ready to scan' : 'Not generated'}
+                />
+                <View style={styles.semesterBlock}>
+                  <View style={styles.semesterTopRow}>
+                    <View style={styles.semesterCopy}>
+                      <Text style={styles.infoLabel}>Current semester</Text>
+                      <Text style={styles.semesterYear} numberOfLines={1}>
+                        {academicYear}
+                      </Text>
+                    </View>
+                    <View
+                      style={[
+                        styles.statusPill,
+                        !isSemesterActive && styles.statusPillEnded,
+                      ]}
+                    >
+                      <View
+                        style={[
+                          styles.statusDot,
+                          !isSemesterActive && styles.statusDotEnded,
+                        ]}
+                      />
+                      <Text
+                        style={[
+                          styles.statusText,
+                          !isSemesterActive && styles.statusTextEnded,
+                        ]}
+                      >
+                        {isSemesterActive ? 'Active' : 'Ended'}
+                      </Text>
+                    </View>
+                  </View>
+                  <UsageBar
+                    ratio={semesterProgress}
+                    color={isSemesterActive ? GREEN : '#94A3B8'}
+                    style={styles.semesterBar}
+                  />
+                  <View style={styles.semesterFooter}>
+                    <Text style={styles.semesterNote} numberOfLines={1}>
+                      {daysLeft === null
+                        ? 'Semester end date unavailable'
+                        : daysLeft > 0
+                        ? `${daysLeft} ${pluralize(
+                            daysLeft,
+                            'day',
+                            'days',
+                          )} remaining`
+                        : 'Semester access has ended'}
+                    </Text>
+                    <Text
+                      style={[styles.semesterNote, styles.semesterNoteRight]}
+                      numberOfLines={1}
+                    >
+                      {semesterEndDate
+                        ? `Ends ${formatLongDate(semesterEndDate)}`
+                        : 'No end date'}
+                    </Text>
+                  </View>
+                </View>
+                {lastUpdated ? (
+                  <Text style={styles.updatedText}>
+                    Updated {formatSyncTime(lastUpdated)}
+                  </Text>
+                ) : null}
+              </View>
             </View>
           </View>
         </Animated.View>
@@ -1008,203 +961,121 @@ export default function StudentDashboardScreen({ navigation }) {
   );
 }
 
+/* -------------------------------------------------------------------------- */
+/* Styles                                                                     */
+/* -------------------------------------------------------------------------- */
+
 const cardSurface = {
-  borderRadius: 14,
+  borderRadius: RADIUS,
   borderWidth: 1,
-  borderColor: DASHBOARD_BORDER,
-  backgroundColor: '#FFFFFF',
-  shadowColor: '#0F172A',
-  shadowOffset: { width: 0, height: 1 },
-  shadowOpacity: 0.04,
-  shadowRadius: 4,
-  elevation: 1,
+  borderColor: BORDER,
+  backgroundColor: WHITE,
 };
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: DASHBOARD_BACKGROUND },
+  screen: { flex: 1, backgroundColor: PAGE_BG },
   scroll: { flex: 1 },
-  content: { paddingBottom: 24 },
-  shellSection: {
+  content: { flexGrow: 1 },
+  shell: {
     width: '100%',
     maxWidth: MAX_CONTENT_WIDTH,
     alignSelf: 'center',
     paddingHorizontal: H_MARGIN,
   },
-  section: { marginTop: 16 },
-  card: { ...cardSurface, overflow: 'hidden' },
-  panel: { ...cardSurface, padding: PANEL_PADDING },
+  section: { marginTop: 22 },
   pressedSoft: { opacity: 0.6 },
 
-  /* Hero */
-  hero: {
-    paddingHorizontal: H_MARGIN,
-    paddingTop: 8,
-    paddingBottom: 85,
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
-    backgroundColor: DASHBOARD_PRIMARY,
-    overflow: 'hidden',
+  /* Background shapes */
+  decorTop: {
+    position: 'absolute',
+    width: 230,
+    height: 230,
+    borderRadius: 115,
+    top: -40,
+    right: -60,
+    backgroundColor: PALE_GREEN,
+    opacity: 0.55,
   },
-  heroInner: {
-    width: '100%',
-    maxWidth: MAX_CONTENT_WIDTH - H_MARGIN * 2,
-    alignSelf: 'center',
+  decorMiddle: {
+    position: 'absolute',
+    width: 260,
+    height: 260,
+    borderRadius: 130,
+    top: 300,
+    right: -120,
+    backgroundColor: PALE_GREEN,
+    opacity: 0.45,
   },
-  heroTopRow: {
+
+  /* Header */
+  header: {
+    flexDirection: 'column',
+    paddingBottom: 2,
+  },
+  headerTopRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    gap: 12,
+    marginBottom: 14,
   },
-  heroCopy: { flex: 1, minWidth: 0 },
-  heroGreeting: {
-    fontSize: 17,
-    lineHeight: 23,
-    fontWeight: '400',
-    color: DASHBOARD_LIGHT_GREEN,
-  },
-  heroName: {
-    fontSize: 26,
-    lineHeight: 32,
-    fontWeight: '600',
-    letterSpacing: -0.4,
-    color: '#FFFFFF',
-  },
-  heroSubtitle: {
-    marginTop: 1,
-    fontSize: 14,
-    lineHeight: 19,
-    fontWeight: '400',
-    color: 'rgba(255,255,255,0.9)',
-  },
-  avatarButton: {
-    width: 48,
+  headerLogo: {
+    width: 58,
     height: 48,
-    borderRadius: 24,
-    padding: 3,
-    backgroundColor: 'rgba(255,255,255,0.96)',
-    ...WEB_CURSOR_STYLE,
   },
-  avatarButtonPressed: { opacity: 0.8, transform: [{ scale: 0.97 }] },
-  avatar: { borderWidth: 0, backgroundColor: '#E8F7EF' },
-  avatarText: { color: DASHBOARD_DARK_GREEN, fontWeight: '600' },
-  foodLayer: { ...StyleSheet.absoluteFillObject },
-  foodIcon: { position: 'absolute' },
-
-  /* Credits */
-  overlapWrap: {
-    width: '100%',
-    maxWidth: MAX_CONTENT_WIDTH,
-    alignSelf: 'center',
-    paddingHorizontal: H_MARGIN,
-    marginTop: -70,
+  headerGreeting: {
+    alignSelf: 'stretch',
   },
-  creditsCard: {
-    ...cardSurface,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    overflow: 'hidden',
-    shadowOpacity: 0.07,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 3 },
-    elevation: 3,
-  },
-  creditsCardNarrow: { paddingBottom: 12 },
-  creditArt: {
-    position: 'absolute',
-    top: 6,
-    right: 16,
-    transform: [{ rotate: '-12deg' }],
-  },
-  creditCopy: { minWidth: 0 },
-  creditLabel: {
+  headerGreetingLabel: {
     fontSize: 13,
     lineHeight: 18,
     fontWeight: '400',
-    color: DASHBOARD_TEXT_SECONDARY,
+    color: MUTED,
   },
-  creditValueRow: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    flexWrap: 'wrap',
-    gap: 6,
-  },
-  creditNumber: {
-    fontSize: 36,
-    lineHeight: 42,
-    fontWeight: '600',
-    letterSpacing: -0.8,
-    color: DASHBOARD_TEXT,
-  },
-  creditUnit: {
+  headerGreetingName: {
+    marginTop: 2,
     fontSize: 20,
     lineHeight: 26,
     fontWeight: '600',
-    color: DASHBOARD_TEXT,
+    color: NAVY,
   },
-  creditReadyRow: {
-    marginTop: 1,
-    maxWidth: 210,
+  headerGreetingSubtitle: {
+    marginTop: 3,
+    fontSize: 13,
+    lineHeight: 18,
+    fontWeight: '400',
+    color: MUTED,
+  },
+  headerRight: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 5,
+    gap: 10,
   },
-  creditReadyText: {
-    flexShrink: 1,
-    fontSize: 12.5,
-    lineHeight: 17,
-    fontWeight: '400',
-    color: DASHBOARD_TEXT_SECONDARY,
-  },
-  creditUpdated: {
-    flexShrink: 0,
-    fontSize: 11,
-    lineHeight: 16,
-    fontWeight: '400',
-    color: DASHBOARD_MUTED,
-  },
-  buyCreditButton: {
-    position: 'absolute',
-    right: 14,
-    bottom: 12,
-    minHeight: 44,
-    paddingHorizontal: 14,
-    borderRadius: 11,
-    flexDirection: 'row',
+  bellButton: {
+    width: 40,
+    height: 40,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 6,
-    backgroundColor: COLORS.primary,
     ...WEB_CURSOR_STYLE,
   },
-  buyCreditButtonNarrow: {
-    position: 'relative',
-    right: 0,
-    bottom: 0,
-    marginTop: 10,
-    alignSelf: 'stretch',
-  },
-  buyCreditButtonPressed: {
-    backgroundColor: COLORS.primaryDark,
-    opacity: 0.9,
-    transform: [{ scale: 0.98 }],
-  },
-  buyCreditText: {
-    fontSize: 13.5,
-    lineHeight: 18,
-    fontWeight: '600',
-    color: '#FFFFFF',
+  avatarButton: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: PALE_GREEN,
+    ...WEB_CURSOR_STYLE,
   },
 
   /* Error notice */
-  noticeWrap: { marginTop: 12 },
   notice: {
-    minHeight: 48,
+    marginTop: 14,
+    minHeight: 44,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
     paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingVertical: 8,
     borderRadius: 12,
     borderWidth: 1,
     borderColor: '#FECACA',
@@ -1212,31 +1083,123 @@ const styles = StyleSheet.create({
   },
   noticeText: {
     flex: 1,
-    fontSize: 12,
+    fontSize: 12.5,
     lineHeight: 17,
-    fontWeight: '400',
     color: '#991B1B',
   },
   noticeRetry: {
-    minHeight: 44,
+    minHeight: 36,
     paddingHorizontal: 12,
-    borderRadius: 10,
+    borderRadius: 9,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#FECACA',
+    backgroundColor: WHITE,
     ...WEB_CURSOR_STYLE,
   },
   noticeRetryText: {
-    fontSize: 12,
+    fontSize: 12.5,
     lineHeight: 16,
-    fontWeight: '500',
+    fontWeight: '600',
     color: '#DC2626',
   },
 
+  /* Credit card */
+  creditCard: {
+    marginTop: 18,
+    borderRadius: RADIUS,
+    backgroundColor: GREEN,
+    paddingHorizontal: 18,
+    paddingVertical: 16,
+    overflow: 'hidden',
+  },
+  creditWaveA: {
+    position: 'absolute',
+    width: 240,
+    height: 240,
+    borderRadius: 120,
+    right: -110,
+    top: -120,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+  },
+  creditWaveB: {
+    position: 'absolute',
+    width: 220,
+    height: 220,
+    borderRadius: 110,
+    left: -90,
+    bottom: -130,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+  },
+  creditRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  creditRowNarrow: {
+    flexDirection: 'column',
+    alignItems: 'stretch',
+  },
+  creditCopy: { flexShrink: 1, minWidth: 0 },
+  creditLabel: {
+    fontSize: 13,
+    lineHeight: 18,
+    fontWeight: '500',
+    color: 'rgba(255,255,255,0.9)',
+  },
+  creditValueRow: {
+    marginTop: 3,
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    flexWrap: 'wrap',
+    gap: 7,
+  },
+  creditNumber: {
+    fontSize: 30,
+    lineHeight: 36,
+    fontWeight: '700',
+    letterSpacing: -0.5,
+    color: WHITE,
+  },
+  creditUnit: {
+    fontSize: 15,
+    lineHeight: 20,
+    fontWeight: '500',
+    color: 'rgba(255,255,255,0.9)',
+  },
+  buyButton: {
+    minHeight: 38,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    backgroundColor: WHITE,
+    ...WEB_CURSOR_STYLE,
+  },
+  buyButtonNarrow: { marginTop: 12, alignSelf: 'stretch' },
+  buyButtonPressed: { opacity: 0.9, transform: [{ scale: 0.98 }] },
+  buyPlus: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: GREEN,
+  },
+  buyText: {
+    fontSize: 15,
+    lineHeight: 20,
+    fontWeight: '600',
+    color: GREEN,
+  },
+
   /* Quick actions */
-  quickSection: { marginTop: 18 },
   quickRow: {
-    width: '100%',
+    marginTop: 20,
     flexDirection: 'row',
     alignItems: 'flex-start',
   },
@@ -1248,28 +1211,26 @@ const styles = StyleSheet.create({
     ...WEB_CURSOR_STYLE,
   },
   quickActionPressed: { opacity: 0.7, transform: [{ scale: 0.97 }] },
-  quickActionIcon: {
-    width: 66,
-    height: 50,
-    borderRadius: 16,
+  quickActionCircle: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  quickActionLabel: {
-    marginTop: 6,
-    textAlign: 'center',
-    fontSize: 12.5,
-    lineHeight: 17,
-    fontWeight: '500',
-    color: DASHBOARD_TEXT,
+  quickActionCirclePrimary: { backgroundColor: GREEN },
+  quickActionCircleLight: {
+    backgroundColor: WHITE,
+    borderWidth: 1,
+    borderColor: BORDER,
   },
-  quickActionDescription: {
-    marginTop: 1,
+  quickActionLabel: {
+    marginTop: 7,
     textAlign: 'center',
-    fontSize: 10.5,
-    lineHeight: 14,
-    fontWeight: '400',
-    color: DASHBOARD_TEXT_SECONDARY,
+    fontSize: 11.5,
+    lineHeight: 15,
+    fontWeight: '500',
+    color: MUTED,
   },
 
   /* Section heading */
@@ -1281,20 +1242,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: 12,
   },
-  sectionTitleRow: {
-    flex: 1,
-    minWidth: 0,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
   sectionTitle: {
     flexShrink: 1,
     fontSize: 16,
-    lineHeight: 22,
+    lineHeight: 21,
     fontWeight: '600',
     letterSpacing: -0.2,
-    color: DASHBOARD_TEXT,
+    color: NAVY,
   },
   sectionAction: {
     flexDirection: 'row',
@@ -1303,302 +1257,306 @@ const styles = StyleSheet.create({
     ...WEB_CURSOR_STYLE,
   },
   sectionActionText: {
-    fontSize: 12.5,
-    lineHeight: 17,
-    fontWeight: '500',
-    color: DASHBOARD_DARK_GREEN,
-  },
-
-  /* Menu */
-  menuSection: { marginTop: 20 },
-  menuScroller: { gap: 8, paddingBottom: 2 },
-  mealImage: {
-    height: 84,
-    justifyContent: 'flex-end',
-    alignItems: 'flex-start',
-    padding: 6,
-    borderRadius: 10,
-    overflow: 'hidden',
-    backgroundColor: '#E7F2EB',
-  },
-  mealImageRow: { width: 118, flexShrink: 0 },
-  mealImageRadius: { borderRadius: 10 },
-  mealBadge: {
-    minHeight: 20,
-    paddingHorizontal: 8,
-    borderRadius: 999,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  mealBadgeToday: { backgroundColor: DASHBOARD_LIGHT_GREEN },
-  mealBadgeSchedule: { backgroundColor: 'rgba(255,255,255,0.92)' },
-  mealBadgeText: {
-    fontSize: 10.5,
-    lineHeight: 14,
-    fontWeight: '500',
-    color: DASHBOARD_DARK_GREEN,
-  },
-  mealBadgeTextSchedule: { color: DASHBOARD_TEXT },
-  mealName: {
-    marginTop: 6,
-    fontSize: 13.5,
+    fontSize: 13,
     lineHeight: 18,
     fontWeight: '600',
-    color: DASHBOARD_TEXT,
+    color: GREEN,
   },
-  mealNameRow: { marginTop: 0, fontSize: 15, lineHeight: 20 },
-  mealDescription: {
-    marginTop: 1,
+
+  /* Weekly menu */
+  menuList: { gap: 8 },
+  menuRow: {
+    ...cardSurface,
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 11,
+  },
+  menuImage: {
+    width: 46,
+    height: 46,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: PALE_GREEN,
+  },
+  cloche: {
+    width: 30,
+    height: 26,
+  },
+  clocheKnob: {
+    position: 'absolute',
+    top: 2,
+    left: 13,
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: GREEN,
+  },
+  clocheDome: {
+    position: 'absolute',
+    top: 8,
+    left: 3,
+    width: 24,
+    height: 12,
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
+    borderWidth: 2,
+    borderBottomWidth: 0,
+    borderColor: GREEN,
+  },
+  clocheBase: {
+    position: 'absolute',
+    bottom: 4,
+    left: 0,
+    right: 0,
+    height: 2,
+    borderRadius: 1,
+    backgroundColor: GREEN,
+  },
+  menuRowBody: { flex: 1, minWidth: 0 },
+  menuName: {
+    fontSize: 14,
+    lineHeight: 18,
+    fontWeight: '600',
+    color: NAVY,
+  },
+  menuDay: {
+    marginTop: 2,
     fontSize: 12,
     lineHeight: 16,
     fontWeight: '400',
-    color: DASHBOARD_TEXT_SECONDARY,
+    color: MUTED,
   },
-  mealTimeRow: {
-    marginTop: 4,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
+  todayTag: {
+    paddingHorizontal: 9,
+    paddingVertical: 4,
+    borderRadius: 999,
+    backgroundColor: PALE_GREEN,
   },
-  mealTimeText: {
-    flexShrink: 1,
+  todayTagText: {
     fontSize: 11,
-    lineHeight: 15,
-    fontWeight: '400',
-    color: DASHBOARD_TEXT_SECONDARY,
-  },
-  mealRowCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  mealRowBody: { flex: 1, minWidth: 0 },
-  menuEmpty: {
-    minHeight: 72,
-    padding: 12,
-    borderRadius: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    backgroundColor: DASHBOARD_BACKGROUND,
-    borderWidth: 1,
-    borderColor: DASHBOARD_BORDER,
-  },
-  menuEmptyIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: DASHBOARD_LIGHT_GREEN,
-  },
-  menuEmptyCopy: { flex: 1 },
-  menuEmptyTitle: {
-    fontSize: 14,
-    lineHeight: 20,
-    fontWeight: '500',
-    color: DASHBOARD_TEXT,
-  },
-  menuEmptyText: {
-    marginTop: 1,
-    fontSize: 12,
-    lineHeight: 17,
-    fontWeight: '400',
-    color: DASHBOARD_TEXT_SECONDARY,
+    lineHeight: 14,
+    fontWeight: '600',
+    color: GREEN,
   },
 
-  /* Semester */
+  /* Empty states */
+  emptyCard: {
+    ...cardSurface,
+    padding: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  emptyIcon: {
+    width: 38,
+    height: 38,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: PALE_GREEN,
+  },
+  emptyCopy: { flex: 1, minWidth: 0 },
+  emptyTitle: {
+    fontSize: 14,
+    lineHeight: 18,
+    fontWeight: '600',
+    color: NAVY,
+  },
+  emptyText: {
+    marginTop: 2,
+    fontSize: 13,
+    lineHeight: 18,
+    fontWeight: '400',
+    color: MUTED,
+  },
+
+  /* Account overview */
+  overviewCard: { ...cardSurface, paddingHorizontal: 14, paddingVertical: 4 },
+  infoRow: {
+    minHeight: 52,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingVertical: 10,
+  },
+  infoRowDivider: {
+    borderBottomWidth: 1,
+    borderBottomColor: DIVIDER,
+  },
+  infoIconBox: {
+    width: 34,
+    height: 34,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: PALE_GREEN,
+  },
+  infoCopy: { flex: 1, minWidth: 0 },
+  infoLabel: {
+    fontSize: 12.5,
+    lineHeight: 17,
+    fontWeight: '400',
+    color: MUTED,
+  },
+  infoValue: {
+    marginTop: 1,
+    fontSize: 14,
+    lineHeight: 19,
+    fontWeight: '600',
+    color: NAVY,
+  },
+  usageBlock: {
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: DIVIDER,
+  },
+  usageHeader: {
+    marginBottom: 7,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 10,
+  },
+  usageValue: {
+    fontSize: 13,
+    lineHeight: 18,
+    fontWeight: '600',
+    color: NAVY,
+  },
   usageTrack: {
     height: 6,
     width: '100%',
     borderRadius: 999,
     overflow: 'hidden',
-    backgroundColor: '#D1FAE5',
+    backgroundColor: PALE_GREEN,
   },
   usageFill: { height: '100%', borderRadius: 999 },
-  semesterCard: {
-    padding: 12,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: '#BBF7D0',
-    backgroundColor: '#F0FDF4',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  semesterIconCircle: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: DASHBOARD_DARK_GREEN,
-  },
-  semesterMain: { flex: 1, minWidth: 0 },
+  semesterBlock: { paddingVertical: 12 },
   semesterTopRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
   },
-  semesterHeadingCopy: { flex: 1, minWidth: 0 },
-  semesterLabel: {
-    fontSize: 12.5,
-    lineHeight: 17,
-    fontWeight: '400',
-    color: DASHBOARD_TEXT_SECONDARY,
-  },
+  semesterCopy: { flex: 1, minWidth: 0 },
   semesterYear: {
-    fontSize: 18,
-    lineHeight: 24,
+    marginTop: 1,
+    fontSize: 15,
+    lineHeight: 21,
     fontWeight: '600',
     letterSpacing: -0.2,
-    color: DASHBOARD_TEXT,
+    color: NAVY,
   },
-  activePill: {
+  statusPill: {
     minHeight: 24,
     paddingHorizontal: 10,
     borderRadius: 999,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
-    backgroundColor: '#CCFBE1',
+    backgroundColor: PALE_GREEN,
   },
-  activePillDot: {
+  statusPillEnded: { backgroundColor: '#E2E8F0' },
+  statusDot: {
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: DASHBOARD_DARK_GREEN,
+    backgroundColor: GREEN,
   },
-  activePillText: {
+  statusDotEnded: { backgroundColor: '#64748B' },
+  statusText: {
     fontSize: 11.5,
-    lineHeight: 15,
-    fontWeight: '500',
-    color: DASHBOARD_DARK_GREEN,
+    lineHeight: 16,
+    fontWeight: '600',
+    color: GREEN,
   },
-  expiredPill: { backgroundColor: '#E2E8F0' },
-  expiredPillDot: { backgroundColor: '#64748B' },
-  expiredPillText: { color: '#475569' },
-  semesterProgress: { marginTop: 8 },
+  statusTextEnded: { color: '#475569' },
+  semesterBar: { marginTop: 10 },
   semesterFooter: {
-    marginTop: 6,
+    marginTop: 7,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: 10,
   },
-  semesterRemaining: {
+  semesterNote: {
     flexShrink: 1,
     fontSize: 12,
     lineHeight: 16,
-    fontWeight: '400',
-    color: DASHBOARD_TEXT_SECONDARY,
+    color: MUTED,
   },
-  semesterEndDate: {
-    flexShrink: 1,
-    textAlign: 'right',
-    fontSize: 12,
-    lineHeight: 16,
-    fontWeight: '400',
-    color: DASHBOARD_TEXT_SECONDARY,
-  },
-
-  /* Announcements */
-  announcementCard: {
-    minHeight: 52,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    borderRadius: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    backgroundColor: '#EFF6FF',
-  },
-  announcementCopy: { flex: 1, minWidth: 0 },
-  announcementTitle: {
-    fontSize: 13.5,
-    lineHeight: 18,
-    fontWeight: '600',
-    color: DASHBOARD_TEXT,
-  },
-  announcementMessage: {
-    marginTop: 1,
-    fontSize: 12,
-    lineHeight: 16,
-    fontWeight: '400',
-    color: DASHBOARD_TEXT_SECONDARY,
-  },
-  previewBadgeText: {
-    alignSelf: 'flex-start',
-    fontSize: 10.5,
-    lineHeight: 14,
-    fontWeight: '400',
-    color: DASHBOARD_MUTED,
-  },
-
-  /* Account list */
-  accountItem: {
-    minHeight: 56,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    ...WEB_CURSOR_STYLE,
-  },
-  accountItemDivider: {
-    borderBottomWidth: 1,
-    borderBottomColor: '#EEF2F6',
-  },
-  accountItemPressed: { backgroundColor: '#F1F5F9' },
-  accountIconBox: {
-    width: 34,
-    height: 34,
-    borderRadius: 11,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: DASHBOARD_LIGHT_GREEN,
-  },
-  accountCopy: { flex: 1, minWidth: 0 },
-  accountLabel: {
+  semesterNoteRight: { textAlign: 'right' },
+  updatedText: {
+    paddingVertical: 10,
     fontSize: 11.5,
-    lineHeight: 15,
-    fontWeight: '400',
-    color: DASHBOARD_TEXT_SECONDARY,
-  },
-  accountValue: {
-    fontSize: 13.5,
-    lineHeight: 18,
-    fontWeight: '500',
-    color: DASHBOARD_TEXT,
+    lineHeight: 16,
+    color: '#9AA3B8',
   },
 
   /* Loader */
-  loaderHero: { paddingTop: 16, paddingBottom: 48 },
-  loaderTitle: {
-    fontSize: 16,
-    lineHeight: 22,
-    fontWeight: '500',
-    color: '#FFFFFF',
-  },
-  loaderSubtitle: {
-    marginTop: 2,
-    fontSize: 12,
-    lineHeight: 17,
-    fontWeight: '400',
-    color: 'rgba(255,255,255,0.8)',
+  loaderHeader: {
+    width: '100%',
+    maxWidth: MAX_CONTENT_WIDTH,
+    alignSelf: 'center',
+    paddingHorizontal: H_MARGIN,
   },
   loaderBody: {
     width: '100%',
     maxWidth: MAX_CONTENT_WIDTH,
     alignSelf: 'center',
     paddingHorizontal: H_MARGIN,
-    marginTop: -24,
-    gap: 16,
+    paddingTop: 18,
+    gap: 12,
+  },
+  loaderTitle: {
+    fontSize: 16,
+    lineHeight: 22,
+    fontWeight: '600',
+    color: NAVY,
+  },
+  loaderSubtitle: {
+    marginTop: -8,
+    fontSize: 13,
+    lineHeight: 18,
+    color: MUTED,
   },
   loaderBlock: {
-    borderRadius: 14,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: DASHBOARD_BORDER,
+    borderRadius: RADIUS,
+    backgroundColor: PALE_GREEN,
+  },
+  /* Announcements */
+  announcementsList: {
+    gap: 10,
+  },
+  announcementRow: {
+    ...cardSurface,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    padding: 12,
+  },
+  announcementRowBody: {
+    flex: 1,
+    minWidth: 0,
+  },
+  announcementTitle: {
+    fontSize: 14,
+    lineHeight: 19,
+    fontWeight: '600',
+    color: NAVY,
+  },
+  announcementDate: {
+    marginTop: 2,
+    fontSize: 12,
+    lineHeight: 16,
+    color: MUTED,
+  },
+  announcementPreview: {
+    marginTop: 4,
+    fontSize: 13,
+    lineHeight: 18,
+    color: MUTED,
   },
 });

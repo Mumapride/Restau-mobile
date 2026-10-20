@@ -1,3 +1,8 @@
+/**
+ * CreateSemesterScreen — presentation-only redesign.
+ * Validation, createSemester() call, alerts and navigation are unchanged.
+ */
+
 import React, { useState } from "react";
 import {
   View,
@@ -8,6 +13,8 @@ import {
   Alert,
   ActivityIndicator,
   ScrollView,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 
 import { createSemester } from "../../api/semester.api";
@@ -21,6 +28,46 @@ import {
   TOUCH_TARGET,
   TYPOGRAPHY,
 } from "../../theme/tokens";
+
+const FIELD_HEIGHT = Math.max(TOUCH_TARGET, 52);
+const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+const DAY_MS = 86400000;
+
+// ---------------------------------------------------------------------------
+// Small presentational helpers
+// ---------------------------------------------------------------------------
+
+const Field = ({ label, hint, children }) => (
+  <View style={styles.field}>
+    <Text style={styles.label}>{label}</Text>
+    {children}
+    {hint ? <Text style={styles.hint}>{hint}</Text> : null}
+  </View>
+);
+
+const FormInput = ({ icon, ...inputProps }) => {
+  const [focused, setFocused] = useState(false);
+  return (
+    <View style={[styles.inputWrap, focused && styles.inputWrapFocused]}>
+      <Ionicons
+        name={icon}
+        size={19}
+        color={focused ? COLORS.primary : COLORS.textMuted}
+      />
+      <TextInput
+        {...inputProps}
+        style={styles.input}
+        placeholderTextColor={COLORS.textMuted}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+      />
+    </View>
+  );
+};
+
+// ---------------------------------------------------------------------------
+// Screen
+// ---------------------------------------------------------------------------
 
 const CreateSemesterScreen = ({ navigation }) => {
   const [name, setName] = useState("");
@@ -83,6 +130,16 @@ const CreateSemesterScreen = ({ navigation }) => {
     }
   };
 
+  // Display-only: length of the semester once both dates are valid.
+  let durationDays = null;
+  if (DATE_PATTERN.test(startDate) && DATE_PATTERN.test(endDate)) {
+    const s = new Date(startDate);
+    const e = new Date(endDate);
+    if (!isNaN(s.getTime()) && !isNaN(e.getTime()) && s < e) {
+      durationDays = Math.round((e - s) / DAY_MS) + 1;
+    }
+  }
+
   return (
     <View style={styles.screen}>
       <ScreenHeader
@@ -92,151 +149,114 @@ const CreateSemesterScreen = ({ navigation }) => {
         onBack={() => navigation.goBack()}
       />
 
-      <ScrollView
-        style={styles.container}
-        contentContainerStyle={styles.content}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        {/* Form Card */}
-        <View style={styles.formCard}>
-          <Text style={styles.formTitle}>
-            Semester Information
-          </Text>
-
-          <Text style={styles.formDescription}>
-            Enter the semester details below.
-          </Text>
-
-          {/* Semester Name */}
-          <View style={styles.field}>
-            <View style={styles.labelRow}>
-              <View style={styles.iconBox}>
-                <Ionicons
-                  name="text-outline"
-                  size={18}
-                  color={COLORS.primary}
-                />
+        <ScrollView
+          style={styles.flex}
+          contentContainerStyle={styles.content}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={styles.formCard}>
+            {/* Card header */}
+            <View style={styles.cardHeader}>
+              <View style={styles.cardIcon}>
+                <Ionicons name="calendar-outline" size={22} color={COLORS.primary} />
               </View>
-
-              <Text style={styles.label}>
-                Semester Name
-              </Text>
-            </View>
-
-            <TextInput
-              style={styles.input}
-              placeholder="e.g. 2026/2027 First Semester"
-              placeholderTextColor={COLORS.textMuted}
-              value={name}
-              onChangeText={setName}
-              editable={!loading}
-            />
-          </View>
-
-          {/* Start Date */}
-          <View style={styles.field}>
-            <View style={styles.labelRow}>
-              <View style={styles.iconBox}>
-                <Ionicons
-                  name="calendar-outline"
-                  size={18}
-                  color={COLORS.primary}
-                />
-              </View>
-
-              <Text style={styles.label}>
-                Start Date
-              </Text>
-            </View>
-
-            <TextInput
-              style={styles.input}
-              placeholder="YYYY-MM-DD"
-              placeholderTextColor={COLORS.textMuted}
-              value={startDate}
-              onChangeText={setStartDate}
-              keyboardType="numbers-and-punctuation"
-              editable={!loading}
-            />
-
-            <Text style={styles.hint}>
-              Example: 2026-09-01
-            </Text>
-          </View>
-
-          {/* End Date */}
-          <View style={styles.field}>
-            <View style={styles.labelRow}>
-              <View style={styles.iconBox}>
-                <Ionicons
-                  name="calendar-outline"
-                  size={18}
-                  color={COLORS.primary}
-                />
-              </View>
-
-              <Text style={styles.label}>
-                End Date
-              </Text>
-            </View>
-
-            <TextInput
-              style={styles.input}
-              placeholder="YYYY-MM-DD"
-              placeholderTextColor={COLORS.textMuted}
-              value={endDate}
-              onChangeText={setEndDate}
-              keyboardType="numbers-and-punctuation"
-              editable={!loading}
-            />
-
-            <Text style={styles.hint}>
-              Example: 2026-12-20
-            </Text>
-          </View>
-
-          {/* Create Button */}
-          <TouchableOpacity
-            style={[
-              styles.primaryButton,
-              loading && styles.disabledButton,
-            ]}
-            onPress={handleCreate}
-            disabled={loading}
-            activeOpacity={0.85}
-          >
-            {loading ? (
-              <ActivityIndicator color={COLORS.onPrimary} />
-            ) : (
-              <>
-                <Ionicons
-                  name="add"
-                  size={18}
-                  color={COLORS.onPrimary}
-                  style={styles.plusIcon}
-                />
-
-                <Text style={styles.primaryButtonText}>
-                  Create Semester
+              <View style={styles.cardHeaderText}>
+                <Text style={styles.formTitle}>Semester Information</Text>
+                <Text style={styles.formDescription}>
+                  Enter the semester details below.
                 </Text>
-              </>
-            )}
-          </TouchableOpacity>
+              </View>
+            </View>
 
-          {/* Cancel Button */}
-          <TouchableOpacity
-            style={styles.cancelButton}
-            onPress={() => navigation.goBack()}
-            disabled={loading}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.cancelText}>
-              Cancel
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
+            <View style={styles.divider} />
+
+            <Field label="Semester name">
+              <FormInput
+                icon="text-outline"
+                placeholder="e.g. 2026/2027 First Semester"
+                value={name}
+                onChangeText={setName}
+                editable={!loading}
+                accessibilityLabel="Semester name"
+              />
+            </Field>
+
+            <Field label="Start date" hint="Example: 2026-09-01">
+              <FormInput
+                icon="calendar-outline"
+                placeholder="YYYY-MM-DD"
+                value={startDate}
+                onChangeText={setStartDate}
+                keyboardType="numbers-and-punctuation"
+                editable={!loading}
+                accessibilityLabel="Start date"
+              />
+            </Field>
+
+            <Field label="End date" hint="Example: 2026-12-20">
+              <FormInput
+                icon="calendar-outline"
+                placeholder="YYYY-MM-DD"
+                value={endDate}
+                onChangeText={setEndDate}
+                keyboardType="numbers-and-punctuation"
+                editable={!loading}
+                accessibilityLabel="End date"
+              />
+            </Field>
+
+            {durationDays !== null && (
+              <View style={styles.summary}>
+                <Ionicons name="hourglass-outline" size={18} color={COLORS.primary} />
+                <Text style={styles.summaryText}>
+                  This semester lasts{" "}
+                  <Text style={styles.summaryStrong}>{durationDays} days</Text>
+                </Text>
+              </View>
+            )}
+
+            {/* Buttons */}
+            <TouchableOpacity
+              style={[styles.primaryButton, loading && styles.disabledButton]}
+              onPress={handleCreate}
+              disabled={loading}
+              activeOpacity={0.85}
+              accessibilityRole="button"
+              accessibilityLabel="Create semester"
+            >
+              {loading ? (
+                <ActivityIndicator color={COLORS.onPrimary} />
+              ) : (
+                <>
+                  <Ionicons
+                    name="add"
+                    size={20}
+                    color={COLORS.onPrimary}
+                    style={styles.buttonIcon}
+                  />
+                  <Text style={styles.primaryButtonText}>Create Semester</Text>
+                </>
+              )}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.cancelButton}
+              onPress={() => navigation.goBack()}
+              disabled={loading}
+              activeOpacity={0.8}
+              accessibilityRole="button"
+              accessibilityLabel="Cancel"
+            >
+              <Text style={styles.cancelText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </View>
   );
 };
@@ -246,145 +266,151 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
   },
-
-  /* =========================
-     HEADER (rendered by ScreenHeader)
-  ========================= */
-
-  /* =========================
-     CONTENT
-  ========================= */
-
-  container: {
+  flex: {
     flex: 1,
   },
-
   content: {
     paddingHorizontal: SPACING.lg,
     paddingTop: SPACING.lg,
     paddingBottom: SPACING.xxl,
   },
 
-  /* =========================
-     FORM CARD
-  ========================= */
-
+  /* ---------- Card ---------- */
   formCard: {
     backgroundColor: COLORS.surface,
     borderRadius: RADIUS.lg,
     padding: SPACING.lg,
     borderWidth: 1,
     borderColor: COLORS.border,
-    ...SHADOWS.md,
+    ...SHADOWS.sm,
   },
-
+  cardHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  cardIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: COLORS.primaryLight,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: SPACING.md,
+  },
+  cardHeaderText: {
+    flex: 1,
+  },
   formTitle: {
     ...TYPOGRAPHY.h3,
     color: COLORS.text,
   },
-
   formDescription: {
     ...TYPOGRAPHY.bodySmall,
     color: COLORS.textSecondary,
-    marginTop: SPACING.xs,
-    marginBottom: SPACING.sm,
+    marginTop: 2,
   },
-
-  /* =========================
-     FIELDS
-  ========================= */
-
-  field: {
+  divider: {
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: COLORS.border,
     marginTop: SPACING.lg,
   },
 
-  labelRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: SPACING.sm,
+  /* ---------- Fields ---------- */
+  field: {
+    marginTop: SPACING.lg,
   },
-
-  iconBox: {
-    width: 34,
-    height: 34,
-    borderRadius: RADIUS.md,
-    backgroundColor: COLORS.primaryLight,
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: SPACING.sm,
-  },
-
   label: {
     ...TYPOGRAPHY.label,
     color: COLORS.text,
+    marginBottom: 8,
   },
-
-  input: {
-    minHeight: TOUCH_TARGET,
+  inputWrap: {
+    minHeight: FIELD_HEIGHT,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 14,
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
     borderColor: COLORS.border,
-    backgroundColor: COLORS.surface,
     borderRadius: RADIUS.md,
-    paddingHorizontal: SPACING.md,
-    color: COLORS.text,
-    fontSize: 14,
   },
-
+  inputWrapFocused: {
+    borderColor: COLORS.primary,
+    backgroundColor: COLORS.surface,
+  },
+  input: {
+    flex: 1,
+    marginLeft: 12,
+    paddingVertical: 0,
+    height: FIELD_HEIGHT - 2,
+    color: COLORS.text,
+    fontSize: 15,
+  },
   hint: {
     color: COLORS.textMuted,
-    fontSize: 11,
-    marginTop: SPACING.xs,
+    fontSize: 12,
+    marginTop: 6,
+    marginLeft: 2,
   },
 
-  /* =========================
-     BUTTONS
-  ========================= */
+  /* ---------- Duration summary ---------- */
+  summary: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: SPACING.lg,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    backgroundColor: COLORS.primaryLight,
+    borderRadius: RADIUS.md,
+  },
+  summaryText: {
+    flex: 1,
+    marginLeft: 10,
+    color: COLORS.textSecondary,
+    fontSize: 13.5,
+  },
+  summaryStrong: {
+    color: COLORS.text,
+    fontWeight: "700",
+  },
 
+  /* ---------- Buttons ---------- */
   primaryButton: {
-    minHeight: TOUCH_TARGET,
+    minHeight: FIELD_HEIGHT,
     paddingHorizontal: SPACING.lg,
     backgroundColor: COLORS.primary,
     borderRadius: RADIUS.md,
     marginTop: SPACING.xl,
-
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-
-    ...SHADOWS.md,
+    ...SHADOWS.sm,
   },
-
-  plusIcon: {
+  buttonIcon: {
     marginRight: SPACING.sm,
   },
-
   primaryButtonText: {
     color: COLORS.onPrimary,
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: "700",
   },
-
   disabledButton: {
     opacity: 0.6,
   },
-
   cancelButton: {
-    minHeight: TOUCH_TARGET,
+    minHeight: FIELD_HEIGHT,
     paddingHorizontal: SPACING.lg,
     borderWidth: 1,
-    borderColor: COLORS.primary,
+    borderColor: COLORS.border,
     borderRadius: RADIUS.md,
     marginTop: SPACING.sm,
-
     alignItems: "center",
     justifyContent: "center",
-
     backgroundColor: COLORS.surface,
   },
-
   cancelText: {
-    color: COLORS.primary,
-    fontSize: 14,
+    color: COLORS.textSecondary,
+    fontSize: 15,
     fontWeight: "700",
   },
 });

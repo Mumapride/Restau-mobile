@@ -21,9 +21,7 @@ const Students = () => {
         const data = await getStudents();
         if (!cancelled) {
           setRows(data.rows || []);
-          setRegisteredTotal(
-            typeof data.registeredTotal === "number" ? data.registeredTotal : null
-          );
+          setRegisteredTotal(typeof data.registeredTotal === "number" ? data.registeredTotal : null);
           setError("");
         }
       } catch (err) {
@@ -50,9 +48,7 @@ const Students = () => {
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
             {loading
               ? "Loading…"
-              : `${filtered.length}${
-                  registeredTotal !== null ? ` of ${registeredTotal}` : ""
-                } shown`}
+              : `${filtered.length}${registeredTotal !== null ? ` of ${registeredTotal}` : ""} shown`}
           </span>
         </div>
         <div className="relative w-full sm:w-80">
@@ -73,11 +69,9 @@ const Students = () => {
           <Info className="h-3.5 w-3.5" strokeWidth={2.25} />
         </div>
         <p className="text-xs leading-relaxed text-slate-600">
-          The backend exposes no dedicated student-listing endpoint. Records are
-          assembled from the subscriptions feed, with names resolved from the
-          meal-claims feed. Students with neither a subscription nor a claim
-          cannot be surfaced by the API, so this list may be a subset of all
-          registered students.
+          The backend exposes no dedicated student-listing endpoint. Records are assembled from the subscriptions feed,
+          with names resolved from the meal-claims feed. Students with neither a subscription nor a claim cannot be
+          surfaced by the API, so this list may be a subset of all registered students.
         </p>
       </div>
 
@@ -121,13 +115,9 @@ const Students = () => {
                           </div>
                           <div className="min-w-0">
                             <p className="truncate font-medium text-slate-900">
-                              {hasName
-                                ? `${s.firstName || ""} ${s.lastName || ""}`.trim()
-                                : <span className="text-slate-400">—</span>}
+                              {hasName ? `${s.firstName || ""} ${s.lastName || ""}`.trim() : <span className="text-slate-400">—</span>}
                             </p>
-                            <p className="truncate text-[11px] text-slate-400">
-                              {s.matricule || ""}
-                            </p>
+                            <p className="truncate text-[11px] text-slate-400">{s.matricule || ""}</p>
                           </div>
                         </div>
                       </td>

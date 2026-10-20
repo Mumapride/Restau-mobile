@@ -1,30 +1,66 @@
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import {
+  Image,
+  Pressable,
+  StyleSheet,
+  StatusBar,
+  View,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { COLORS, RADIUS, SPACING, TOUCH_TARGET } from '../theme/tokens';
+import useAuthStore from '../store/useAuthStore';
+import { COLORS, SPACING } from '../theme/tokens';
+import Avatar from './Avatar';
 
-const DASHBOARD_PRIMARY = '#16A36A';
-export const STUDENT_TOP_BAR_HEIGHT = 52;
+// Real brand asset (mobile/assets/brand/restau-logo.png).
+// eslint-disable-next-line import/no-unresolved
+const RESTAU_LOGO = require('../../assets/brand/restau-logo.png');
+
+export const STUDENT_TOP_BAR_HEIGHT = 56;
 
 /**
- * StudentTopBar — the fixed Restau Mobile app bar for student screens.
+ * StudentTopBar — shared, compact student app bar.
  *
- * The safe-area strip remains neutral so the native Android status bar stays
- * visually separate. The branded gradient begins below that strip.
+ * Layout (one row, fixed height):
+ *   [RESTAU logo]  [spacer]  [Notifications bell]  [Profile avatar]
+ *
+ * Blends into the screen: white background, no gradient, no strong
+ * border or shadow. Safe-area aware.
  */
 export default function StudentTopBar({
   navigation,
-  title = 'Restau Mobile',
-  subtitle,
+  onNotifications,
+  onProfile,
   showBack = false,
   onBack,
   rightAction,
 }) {
   const insets = useSafeAreaInsets();
-  const canOpenProfile = Boolean(navigation?.navigate);
+  const { user } = useAuthStore();
+
+  const firstName = user?.firstName || '';
+  const lastName = user?.lastName || '';
+  const initials = [firstName, lastName]
+    .filter(Boolean)
+    .map((name) => name.charAt(0))
+    .join('')
+    .toUpperCase() || '?';
+
+  const hasNotificationsRoute = Boolean(
+    navigation?.getState?.()?.routeNames?.includes('Notifications'),
+  );
+
+  const handleNotifications = onNotifications
+    ? onNotifications
+    : hasNotificationsRoute
+      ? () => navigation.navigate('Notifications')
+      : undefined;
+
+  const handleProfile = onProfile
+    ? onProfile
+    : () => navigation?.navigate('Profile');
 
   const handleBack = () => {
     if (onBack) {
@@ -36,73 +72,73 @@ export default function StudentTopBar({
 
   return (
     <View style={[styles.root, { paddingTop: insets.top }]}>
-      <LinearGradient
-        colors={[COLORS.primary, DASHBOARD_PRIMARY]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.gradient}
-      >
-        <View style={styles.content}>
-          <View style={styles.leftGroup}>
-            {showBack ? (
+      <StatusBar
+        barStyle="dark-content"
+        backgroundColor={COLORS.surface}
+        animated
+      />
+      <View style={styles.bar}>
+        {showBack ? (
+          <Pressable
+            onPress={handleBack}
+            accessible
+            accessibilityRole="button"
+            accessibilityLabel="Go back"
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            style={styles.backButton}
+          >
+            <Ionicons name="chevron-back" size={20} color={COLORS.text} />
+          </Pressable>
+        ) : (
+          <Image
+            source={RESTAU_LOGO}
+            style={styles.logo}
+            resizeMode="contain"
+            accessibilityLabel="Restau"
+          />
+        )}
+        <View style={styles.spacer} />
+        {rightAction !== undefined ? (
+          rightAction
+        ) : (
+          <View style={styles.actions}>
+            {handleNotifications ? (
               <Pressable
-                onPress={handleBack}
-                accessibilityRole="button"
-                accessibilityLabel="Go back"
-                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                style={({ pressed }) => [
-                  styles.backButton,
-                  pressed && styles.backButtonPressed,
-                ]}
-              >
-                <Ionicons name="chevron-back" size={22} color={COLORS.onPrimary} />
-              </Pressable>
-            ) : null}
-
-            <View style={styles.titleWrap}>
-              <Text style={styles.title} numberOfLines={1}>
-                {title}
-              </Text>
-              {subtitle ? (
-                <Text style={styles.subtitle} numberOfLines={1}>
-                  {subtitle}
-                </Text>
-              ) : null}
-            </View>
-          </View>
-
-          {rightAction !== undefined ? (
-            rightAction
-          ) : (
-            <View style={styles.actions}>
-              <View
-                style={styles.notificationIcon}
+                onPress={handleNotifications}
                 accessible
+                accessibilityRole="button"
                 accessibilityLabel="Notifications"
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                style={styles.iconButton}
               >
-                <Ionicons name="notifications-outline" size={18} color={COLORS.onPrimary} />
+                <Ionicons
+                  name="notifications-outline"
+                  size={20}
+                  color={COLORS.textSecondary}
+                />
+              </Pressable>
+            ) : (
+              <View style={styles.iconButton}>
+                <Ionicons
+                  name="notifications-outline"
+                  size={20}
+                  color={COLORS.textSecondary}
+                />
               </View>
-              {canOpenProfile ? (
-                <Pressable
-                  onPress={() => navigation.navigate('Profile')}
-                  accessibilityRole="button"
-                  accessibilityLabel="Open profile"
-                  style={({ pressed }) => [
-                    styles.profileButton,
-                    pressed && styles.profileButtonPressed,
-                  ]}
-                >
-                  <Ionicons name="person-outline" size={18} color={COLORS.onPrimary} />
-                </Pressable>
-              ) : (
-                <View style={styles.profileButton} accessible accessibilityLabel="Profile">
-                  <Ionicons name="person-outline" size={18} color={COLORS.onPrimary} />
-                </View>
-              )}
-            </View>
-          )}
-        </View>
-      </LinearGradient>
+            )}
+            <Pressable
+              onPress={handleProfile}
+              accessible
+              accessibilityRole="button"
+              accessibilityLabel="Open profile"
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              style={styles.avatarButton}
+            >
+              <Avatar size={32} initials={initials} />
+            </Pressable>
+          </View>
+        )}
+      </View>
     </View>
   );
 }
@@ -111,82 +147,43 @@ const styles = StyleSheet.create({
   root: {
     flexShrink: 0,
     width: '100%',
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.surface,
   },
-  gradient: {
-    minHeight: STUDENT_TOP_BAR_HEIGHT,
-    justifyContent: 'center',
-    paddingVertical: 2,
-  },
-  content: {
-    width: '100%',
-    maxWidth: 680,
-    minHeight: STUDENT_TOP_BAR_HEIGHT,
-    paddingHorizontal: SPACING.lg,
-    paddingVertical: 2,
-    alignSelf: 'center',
+  bar: {
+    height: STUDENT_TOP_BAR_HEIGHT,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    gap: SPACING.md,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.xs,
+    backgroundColor: 'transparent',
   },
-  leftGroup: {
-    flex: 1,
-    minWidth: 0,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
+  logo: {
+    width: 110,
+    height: 28,
+    resizeMode: 'contain',
   },
   backButton: {
-    width: 42,
-    height: 42,
-    borderRadius: RADIUS.md,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.16)',
+    padding: 6,
   },
-  backButtonPressed: {
-    opacity: 0.72,
-    transform: [{ scale: 0.96 }],
-  },
-  titleWrap: {
+  spacer: {
     flex: 1,
     minWidth: 0,
   },
   title: {
-    color: COLORS.onPrimary,
-    fontSize: 18,
-    lineHeight: 22,
+    fontSize: 16,
+    lineHeight: 20,
     fontWeight: '600',
-    letterSpacing: -0.2,
-  },
-  subtitle: {
-    color: COLORS.onPrimaryMuted,
-    fontSize: 12,
-    lineHeight: 16,
-    fontWeight: '400',
-    marginTop: 2,
   },
   actions: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: SPACING.xs,
+    gap: SPACING.sm,
   },
-  notificationIcon: {
-    width: TOUCH_TARGET,
-    height: TOUCH_TARGET,
-    alignItems: 'center',
-    justifyContent: 'center',
+  iconButton: {
+    padding: 6,
   },
-  profileButton: {
-    width: TOUCH_TARGET,
-    height: TOUCH_TARGET,
-    borderRadius: RADIUS.md,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.12)',
-  },
-  profileButtonPressed: {
-    opacity: 0.72,
+  avatarButton: {
+    padding: 4,
   },
 });
