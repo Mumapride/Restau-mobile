@@ -41,6 +41,20 @@ model Admin {
   email  String @unique
   userId Int    @unique
   user   User   @relation(fields: [userId], references: [id])
+
+  announcements Announcement[]
+}
+
+model Announcement {
+  id          Int      @id @default(autoincrement())
+  title       String
+  body        String   @db.Text
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  adminId     Int
+
+  admin       Admin    @relation(fields: [adminId], references: [id])
 }
 model Semester {
   id            Int            @id @default(autoincrement())

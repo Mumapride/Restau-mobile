@@ -37,6 +37,14 @@ const STATUS_CONFIG = {
     label: "Claimed",
     classes: "bg-success/15 text-success border-success/30",
   },
+  PUBLISHED: {
+    label: "Published",
+    classes: "bg-primary/15 text-primary border-primary/30",
+  },
+  DRAFT: {
+    label: "Draft",
+    classes: "bg-border text-text-muted border-border",
+  },
 };
 
 // Accept lowercase aliases used by some callers.

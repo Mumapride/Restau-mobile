@@ -1,7 +1,10 @@
 ﻿import React from "react";
 import { Routes, Route } from "react-router-dom";
 import Dashboard from "./pages/Dashboard.jsx";
+import Home from "./pages/Home.jsx";
 import MealPlans from "./pages/MealPlans.jsx";
+import WeeklyMenu from "./pages/WeeklyMenu.jsx";
+import Announcements from "./pages/Announcements.jsx";
 import Semesters from "./pages/Semesters.jsx";
 import Students from "./pages/Students.jsx";
 import Subscriptions from "./pages/Subscriptions.jsx";
@@ -25,6 +28,7 @@ const AdminPage = ({ title, breadcrumb, children }) => (
 export default function App() {
   return (
     <Routes>
+      <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
 
       <Route
@@ -43,6 +47,24 @@ export default function App() {
           </AdminPage>
         }
       />
+      <Route
+        path="/weekly-menu"
+        element={
+          <AdminPage title="Weekly Menu" breadcrumb={["Weekly Menu"]}>
+            <WeeklyMenu />
+          </AdminPage>
+        }
+      />
+
+      <Route
+        path="/announcements"
+        element={
+          <AdminPage title="Announcements" breadcrumb={["Announcements"]}>
+            <Announcements />
+          </AdminPage>
+        }
+      />
+
       <Route
         path="/semesters"
         element={

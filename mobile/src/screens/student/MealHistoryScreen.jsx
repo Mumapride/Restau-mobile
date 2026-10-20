@@ -19,10 +19,9 @@ import StudentTopBar from '../../components/StudentTopBar';
 import AppButton from '../../components/AppButton';
 import { COLORS, RADIUS, SHADOWS } from '../../theme/tokens';
 
-const DASHBOARD_PRIMARY = '#16A36A';
-const DASHBOARD_DARK_GREEN = '#15803D';
-const DASHBOARD_LIGHT_GREEN = '#DCFCE7';
-const DASHBOARD_BACKGROUND = '#F8FAFC';
+const DASHBOARD_DARK_GREEN = COLORS.primary;
+const DASHBOARD_LIGHT_GREEN = COLORS.primaryLight;
+const DASHBOARD_BACKGROUND = COLORS.background;
 const DASHBOARD_TEXT = '#0F172A';
 const DASHBOARD_TEXT_SECONDARY = '#64748B';
 const DASHBOARD_BORDER = '#E2E8F0';
