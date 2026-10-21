@@ -18,6 +18,7 @@ const router = express.Router();
 
 router.post('/scan', protect, requireRole('SCANNER'), scanQR);
 router.get('/my-claims', protect, requireRole('STUDENT'), getMyClaims);
+router.get('/my-history', protect, requireRole('STUDENT'), getMyClaims);
 
 router.get(
   "/",

@@ -409,7 +409,7 @@ export default function Announcements() {
             </button>
             <button
               type="submit"
-              disabled={saving || !title.trim() || !body.trim()}
+              disabled={saving}
               className={`${BTN_MD} ${BTN_PRIMARY}`}
             >
               {saving && <Spinner />}

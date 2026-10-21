@@ -7,7 +7,6 @@ import {
   Text,
   View,
 } from 'react-native';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -81,9 +80,7 @@ export default function StudentTabBar({ state, navigation }) {
           return (
             <Pressable
               key={route.key}
-               meta={meta}
               focused={focused}
-              badge={options.tabBarBadge}
               onPress={onPress}
               onLongPress={onLongPress}
               accessibilityRole="tab"

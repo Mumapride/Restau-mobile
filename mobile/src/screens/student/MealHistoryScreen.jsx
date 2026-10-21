@@ -109,7 +109,7 @@ export default function MealHistoryScreen({ navigation }) {
 
       try {
         const response = await axios.get(
-          `${BASE_URL}/meal-claims/student/${user.studentId}`,
+         `${BASE_URL}/meal-claims/my-history`,
           {
             headers: { Authorization: `Bearer ${token}` },
             timeout: 15000,

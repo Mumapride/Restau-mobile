@@ -44,19 +44,15 @@ model Admin {
   userId Int    @unique
   user   User   @relation(fields: [userId], references: [id])
 
-  announcements Announcement[]
 }
 
 model Announcement {
   id          Int      @id @default(autoincrement())
-  title       String
+  title       String   @db.VarChar(191)
   body        String   @db.Text
   isPublished Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  adminId     Int
-
-  admin       Admin    @relation(fields: [adminId], references: [id])
 }
 model Scanner {
   id        Int    @id @default(autoincrement())

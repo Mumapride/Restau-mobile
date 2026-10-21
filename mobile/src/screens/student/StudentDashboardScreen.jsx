@@ -501,19 +501,19 @@ export default function StudentDashboardScreen({ navigation }) {
   }, [token]);
 
   const fetchAnnouncements = useCallback(async () => {
-    try {
-      const data = await getAnnouncements(3);
-      setAnnouncements(Array.isArray(data) ? data : []);
-      setAnnouncementsError('');
-    } catch (err) {
-      console.error('DASHBOARD ANNOUNCEMENTS REQUEST FAILED:', err);
-      setAnnouncements([]);
-      setAnnouncementsError(
-        err.response?.data?.message ||
-          'Announcements temporarily unavailable.',
-      );
-    }
-  }, []);
+  try {
+    const data = await getAnnouncements(3, token);
+    setAnnouncements(Array.isArray(data) ? data : []);
+    setAnnouncementsError('');
+  } catch (err) {
+    console.error('DASHBOARD ANNOUNCEMENTS REQUEST FAILED:', err);
+    setAnnouncements([]);
+    setAnnouncementsError(
+      err.response?.data?.message ||
+        'Announcements temporarily unavailable.',
+    );
+  }
+  }, [token]);
 
   const loadDashboard = useCallback(
     async (isRefresh = false) => {
