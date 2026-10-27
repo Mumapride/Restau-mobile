@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const BASE_URL = 'http://172.20.10.3:5000/api';
+export const BASE_URL = 'https://restau-mobile-production.up.railway.app';
 
 const api = axios.create({
   baseURL: BASE_URL,
